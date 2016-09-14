@@ -6,9 +6,12 @@ class OccurrencesController < ApplicationController
   end
 
   def create
-    occurrence = Occurrence.new(occurrence_params)
+    patch = Patch.find_or_create_by!(name: params[:occurrence][:pumpkin_patch])
+
+    occurrence = patch.occurrences.new(occurrence_params)
     occurrence.data = params[:occurrence][:data]
     occurrence.save!
+
     render json: occurrence
   end
 
