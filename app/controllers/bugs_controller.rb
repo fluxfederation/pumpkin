@@ -1,11 +1,8 @@
 class BugsController < ApplicationController
   def index
-    bugs = if params[:patch_id]
-      Patch.find(params[:patch_id]).bugs
-    else
-      Bug.all
-    end
-
+    bugs = Bug.all
+    bugs = bugs.where(:id => params[:ids]) if params[:ids]
+    bugs = bugs.join(:primary_occurrence).merge(Occurrence.where(:patch_id => params[:patch_ids])) if params[:patch_ids]
     render json: bugs, include: []
   end
 
