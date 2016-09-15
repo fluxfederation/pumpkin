@@ -14,7 +14,7 @@ class OccurrencesController < ApplicationController
 
     AssignBugsJob.perform_later(occurrence)
 
-    render json: occurrence
+    render json: occurrence, include: []
   end
 
   private

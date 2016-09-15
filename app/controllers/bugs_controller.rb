@@ -6,6 +6,11 @@ class BugsController < ApplicationController
       Bug.all
     end
 
-    render json: bugs
+    render json: bugs, include: []
+  end
+
+  def show
+    bug = Bug.find(params[:id])
+    render json: bug
   end
 end

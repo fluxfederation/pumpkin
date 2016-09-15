@@ -1,9 +1,5 @@
 class PatchesController < ApplicationController
   def index
-    render json: Patch.all
-  end
-
-  def show
-    render json: Patch.find(params[:id])
+    render json: Patch.all, include: []
   end
 end
