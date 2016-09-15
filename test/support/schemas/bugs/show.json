@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "id":{"type":"string"},
+    "message":{"type":"string"},
+    "first_occurred_at":{"type":"string"},
+    "last_occurred_at":{"type":"string"},
+    "patch_id": { "type": "string" },
+    "data": { "type": "object" },
+    "occurrences": {
+      "type": "array",
+      "properties": {
+        "id":{"type":"string"}
+      },
+      "minItems": 1
+    }
+  },
+  "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id", "data", "occurrences"]
+}

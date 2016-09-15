@@ -10,5 +10,6 @@
       "patch_id": { "type": "string" }
     },
     "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id"]
-  }
+  },
+  "minItems": 1
 }
