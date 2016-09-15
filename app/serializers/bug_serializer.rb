@@ -1,5 +1,5 @@
 class BugSerializer < ActiveModel::Serializer
-  attributes :id, :message, :occurred_at, :data
+  attributes :id, :message, :first_occurred_at, :last_occurred_at, :data
 
   has_many :occurrences
 
@@ -11,8 +11,12 @@ class BugSerializer < ActiveModel::Serializer
     object.primary_occurrence.message
   end
 
-  def occurred_at
+  def first_occurred_at
     object.primary_occurrence.occurred_at
+  end
+
+  def last_occurred_at
+    object.occurrences.order("occurred_at DESC").first.occurred_at
   end
 
   def data
