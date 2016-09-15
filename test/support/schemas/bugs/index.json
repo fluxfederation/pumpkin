@@ -6,8 +6,9 @@
       "id":{"type":"string"},
       "message":{"type":"string"},
       "first_occurred_at":{"type":"string"},
-      "last_occurred_at":{"type":"string"}
+      "last_occurred_at":{"type":"string"},
+      "patch_id": { "type": "string" }
     },
-    "required":["id", "message", "first_occurred_at", "last_occurred_at"]
+    "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id"]
   }
 }
