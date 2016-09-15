@@ -8,6 +8,6 @@ class BugsController < ApplicationController
 
   def show
     bug = Bug.find(params[:id])
-    render json: bug
+    render json: bug, serializer: FullBugSerializer
   end
 end
