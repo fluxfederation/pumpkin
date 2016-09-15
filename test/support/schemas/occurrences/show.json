@@ -1,0 +1,18 @@
+{
+  "id": "file://occurrences/show.json",
+  "type": "object",
+  "attributes": {
+    "id": { "type": "string" },
+    "message": { "type": "string" },
+    "data": { "type": "object" },
+    "patch": {
+      "type": "object",
+      "attributes": {
+        "id": { "type": "string" },
+        "name": { "type": "string" }
+      },
+      "required": ["id", "name"]
+    }
+  },
+  "required": ["id", "message", "data", "patch"]
+}

@@ -1,0 +1,7 @@
+{
+  "type": "object",
+  "attributes": {
+    "$ref": "file://occurrences/show.json"
+  },
+  "required": ["id", "message", "data", "patch"]
+}

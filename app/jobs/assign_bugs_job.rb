@@ -1,10 +1,6 @@
 class AssignBugsJob < ApplicationJob
   queue_as :default
 
-  rescue_from(Exception) do |exception|
-    puts exception.inspect
-  end
-
   def perform(*args)
     occurrence = args[0]
     occurrence.with_lock do
