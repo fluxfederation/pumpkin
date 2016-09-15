@@ -1,0 +1,13 @@
+{
+  "type":"array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id":{"type":"string"},
+      "message":{"type":"string"},
+      "first_occurred_at":{"type":"string"},
+      "last_occurred_at":{"type":"string"}
+    },
+    "required":["id", "message", "first_occurred_at", "last_occurred_at"]
+  }
+}
