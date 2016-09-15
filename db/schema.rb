@@ -10,11 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160914233416) do
+ActiveRecord::Schema.define(version: 20160915001629) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "bugs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid     "primary_occurrence_id"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+    t.index ["primary_occurrence_id"], name: "index_bugs_on_primary_occurrence_id", using: :btree
+  end
 
   create_table "occurrences", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string   "message"
@@ -23,6 +30,8 @@ ActiveRecord::Schema.define(version: 20160914233416) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.uuid     "patch_id"
+    t.uuid     "bug_id"
+    t.index ["bug_id"], name: "index_occurrences_on_bug_id", using: :btree
     t.index ["patch_id"], name: "index_occurrences_on_patch_id", using: :btree
   end
 

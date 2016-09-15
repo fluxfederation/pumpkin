@@ -12,6 +12,8 @@ class OccurrencesController < ApplicationController
     occurrence.data = params[:occurrence][:data]
     occurrence.save!
 
+    AssignBugsJob.perform_later(occurrence)
+
     render json: occurrence
   end
 
