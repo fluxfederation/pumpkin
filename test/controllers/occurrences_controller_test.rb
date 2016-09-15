@@ -5,7 +5,7 @@ class OccurrencesControllerTest < ActionDispatch::IntegrationTest
   include ActiveModelSerializers::Test::Schema
 
   test "show" do
-    get occurrence_path(occurrences(:normal))
+    get occurrence_path(occurrences(:prod_normal))
     assert_response :success
     assert_response_schema "occurrences/show.json"
   end

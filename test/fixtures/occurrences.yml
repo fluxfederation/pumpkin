@@ -1,6 +1,27 @@
-normal:
-  patch: normal
-  bug: normal
+qa_normal:
+  patch: qa
+  bug: qa_normal
+  occurred_at: "2016-01-01"
+  message: "Strictly testing normal occurrence"
+  data: {"admin_id":5}
+
+prod_normal:
+  patch: prod
+  bug: prod_normal
   occurred_at: "2016-01-01"
   message: "Very normal occurrence"
-  data: {}
+  data: {"admin_id":5}
+
+prod_twice1:
+  patch: prod
+  bug: prod_twice
+  occurred_at: "2016-01-01"
+  message: "Pumpkin"
+  data: {"admin_id":6}
+
+prod_twice2:
+  patch: prod
+  bug: prod_twice
+  occurred_at: "2016-01-02"
+  message: "Pumpkin"
+  data: {"admin_id":1}

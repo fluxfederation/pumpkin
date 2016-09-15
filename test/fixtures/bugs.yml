@@ -1,2 +1,8 @@
-normal:
-  primary_occurrence: normal
+qa_normal:
+  primary_occurrence: qa_normal
+
+prod_normal:
+  primary_occurrence: prod_normal
+
+prod_twice:
+  primary_occurrence: prod_twice1
