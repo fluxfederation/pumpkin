@@ -12,6 +12,18 @@ prod_normal:
   message: "Very normal occurrence"
   data: {"admin_id":5}
 
+prod_normal_unassigned:
+  patch: prod
+  occurred_at: "2016-01-02"
+  message: "Very normal occurrence"
+  data: {"admin_id":5}
+
+prod_new_unassigned:
+  patch: prod
+  occurred_at: "2016-01-02"
+  message: "It's a whole new world"
+  data: {"admin_id":5}
+
 prod_twice1:
   patch: prod
   bug: prod_twice
