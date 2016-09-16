@@ -7,9 +7,10 @@
       "message":{"type":"string"},
       "first_occurred_at":{"type":"string"},
       "last_occurred_at":{"type":"string"},
-      "patch_id": { "type": "string" }
+      "patch_id": { "type": "string" },
+      "occurrence_count": { "type": "number" }
     },
-    "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id"]
+    "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id", "occurrence_count"]
   },
   "minItems": 1
 }
