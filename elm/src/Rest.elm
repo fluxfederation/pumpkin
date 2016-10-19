@@ -9,10 +9,10 @@ import Date
 -- URLs
 
 patchesUrl : String
-patchesUrl = "http://localhost:5678/patches"
+patchesUrl = "/patches"
 
 bugsUrl : String
-bugsUrl = "http://localhost:5678/bugs"
+bugsUrl = "/bugs"
 
 bugDetailsUrl : String -> String
 bugDetailsUrl bugId = bugsUrl ++ "/" ++ bugId

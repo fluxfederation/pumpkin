@@ -9178,7 +9178,7 @@ var _user$project$Rest$decodeBugDetails = A8(
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'last_occurred_at', _user$project$Rest$date),
 	_user$project$Rest$stacktrace,
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'occurrence_count', _elm_lang$core$Json_Decode$int));
-var _user$project$Rest$bugsUrl = 'http://localhost:5678/bugs';
+var _user$project$Rest$bugsUrl = '/bugs';
 var _user$project$Rest$bugDetailsUrl = function (bugId) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -9206,7 +9206,7 @@ var _user$project$Rest$loadBugs = A2(
 		_elm_lang$core$Result$Err,
 		_elm_lang$core$Result$Ok,
 		A2(_evancz$elm_http$Http$get, _user$project$Rest$decodeBugs, _user$project$Rest$bugsUrl)));
-var _user$project$Rest$patchesUrl = 'http://localhost:5678/patches';
+var _user$project$Rest$patchesUrl = '/patches';
 var _user$project$Rest$loadPatches = A2(
 	_elm_lang$core$Platform_Cmd$map,
 	_user$project$Types$LoadedPatches,
