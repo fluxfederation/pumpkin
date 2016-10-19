@@ -2,6 +2,7 @@ class BugSerializer < ActiveModel::Serializer
   attributes :id, :message, :first_occurred_at, :last_occurred_at, :patch_id, :occurrence_count
 
   has_many :occurrences
+  belongs_to :latest_event
 
   class OccurrenceSerializer < ActiveModel::Serializer
     attributes :id

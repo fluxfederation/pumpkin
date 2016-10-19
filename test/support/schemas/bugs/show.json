@@ -13,7 +13,14 @@
         "id":{"type":"string"}
       },
       "minItems": 1
+    },
+    "latest_event": {
+      "type": "object",
+      "properties": {
+        "name": { "type":"string" }
+      },
+      "required": ["name"]
     }
   },
-  "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id", "data", "occurrences"]
+  "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id", "data", "occurrences", "latest_event"]
 }
