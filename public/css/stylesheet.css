@@ -1,0 +1,23 @@
+div.bug {
+  width: 100%;
+  height: 60px;
+  padding: 4px;
+  box-sizing: border-box;
+  border-radius: 2px;
+}
+
+div.bug:hover {
+  background: #ddd;
+}
+
+div.bug.is-active {
+  background: #eee;
+}
+
+div.stacktrace {
+  height: 400px;
+  overflow-y: scroll;
+  border-left: 4px solid #ccc;
+  padding-left: 10px;
+  background: #eee;
+}
