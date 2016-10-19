@@ -15,6 +15,7 @@ class AssignBugsJobTest < ActiveJob::TestCase
       AssignBugsJob.perform_now(occurrence)
     end
     bug = occurrence.bug
+    assert_equal 'created', bug.events.first!.name
     assert_equal occurrence, bug.primary_occurrence
   end
 end

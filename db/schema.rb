@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160915022656) do
+ActiveRecord::Schema.define(version: 20161019211306) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,14 @@ ActiveRecord::Schema.define(version: 20160915022656) do
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
     t.index ["primary_occurrence_id"], name: "index_bugs_on_primary_occurrence_id", using: :btree
+  end
+
+  create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.integer  "bug_id",     null: false
+    t.string   "name",       null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bug_id"], name: "index_events_on_bug_id", using: :btree
   end
 
   create_table "occurrences", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
