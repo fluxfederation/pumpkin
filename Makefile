@@ -11,3 +11,6 @@ clean-deps:
 clean:
 	rm -f public/js/app.js
 	rm -rf ./elm/elm-stuff/build-artifacts
+
+watch:
+	fswatch elm/src/ | while read; do make; done
