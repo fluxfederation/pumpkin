@@ -10,4 +10,10 @@ class BugsController < ApplicationController
     bug = Bug.find(params[:id])
     render json: bug, serializer: FullBugSerializer
   end
+
+  def close
+    bug = Bug.find(params[:id])
+    bug.events.create!(name: 'closed')
+    render json: bug, serializer: FullBugSerializer
+  end
 end

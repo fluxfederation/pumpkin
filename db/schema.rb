@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 20161019211306) do
   end
 
   create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.integer  "bug_id",     null: false
+    t.uuid     "bug_id",     null: false
     t.string   "name",       null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

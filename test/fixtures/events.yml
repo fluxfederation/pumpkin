@@ -1,7 +1,11 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+qa_normal_created:
+  bug: qa_normal
+  name: "created"
 
-# one:
-#   name: MyString
+prod_normal_created:
+  bug: prod_normal
+  name: "created"
 
-# two:
-#   name: MyString
+prod_twice_created:
+  bug: prod_twice
+  name: "created"

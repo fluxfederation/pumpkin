@@ -26,4 +26,11 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_response_schema "bugs/show.json"
   end
+
+  test "close" do
+    post close_bug_path(bugs(:prod_normal))
+    assert_response :success
+    assert_response_schema "bugs/show.json"
+    assert_equal "closed", bugs(:prod_normal).events.created_order.last!.name
+  end
 end
