@@ -1,8 +1,7 @@
 class BugSerializer < ActiveModel::Serializer
-  attributes :id, :message, :first_occurred_at, :last_occurred_at, :patch_id, :occurrence_count
+  attributes :id, :message, :first_occurred_at, :last_occurred_at, :patch_id, :occurrence_count, :closed_at
 
   has_many :occurrences
-  belongs_to :latest_event
 
   class OccurrenceSerializer < ActiveModel::Serializer
     attributes :id
@@ -22,5 +21,10 @@ class BugSerializer < ActiveModel::Serializer
 
   def occurrence_count
     object.occurrences.count
+  end
+
+  def closed_at
+    return unless object.latest_event.try!(:name) == "closed"
+    object.latest_event.created_at
   end
 end

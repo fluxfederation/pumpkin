@@ -8,16 +8,10 @@
       "first_occurred_at":{"type":"string"},
       "last_occurred_at":{"type":"string"},
       "patch_id": { "type": "string" },
-      "occurrence_count": { "type": "number" },
-      "latest_event": {
-        "type": "object",
-        "properties": {
-          "name": { "type":"string" }
-        },
-        "required": ["name"]
-      }
+      "closed_at": { "type": ["string", "null"] },
+      "occurrence_count": { "type": "number" }
     },
-    "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id", "occurrence_count", "latest_event"]
+    "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id", "closed_at", "occurrence_count"]
   },
   "minItems": 1
 }
