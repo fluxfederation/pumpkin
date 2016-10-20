@@ -29,8 +29,7 @@ detailsView bugDetails =
             bugDetails.latestEvent.name == "closed"
     in
         div
-            [ class "column bug-pane"
-            ]
+            [ class "bug-pane" ]
             [ h5 [ class "title is-5" ] [ text bugDetails.message ]
             , table [ class "table" ]
                 [ tr []
