@@ -16,5 +16,12 @@ class BugTest < ActiveSupport::TestCase
     bug = Bug.with_latest_details.find(bugs(:prod_twice).id)
     assert_equal event, bug.latest_event
     assert_equal occurrence.occurred_at, bug.last_occurred_at
+
+    # doesnt look at occurrences for other bugs
+    occurrence2 = occurrences(:prod_normal).dup
+    occurrence2.update_attributes! occurred_at: Time.zone.now
+    bug = Bug.with_latest_details.find(bugs(:prod_twice).id)
+    assert_equal event, bug.latest_event
+    assert_equal occurrence.occurred_at, bug.last_occurred_at
   end
 end
