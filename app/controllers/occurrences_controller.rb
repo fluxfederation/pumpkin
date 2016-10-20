@@ -2,7 +2,7 @@ class OccurrencesController < ApplicationController
 
   def show
     occurrence = Occurrence.find(params[:id])
-    render json: occurrence
+    render json: occurrence, include: [:patch]
   end
 
   def create
@@ -14,7 +14,7 @@ class OccurrencesController < ApplicationController
 
     AssignBugsJob.perform_later(occurrence)
 
-    render json: occurrence
+    render json: occurrence, include: [:patch]
   end
 
   private

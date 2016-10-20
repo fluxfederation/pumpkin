@@ -16,10 +16,6 @@ class BugSerializer < ActiveModel::Serializer
     object.primary_occurrence.occurred_at
   end
 
-  def last_occurred_at
-    object.occurrences.order("occurred_at DESC").first.occurred_at
-  end
-
   def patch_id
     object.primary_occurrence.patch.id
   end
