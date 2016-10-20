@@ -3,6 +3,11 @@ class BugsController < ApplicationController
     bugs = Bug.with_latest_details.includes({:occurrences => :patch}, {:primary_occurrence => :patch})
     bugs = bugs.where(:id => params[:ids]) if params[:ids]
     bugs = bugs.joins(:primary_occurrence).merge(Occurrence.where(:patch_id => params[:patch_ids])) if params[:patch_ids]
+    if params[:closed] == "true"
+      bugs = bugs.where("ev_latest.name = ?", "closed")
+    else
+      bugs = bugs.where("ev_latest.name <> ?", "closed")
+    end
     render json: bugs, include: []
   end
 

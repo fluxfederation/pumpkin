@@ -6,3 +6,6 @@ prod_normal:
 
 prod_twice:
   primary_occurrence: prod_twice1
+
+prod_closed:
+  primary_occurrence: prod_closed

@@ -37,3 +37,10 @@ prod_twice2:
   occurred_at: "2016-01-02"
   message: "Pumpkin"
   data: {"admin_id":1}
+
+prod_closed:
+  patch: prod
+  bug: prod_closed
+  occurred_at: "2016-01-01"
+  message: "Very closed occurrence"
+  data: {"admin_id":5}

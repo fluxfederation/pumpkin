@@ -9,3 +9,13 @@ prod_normal_created:
 prod_twice_created:
   bug: prod_twice
   name: "created"
+
+prod_closed_created:
+  bug: prod_closed
+  name: "created"
+  created_at: "2016-01-01"
+
+prod_closed_closed:
+  bug: prod_closed
+  name: "closed"
+  created_at: "2016-01-02"
