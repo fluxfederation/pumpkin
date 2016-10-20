@@ -7,6 +7,9 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
     get bugs_path
     assert_response :success
     assert_response_schema "bugs/index.json"
+
+    event_times = JSON::parse(@response.body).map { |bug| Time.parse(bug['last_occurred_at']) }
+    assert_equal event_times, event_times.sort.reverse
   end
 
   test "index with bug filtering" do
