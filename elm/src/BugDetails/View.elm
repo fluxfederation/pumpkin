@@ -18,6 +18,10 @@ root focusedBug =
             detailsView bugDetails
 
 
+timestamp ts =
+    (DF.format "%e %b %Y %H:%m:%S" ts)
+
+
 detailsView : Details -> Html Msg
 detailsView bugDetails =
     let
@@ -28,8 +32,16 @@ detailsView bugDetails =
             [ class "column bug-pane"
             ]
             [ h5 [ class "title is-5" ] [ text bugDetails.message ]
-            , div [] [ text ("Last occurred at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.lastOccurredAt)) ]
-            , div [] [ text ("First occured at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.firstOccurredAt)) ]
+            , table [ class "table" ]
+                [ tr []
+                    [ th [] [ text "Last occurred at" ]
+                    , td [] [ text <| timestamp bugDetails.lastOccurredAt ]
+                    ]
+                , tr []
+                    [ th [] [ text "First occurred at" ]
+                    , td [] [ text <| timestamp bugDetails.firstOccurredAt ]
+                    ]
+                ]
             , div [] [ button [ disabled (closed), onClick (CloseBug bugDetails.id), classList [ ( "button", True ), ( "is-danger", True ) ] ] [ text "Close" ] ]
             , br [] []
             , div [ class "stacktrace" ] [ text (String.join ",\n" bugDetails.stackTrace) ]
