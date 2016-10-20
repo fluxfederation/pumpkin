@@ -60,7 +60,7 @@ decodeBug =
         ("first_occurred_at" := date)
         ("last_occurred_at" := date)
         ("occurrence_count" := int)
-        ("latest_event" := event)
+        ("closed_at" := (maybe date))
         (stacktrace)
 
 

@@ -5,7 +5,6 @@ import Html.App
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Date.Format as DF
-import String
 import Types exposing (..)
 
 
@@ -46,7 +45,7 @@ bugs : Model -> Html Msg
 bugs model =
     div [ class "section" ]
         [ div [ class "columns" ]
-            [ div [ class "column is-6" ] (bugListView model)
+            [ div [ class "column is-6" ] (bugList model)
             , div [ class "column is-6" ] (bugPane model)
             ]
         ]
@@ -60,7 +59,7 @@ bugPane model =
 
         Just bug ->
             [ div [ class "box" ]
-                [ detailsView bug ]
+                [ bugDetails bug ]
             ]
 
 
@@ -92,8 +91,8 @@ patchButton selectedPatchIds project =
             [ text project.name ]
 
 
-bugListView : Model -> List (Html Msg)
-bugListView model =
+bugList : Model -> List (Html Msg)
+bugList model =
     let
         shouldShowBug =
             (\bug -> List.member bug.patchId model.selectedPatchIds)
@@ -110,11 +109,8 @@ bugRow currentBug bug =
         isActive =
             Maybe.withDefault False <| Maybe.map (\otherBug -> otherBug.id == bug.id) currentBug
 
-        isClosed =
-            bug.latestEvent.name == "closed"
-
         bugRowClasses =
-            classList [ ( "bug", True ), ( "is-active", isActive ), ( "closed", isClosed ) ]
+            classList [ ( "bug", True ), ( "is-active", isActive ), ( "closed", isClosed bug ) ]
     in
         div
             [ bugRowClasses
@@ -132,34 +128,26 @@ timestamp ts =
     (DF.format "%e %b %Y %H:%m:%S" ts)
 
 
-detailsView : Bug -> Html Msg
-detailsView bugDetails =
-    let
-        closed =
-            bugDetails.latestEvent.name == "closed"
-
-        stackTrace =
-            case bugDetails.stackTrace of
-                Nothing ->
-                    ""
-
-                Just trace ->
-                    String.join ",\n" trace
-    in
-        div
-            [ class "bug-pane" ]
-            [ h5 [ class "title is-5" ] [ text bugDetails.message ]
-            , table [ class "table" ]
-                [ tr []
-                    [ th [] [ text "Last occurred at" ]
-                    , td [] [ text <| timestamp bugDetails.lastOccurredAt ]
-                    ]
-                , tr []
-                    [ th [] [ text "First occurred at" ]
-                    , td [] [ text <| timestamp bugDetails.firstOccurredAt ]
-                    ]
-                ]
-            , div [] [ button [ disabled (closed), onClick (CloseBug bugDetails.id), classList [ ( "button", True ), ( "is-danger", True ) ] ] [ text "Close" ] ]
-            , br [] []
-            , div [ class "stacktrace" ] [ text stackTrace ]
+bugDetails : Bug -> Html Msg
+bugDetails bug =
+    div
+        [ class "bug-pane" ]
+        [ div
+            [ class "columns" ]
+            [ div [ class "column is-11" ] [ h5 [ class "title" ] [ text bug.message ] ]
+            , div [ class "column is-1" ] [ button [ class "button is-warning", onClick HideBug ] [ text "<<" ] ]
             ]
+        , table [ class "table" ]
+            [ tr []
+                [ th [] [ text "Last occurred at" ]
+                , td [] [ text <| timestamp bug.lastOccurredAt ]
+                ]
+            , tr []
+                [ th [] [ text "First occurred at" ]
+                , td [] [ text <| timestamp bug.firstOccurredAt ]
+                ]
+            ]
+        , div [] [ button [ disabled (isClosed bug), onClick (CloseBug bug.id), classList [ ( "button", True ), ( "is-danger", True ) ] ] [ text "Close" ] ]
+        , br [] []
+        , div [ class "stacktrace" ] [ text <| stackTraceString bug ]
+        ]

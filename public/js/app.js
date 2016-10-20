@@ -10302,6 +10302,28 @@ var _mgold$elm_date_format$Date_Format$format = F2(
 	});
 var _mgold$elm_date_format$Date_Format$formatISO8601 = _mgold$elm_date_format$Date_Format$format('%Y-%m-%dT%H:%M:%SZ');
 
+var _user$project$Types$stackTraceString = function (bug) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		A2(
+			_elm_lang$core$Maybe$map,
+			function (trace) {
+				return A2(_elm_lang$core$String$join, ',\n', trace);
+			},
+			bug.stackTrace));
+};
+var _user$project$Types$isClosed = function (bug) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		false,
+		A2(
+			_elm_lang$core$Maybe$map,
+			function (x) {
+				return true;
+			},
+			bug.closedAt));
+};
 var _user$project$Types$Model = F4(
 	function (a, b, c, d) {
 		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d};
@@ -10324,8 +10346,9 @@ var _user$project$Types$Patch = F2(
 	});
 var _user$project$Types$Bug = F8(
 	function (a, b, c, d, e, f, g, h) {
-		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, latestEvent: g, stackTrace: h};
+		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
 	});
+var _user$project$Types$HideBug = {ctor: 'HideBug'};
 var _user$project$Types$CloseBug = function (a) {
 	return {ctor: 'CloseBug', _0: a};
 };
@@ -10354,16 +10377,7 @@ var _user$project$Types$LoadedPatches = function (a) {
 var _user$project$View$timestamp = function (ts) {
 	return A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y %H:%m:%S', ts);
 };
-var _user$project$View$detailsView = function (bugDetails) {
-	var stackTrace = function () {
-		var _p0 = bugDetails.stackTrace;
-		if (_p0.ctor === 'Nothing') {
-			return '';
-		} else {
-			return A2(_elm_lang$core$String$join, ',\n', _p0._0);
-		}
-	}();
-	var closed = _elm_lang$core$Native_Utils.eq(bugDetails.latestEvent.name, 'closed');
+var _user$project$View$bugDetails = function (bug) {
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
@@ -10373,14 +10387,52 @@ var _user$project$View$detailsView = function (bugDetails) {
 		_elm_lang$core$Native_List.fromArray(
 			[
 				A2(
-				_elm_lang$html$Html$h5,
+				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_elm_lang$html$Html_Attributes$class('title is-5')
+						_elm_lang$html$Html_Attributes$class('columns')
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_elm_lang$html$Html$text(bugDetails.message)
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('column is-11')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$h5,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('title')
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html$text(bug.message)
+									]))
+							])),
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('column is-1')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$button,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('button is-warning'),
+										_elm_lang$html$Html_Events$onClick(_user$project$Types$HideBug)
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html$text('<<')
+									]))
+							]))
 					])),
 				A2(
 				_elm_lang$html$Html$table,
@@ -10411,7 +10463,7 @@ var _user$project$View$detailsView = function (bugDetails) {
 								_elm_lang$core$Native_List.fromArray(
 									[
 										_elm_lang$html$Html$text(
-										_user$project$View$timestamp(bugDetails.lastOccurredAt))
+										_user$project$View$timestamp(bug.lastOccurredAt))
 									]))
 							])),
 						A2(
@@ -10435,7 +10487,7 @@ var _user$project$View$detailsView = function (bugDetails) {
 								_elm_lang$core$Native_List.fromArray(
 									[
 										_elm_lang$html$Html$text(
-										_user$project$View$timestamp(bugDetails.firstOccurredAt))
+										_user$project$View$timestamp(bug.firstOccurredAt))
 									]))
 							]))
 					])),
@@ -10449,9 +10501,10 @@ var _user$project$View$detailsView = function (bugDetails) {
 						_elm_lang$html$Html$button,
 						_elm_lang$core$Native_List.fromArray(
 							[
-								_elm_lang$html$Html_Attributes$disabled(closed),
+								_elm_lang$html$Html_Attributes$disabled(
+								_user$project$Types$isClosed(bug)),
 								_elm_lang$html$Html_Events$onClick(
-								_user$project$Types$CloseBug(bugDetails.id)),
+								_user$project$Types$CloseBug(bug.id)),
 								_elm_lang$html$Html_Attributes$classList(
 								_elm_lang$core$Native_List.fromArray(
 									[
@@ -10478,13 +10531,13 @@ var _user$project$View$detailsView = function (bugDetails) {
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_elm_lang$html$Html$text(stackTrace)
+						_elm_lang$html$Html$text(
+						_user$project$Types$stackTraceString(bug))
 					]))
 			]));
 };
 var _user$project$View$bugRow = F2(
 	function (currentBug, bug) {
-		var isClosed = _elm_lang$core$Native_Utils.eq(bug.latestEvent.name, 'closed');
 		var isActive = A2(
 			_elm_lang$core$Maybe$withDefault,
 			false,
@@ -10499,7 +10552,11 @@ var _user$project$View$bugRow = F2(
 				[
 					{ctor: '_Tuple2', _0: 'bug', _1: true},
 					{ctor: '_Tuple2', _0: 'is-active', _1: isActive},
-					{ctor: '_Tuple2', _0: 'closed', _1: isClosed}
+					{
+					ctor: '_Tuple2',
+					_0: 'closed',
+					_1: _user$project$Types$isClosed(bug)
+				}
 				]));
 		return A2(
 			_elm_lang$html$Html$div,
@@ -10563,7 +10620,7 @@ var _user$project$View$bugRow = F2(
 						]))
 				]));
 	});
-var _user$project$View$bugListView = function (model) {
+var _user$project$View$bugList = function (model) {
 	var shouldShowBug = function (bug) {
 		return A2(_elm_lang$core$List$member, bug.patchId, model.selectedPatchIds);
 	};
@@ -10593,8 +10650,8 @@ var _user$project$View$patchButton = F2(
 				]));
 	});
 var _user$project$View$bugPane = function (model) {
-	var _p1 = model.focusedBug;
-	if (_p1.ctor === 'Nothing') {
+	var _p0 = model.focusedBug;
+	if (_p0.ctor === 'Nothing') {
 		return _elm_lang$core$Native_List.fromArray(
 			[]);
 	} else {
@@ -10608,7 +10665,7 @@ var _user$project$View$bugPane = function (model) {
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_user$project$View$detailsView(_p1._0)
+						_user$project$View$bugDetails(_p0._0)
 					]))
 			]);
 	}
@@ -10636,7 +10693,7 @@ var _user$project$View$bugs = function (model) {
 							[
 								_elm_lang$html$Html_Attributes$class('column is-6')
 							]),
-						_user$project$View$bugListView(model)),
+						_user$project$View$bugList(model)),
 						A2(
 						_elm_lang$html$Html$div,
 						_elm_lang$core$Native_List.fromArray(
@@ -10762,7 +10819,10 @@ var _user$project$Rest$decodeBug = A9(
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'first_occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'last_occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'occurrence_count', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'latest_event', _user$project$Rest$event),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'closed_at',
+		_elm_lang$core$Json_Decode$maybe(_user$project$Rest$date)),
 	_user$project$Rest$stacktrace);
 var _user$project$Rest$decodeBugs = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeBug);
 var _user$project$Rest$closeBug = function (bugId) {
@@ -10823,7 +10883,10 @@ var _user$project$Main$update = F2(
 				if (_p1.ctor === 'Err') {
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
-						A2(_elm_lang$core$Debug$log, 'error loading patches', model),
+						A2(
+							_elm_lang$core$Debug$log,
+							_elm_lang$core$Basics$toString(_p1._0),
+							model),
 						_elm_lang$core$Native_List.fromArray(
 							[_elm_lang$core$Platform_Cmd$none]));
 				} else {
@@ -10840,7 +10903,10 @@ var _user$project$Main$update = F2(
 				if (_p2.ctor === 'Err') {
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
-						A2(_elm_lang$core$Debug$log, 'error loading Bug digests', model),
+						A2(
+							_elm_lang$core$Debug$log,
+							_elm_lang$core$Basics$toString(_p2._0),
+							model),
 						_elm_lang$core$Native_List.fromArray(
 							[_elm_lang$core$Platform_Cmd$none]));
 				} else {
@@ -10934,7 +11000,7 @@ var _user$project$Main$update = F2(
 						_elm_lang$core$Native_List.fromArray(
 							[_elm_lang$core$Platform_Cmd$none]));
 				}
-			default:
+			case 'CloseBug':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
@@ -10942,6 +11008,14 @@ var _user$project$Main$update = F2(
 						[
 							_user$project$Rest$closeBug(_p0._0)
 						]));
+			default:
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{focusedBug: _elm_lang$core$Maybe$Nothing}),
+					_elm_lang$core$Native_List.fromArray(
+						[_elm_lang$core$Platform_Cmd$none]));
 		}
 	});
 var _user$project$Main$subscriptions = function (model) {

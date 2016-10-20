@@ -2,6 +2,7 @@ module Types exposing (..)
 
 import Http
 import Date
+import String
 
 
 -- Messages
@@ -16,6 +17,7 @@ type Msg
     | RequestDetails String
     | ClosedBug (Result Http.Error Bug)
     | CloseBug String
+    | HideBug
 
 
 
@@ -53,7 +55,7 @@ type alias Bug =
     , firstOccurredAt : Date.Date
     , lastOccurredAt : Date.Date
     , occurrenceCount : Int
-    , latestEvent : Event
+    , closedAt : Maybe Date.Date
     , stackTrace : Maybe (List String)
     }
 
@@ -61,3 +63,13 @@ type alias Bug =
 initialModel : Model
 initialModel =
     Model [] [] [] Nothing
+
+
+isClosed : Bug -> Bool
+isClosed bug =
+    Maybe.withDefault False <| Maybe.map (\x -> True) bug.closedAt
+
+
+stackTraceString : Bug -> String
+stackTraceString bug =
+    Maybe.withDefault "" <| Maybe.map (\trace -> String.join ",\n" trace) bug.stackTrace

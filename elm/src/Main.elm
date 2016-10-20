@@ -42,7 +42,7 @@ update msg model =
             case result of
                 Err err ->
                     -- TODO Actually handle errors
-                    Debug.log "error loading patches"
+                    Debug.log (toString err)
                         model
                         ! [ Cmd.none ]
 
@@ -53,7 +53,7 @@ update msg model =
             case result of
                 Err err ->
                     -- TODO Actually handle errors
-                    Debug.log "error loading Bug digests"
+                    Debug.log (toString err)
                         model
                         ! [ Cmd.none ]
 
@@ -100,3 +100,6 @@ update msg model =
 
         CloseBug bugId ->
             model ! [ Rest.closeBug bugId ]
+
+        HideBug ->
+            { model | focusedBug = Nothing } ! [ Cmd.none ]
