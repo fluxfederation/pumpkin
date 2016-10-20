@@ -59,13 +59,6 @@ test:
   <<: *default
   database: pumpkin_test
 
-staging:
-  <<: *default
-  database: <%= ENV['POSTGRES_DATABASE'] %>
-  username: <%= ENV['POSTGRES_USERNAME'] %>
-  password: <%= ENV['POSTGRES_PASSWORD'] %>
-  host: <%= ENV['POSTGRES_HOST'] %>
-
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -88,6 +81,7 @@ staging:
 #
 production:
   <<: *default
-  database: pumpkin_production
-  username: pumpkin
-  password: <%= ENV['PUMPKIN_DATABASE_PASSWORD'] %>
+  database: <%= ENV['POSTGRES_DATABASE'] %>
+  username: <%= ENV['POSTGRES_USERNAME'] %>
+  password: <%= ENV['POSTGRES_PASSWORD'] %>
+  host: <%= ENV['POSTGRES_HOST'] %>
