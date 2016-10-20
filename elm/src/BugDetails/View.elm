@@ -31,7 +31,6 @@ detailsView bugDetails =
             , div [] [ text ("Last occurred at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.lastOccurredAt)) ]
             , div [] [ text ("First occured at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.firstOccurredAt)) ]
             , div [] [ button [ disabled (closed), onClick (CloseBug bugDetails.id), classList [ ( "button", True ), ( "is-danger", True ) ] ] [ text "Close" ] ]
-            , div [] [ text (toString closed) ]
             , br [] []
             , div [ class "stacktrace" ] [ text (String.join ",\n" bugDetails.stackTrace) ]
             ]
