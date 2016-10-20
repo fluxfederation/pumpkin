@@ -10842,7 +10842,7 @@ var _user$project$Rest$closeBug = function (bugId) {
 var _user$project$Rest$detailsUrl = function (bugId) {
 	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', bugId);
 };
-var _user$project$Rest$loadDetails = function (bugId) {
+var _user$project$Rest$loadBugDetails = function (bugId) {
 	return A2(
 		_elm_lang$core$Platform_Cmd$map,
 		_user$project$Types$LoadedDetails,
@@ -10953,7 +10953,7 @@ var _user$project$Main$update = F2(
 					model,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_user$project$Rest$loadDetails(_p0._0)
+							_user$project$Rest$loadBugDetails(_p0._0)
 						]));
 			case 'LoadedDetails':
 				var _p3 = _p0._0;

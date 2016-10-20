@@ -69,16 +69,6 @@ stacktrace =
     maybe <| at [ "data", "exception", "backtrace" ] (list string)
 
 
-loadDetails : String -> Cmd Msg
-loadDetails bugId =
-    Cmd.map LoadedDetails
-        (Task.perform
-            Err
-            Ok
-            (Http.get decodeBug (detailsUrl bugId))
-        )
-
-
 event : Decoder (Event)
 event =
     object1 Event ("name" := string)
@@ -89,6 +79,20 @@ closeBugUrl bugId =
     "/bugs/" ++ bugId ++ "/close"
 
 
+
+-- Web Requests
+
+
+loadBugDetails : String -> Cmd Msg
+loadBugDetails bugId =
+    Cmd.map LoadedDetails
+        (Task.perform
+            Err
+            Ok
+            (Http.get decodeBug (detailsUrl bugId))
+        )
+
+
 closeBug : String -> Cmd Msg
 closeBug bugId =
     Cmd.map ClosedBug
@@ -97,10 +101,6 @@ closeBug bugId =
             Ok
             (Http.post decodeBug (closeBugUrl bugId) Http.empty)
         )
-
-
-
--- Web Requests
 
 
 loadPatches : Cmd Msg

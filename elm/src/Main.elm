@@ -67,7 +67,7 @@ update msg model =
             { model | selectedPatchIds = List.filter (\x -> x /= projectName) model.selectedPatchIds } ! [ Cmd.none ]
 
         RequestDetails bugId ->
-            model ! [ Rest.loadDetails bugId ]
+            model ! [ Rest.loadBugDetails bugId ]
 
         LoadedDetails result ->
             case result of
