@@ -109,19 +109,17 @@ bugListView model =
 bugRow : Maybe BugDetails.Types.Details -> BugDigest -> Html BugDetails.Types.Msg
 bugRow currentBug bug =
     let
-        bugRowClass =
-            case currentBug of
-                Nothing ->
-                    "bug"
+        isActive =
+            Maybe.withDefault False <| Maybe.map (\otherBug -> otherBug.id == bug.id) currentBug
 
-                Just otherBug ->
-                    if otherBug.id == bug.id then
-                        "bug is-active"
-                    else
-                        "bug"
+        isClosed =
+            bug.latestEvent.name == "closed"
+
+        bugRowClasses =
+            classList [ ( "bug", True ), ( "is-active", isActive ), ( "closed", isClosed ) ]
     in
         div
-            [ class bugRowClass
+            [ bugRowClasses
             , onClick (BugDetails.Types.RequestDetails bug.id)
             ]
             [ div [ class "columns" ]

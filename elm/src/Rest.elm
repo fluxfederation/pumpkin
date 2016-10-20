@@ -48,13 +48,19 @@ decodeBugs =
 
 decodeBug : Decoder BugDigest
 decodeBug =
-    object6 BugDigest
+    object7 BugDigest
         ("id" := string)
         ("patch_id" := string)
         ("message" := string)
         ("first_occurred_at" := date)
         ("last_occurred_at" := date)
         ("occurrence_count" := int)
+        ("latest_event" := event)
+
+
+event : Decoder (Event)
+event =
+    object1 Event ("name" := string)
 
 
 

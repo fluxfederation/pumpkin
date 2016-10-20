@@ -15,11 +15,6 @@ type alias Event =
     { name : String }
 
 
-type State
-    = Open
-    | Closed
-
-
 type alias Details =
     { id : String
     , patchId : String

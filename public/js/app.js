@@ -9121,8 +9121,6 @@ var _user$project$BugDetails_Types$RequestDetails = function (a) {
 var _user$project$BugDetails_Types$LoadedDetails = function (a) {
 	return {ctor: 'LoadedDetails', _0: a};
 };
-var _user$project$BugDetails_Types$Closed = {ctor: 'Closed'};
-var _user$project$BugDetails_Types$Open = {ctor: 'Open'};
 
 var _user$project$BugDetails_Rest$date = A2(_elm_lang$core$Json_Decode$customDecoder, _elm_lang$core$Json_Decode$string, _elm_lang$core$Date$fromString);
 var _user$project$BugDetails_Rest$event = A2(
@@ -9355,13 +9353,16 @@ var _user$project$Types$initialModel = A4(
 	_elm_lang$core$Native_List.fromArray(
 		[]),
 	_elm_lang$core$Maybe$Nothing);
+var _user$project$Types$Event = function (a) {
+	return {name: a};
+};
 var _user$project$Types$Patch = F2(
 	function (a, b) {
 		return {id: a, name: b};
 	});
-var _user$project$Types$BugDigest = F6(
-	function (a, b, c, d, e, f) {
-		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f};
+var _user$project$Types$BugDigest = F7(
+	function (a, b, c, d, e, f, g) {
+		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, latestEvent: g};
 	});
 var _user$project$Types$BugDetailsMsg = function (a) {
 	return {ctor: 'BugDetailsMsg', _0: a};
@@ -9381,19 +9382,28 @@ var _user$project$Types$LoadedPatches = function (a) {
 
 var _user$project$View$bugRow = F2(
 	function (currentBug, bug) {
-		var bugRowClass = function () {
-			var _p0 = currentBug;
-			if (_p0.ctor === 'Nothing') {
-				return 'bug';
-			} else {
-				return _elm_lang$core$Native_Utils.eq(_p0._0.id, bug.id) ? 'bug is-active' : 'bug';
-			}
-		}();
+		var isClosed = _elm_lang$core$Native_Utils.eq(bug.latestEvent.name, 'closed');
+		var isActive = A2(
+			_elm_lang$core$Maybe$withDefault,
+			false,
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (otherBug) {
+					return _elm_lang$core$Native_Utils.eq(otherBug.id, bug.id);
+				},
+				currentBug));
+		var bugRowClasses = _elm_lang$html$Html_Attributes$classList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'bug', _1: true},
+					{ctor: '_Tuple2', _0: 'is-active', _1: isActive},
+					{ctor: '_Tuple2', _0: 'closed', _1: isClosed}
+				]));
 		return A2(
 			_elm_lang$html$Html$div,
 			_elm_lang$core$Native_List.fromArray(
 				[
-					_elm_lang$html$Html_Attributes$class(bugRowClass),
+					bugRowClasses,
 					_elm_lang$html$Html_Events$onClick(
 					_user$project$BugDetails_Types$RequestDetails(bug.id))
 				]),
@@ -9481,8 +9491,8 @@ var _user$project$View$patchButton = F2(
 				]));
 	});
 var _user$project$View$bugPane = function (model) {
-	var _p1 = model.focusedBug;
-	if (_p1.ctor === 'Nothing') {
+	var _p0 = model.focusedBug;
+	if (_p0.ctor === 'Nothing') {
 		return _elm_lang$core$Native_List.fromArray(
 			[]);
 	} else {
@@ -9621,6 +9631,10 @@ var _user$project$View$view = function (model) {
 			]));
 };
 
+var _user$project$Rest$event = A2(
+	_elm_lang$core$Json_Decode$object1,
+	_user$project$Types$Event,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'name', _elm_lang$core$Json_Decode$string));
 var _user$project$Rest$decodePatch = A3(
 	_elm_lang$core$Json_Decode$object2,
 	_user$project$Types$Patch,
@@ -9628,15 +9642,16 @@ var _user$project$Rest$decodePatch = A3(
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'name', _elm_lang$core$Json_Decode$string));
 var _user$project$Rest$decodePatches = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodePatch);
 var _user$project$Rest$date = A2(_elm_lang$core$Json_Decode$customDecoder, _elm_lang$core$Json_Decode$string, _elm_lang$core$Date$fromString);
-var _user$project$Rest$decodeBug = A7(
-	_elm_lang$core$Json_Decode$object6,
+var _user$project$Rest$decodeBug = A8(
+	_elm_lang$core$Json_Decode$object7,
 	_user$project$Types$BugDigest,
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'patch_id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'message', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'first_occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'last_occurred_at', _user$project$Rest$date),
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'occurrence_count', _elm_lang$core$Json_Decode$int));
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'occurrence_count', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'latest_event', _user$project$Rest$event));
 var _user$project$Rest$decodeBugs = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeBug);
 var _user$project$Rest$bugsUrl = '/bugs';
 var _user$project$Rest$loadBugs = A2(

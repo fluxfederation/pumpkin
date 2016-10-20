@@ -28,6 +28,10 @@ type alias Model =
     }
 
 
+type alias Event =
+    { name : String }
+
+
 type alias Patches =
     List Patch
 
@@ -47,6 +51,7 @@ type alias BugDigest =
     , firstOccurredAt : Date.Date
     , lastOccurredAt : Date.Date
     , occurrenceCount : Int
+    , latestEvent : Event
     }
 
 
