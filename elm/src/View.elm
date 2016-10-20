@@ -48,10 +48,22 @@ bugs model =
     div [ class "section" ]
         [ div [ class "columns" ]
             [ div [ class "column is-6" ] (bugListView model)
-            , div [ class "column is-6" ] [ BugDetails.View.root model.focusedBug ]
+            , div [ class "column is-6" ] (bugPane model)
             ]
         ]
         |> Html.App.map BugDetailsMsg
+
+
+bugPane : Model -> List (Html BugDetails.Types.Msg)
+bugPane model =
+    case model.focusedBug of
+        Nothing ->
+            []
+
+        _ ->
+            [ div [ class "box" ]
+                [ BugDetails.View.root model.focusedBug ]
+            ]
 
 
 patchButton : List String -> Patch -> Html Msg

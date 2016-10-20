@@ -9459,6 +9459,27 @@ var _user$project$View$patchButton = F2(
 					_elm_lang$html$Html$text(project.name)
 				]));
 	});
+var _user$project$View$bugPane = function (model) {
+	var _p1 = model.focusedBug;
+	if (_p1.ctor === 'Nothing') {
+		return _elm_lang$core$Native_List.fromArray(
+			[]);
+	} else {
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('box')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_user$project$BugDetails_View$root(model.focusedBug)
+					]))
+			]);
+	}
+};
 var _user$project$View$bugs = function (model) {
 	return A2(
 		_elm_lang$html$Html_App$map,
@@ -9492,10 +9513,7 @@ var _user$project$View$bugs = function (model) {
 								[
 									_elm_lang$html$Html_Attributes$class('column is-6')
 								]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_user$project$BugDetails_View$root(model.focusedBug)
-								]))
+							_user$project$View$bugPane(model))
 						]))
 				])));
 };
