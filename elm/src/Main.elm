@@ -63,8 +63,23 @@ update msg model =
         ShowPatchBugs projectName ->
             { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ] } ! [ Cmd.none ]
 
-        HidePatchBugs projectName ->
-            { model | selectedPatchIds = List.filter (\x -> x /= projectName) model.selectedPatchIds } ! [ Cmd.none ]
+        HidePatchBugs patchId ->
+            let
+                newFocusedBug =
+                    case Maybe.map (\bug -> bug.patchId == patchId) model.focusedBug of
+                        Nothing ->
+                            Nothing
+
+                        Just True ->
+                            Nothing
+
+                        Just False ->
+                            model.focusedBug
+
+                newPatchIds =
+                    List.filter (\x -> x /= patchId) model.selectedPatchIds
+            in
+                { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug } ! [ Cmd.none ]
 
         RequestDetails bugId ->
             model ! [ Rest.loadBugDetails bugId ]

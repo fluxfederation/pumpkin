@@ -10933,18 +10933,35 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$Native_List.fromArray(
 						[_elm_lang$core$Platform_Cmd$none]));
 			case 'HidePatchBugs':
+				var _p4 = _p0._0;
+				var newPatchIds = A2(
+					_elm_lang$core$List$filter,
+					function (x) {
+						return !_elm_lang$core$Native_Utils.eq(x, _p4);
+					},
+					model.selectedPatchIds);
+				var newFocusedBug = function () {
+					var _p3 = A2(
+						_elm_lang$core$Maybe$map,
+						function (bug) {
+							return _elm_lang$core$Native_Utils.eq(bug.patchId, _p4);
+						},
+						model.focusedBug);
+					if (_p3.ctor === 'Nothing') {
+						return _elm_lang$core$Maybe$Nothing;
+					} else {
+						if (_p3._0 === true) {
+							return _elm_lang$core$Maybe$Nothing;
+						} else {
+							return model.focusedBug;
+						}
+					}
+				}();
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{
-							selectedPatchIds: A2(
-								_elm_lang$core$List$filter,
-								function (x) {
-									return !_elm_lang$core$Native_Utils.eq(x, _p0._0);
-								},
-								model.selectedPatchIds)
-						}),
+						{selectedPatchIds: newPatchIds, focusedBug: newFocusedBug}),
 					_elm_lang$core$Native_List.fromArray(
 						[_elm_lang$core$Platform_Cmd$none]));
 			case 'RequestDetails':
@@ -10956,8 +10973,8 @@ var _user$project$Main$update = F2(
 							_user$project$Rest$loadBugDetails(_p0._0)
 						]));
 			case 'LoadedDetails':
-				var _p3 = _p0._0;
-				if (_p3.ctor === 'Err') {
+				var _p5 = _p0._0;
+				if (_p5.ctor === 'Err') {
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						A2(_elm_lang$core$Debug$log, 'error loading Bug details', model),
@@ -10969,29 +10986,29 @@ var _user$project$Main$update = F2(
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								focusedBug: _elm_lang$core$Maybe$Just(_p3._0)
+								focusedBug: _elm_lang$core$Maybe$Just(_p5._0)
 							}),
 						_elm_lang$core$Native_List.fromArray(
 							[_elm_lang$core$Platform_Cmd$none]));
 				}
 			case 'ClosedBug':
-				var _p4 = _p0._0;
-				if (_p4.ctor === 'Err') {
+				var _p6 = _p0._0;
+				if (_p6.ctor === 'Err') {
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						A2(_elm_lang$core$Debug$log, 'error closing Bug', model),
 						_elm_lang$core$Native_List.fromArray(
 							[_elm_lang$core$Platform_Cmd$none]));
 				} else {
-					var _p5 = _p4._0;
+					var _p7 = _p6._0;
 					var bugList = A3(
 						_elm_community$list_extra$List_Extra$replaceIf,
 						function (x) {
-							return _elm_lang$core$Native_Utils.eq(_p5.id, x.id);
+							return _elm_lang$core$Native_Utils.eq(_p7.id, x.id);
 						},
-						_p5,
+						_p7,
 						model.bugs);
-					var bug = _elm_lang$core$Maybe$Just(_p5);
+					var bug = _elm_lang$core$Maybe$Just(_p7);
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
