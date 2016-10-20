@@ -10,6 +10,11 @@ import Date.Format as DF
 import Types exposing (..)
 
 
+container : List (Html Msg) -> Html Msg
+container contents =
+    div [ classList [ ( "container", True ), ( "is-fluid", True ) ] ] contents
+
+
 view : Model -> Html Msg
 view model =
     div []
@@ -21,26 +26,29 @@ view model =
 
 heading : Html Msg
 heading =
-    div [ class "section" ] [ div [ class "container" ] [ h1 [ class "title is-1" ] [ text "Pumpkin" ] ] ]
+    div [ classList [ ( "nav", True ), ( "has-shadow", True ) ] ]
+        [ container
+            [ div [ class "nav-left" ]
+                [ a [ class "nav-item is-brand" ]
+                    [ text "Pumpkin" ]
+                ]
+            ]
+        ]
 
 
 patches : Model -> Html Msg
 patches model =
     div [ class "section" ]
-        [ div [ class "container" ]
-            [ div [] (List.map (patchButton model.selectedPatchIds) model.patches)
-            ]
+        [ div [] (List.map (patchButton model.selectedPatchIds) model.patches)
         ]
 
 
 bugs : Model -> Html Msg
 bugs model =
     div [ class "section" ]
-        [ div [ class "container" ]
-            [ div [ class "columns" ]
-                [ div [ class "column is-6" ] (bugListView model)
-                , div [ class "column is-6" ] [ BugDetails.View.root model.focusedBug ]
-                ]
+        [ div [ class "columns" ]
+            [ div [ class "column is-6" ] (bugListView model)
+            , div [ class "column is-6" ] [ BugDetails.View.root model.focusedBug ]
             ]
         ]
         |> Html.App.map BugDetailsMsg

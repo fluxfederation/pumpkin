@@ -9014,6 +9014,12 @@ var _mgold$elm_date_format$Date_Format$formatToken = F2(
 			case 'Y':
 				return _elm_lang$core$Basics$toString(
 					_elm_lang$core$Date$year(d));
+			case 'y':
+				return A2(
+					_elm_lang$core$String$right,
+					2,
+					_elm_lang$core$Basics$toString(
+						_elm_lang$core$Date$year(d)));
 			case 'm':
 				return A3(
 					_elm_lang$core$String$padLeft,
@@ -9090,7 +9096,7 @@ var _mgold$elm_date_format$Date_Format$formatToken = F2(
 				return '';
 		}
 	});
-var _mgold$elm_date_format$Date_Format$re = _elm_lang$core$Regex$regex('%(%|Y|m|B|b|d|e|a|A|H|k|I|l|p|P|M|S)');
+var _mgold$elm_date_format$Date_Format$re = _elm_lang$core$Regex$regex('%(%|Y|y|m|B|b|d|e|a|A|H|k|I|l|p|P|M|S)');
 var _mgold$elm_date_format$Date_Format$format = F2(
 	function (s, d) {
 		return A4(
@@ -9401,7 +9407,7 @@ var _user$project$View$bugs = function (model) {
 					_elm_lang$html$Html$div,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_elm_lang$html$Html_Attributes$class('container')
+							_elm_lang$html$Html_Attributes$class('columns')
 						]),
 					_elm_lang$core$Native_List.fromArray(
 						[
@@ -9409,27 +9415,18 @@ var _user$project$View$bugs = function (model) {
 							_elm_lang$html$Html$div,
 							_elm_lang$core$Native_List.fromArray(
 								[
-									_elm_lang$html$Html_Attributes$class('columns')
+									_elm_lang$html$Html_Attributes$class('column is-6')
+								]),
+							_user$project$View$bugListView(model)),
+							A2(
+							_elm_lang$html$Html$div,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html_Attributes$class('column is-6')
 								]),
 							_elm_lang$core$Native_List.fromArray(
 								[
-									A2(
-									_elm_lang$html$Html$div,
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html_Attributes$class('column is-6')
-										]),
-									_user$project$View$bugListView(model)),
-									A2(
-									_elm_lang$html$Html$div,
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html_Attributes$class('column is-6')
-										]),
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_user$project$BugDetails_View$root(model.focusedBug)
-										]))
+									_user$project$BugDetails_View$root(model.focusedBug)
 								]))
 						]))
 				])));
@@ -9446,47 +9443,61 @@ var _user$project$View$patches = function (model) {
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('container')
-					]),
+					[]),
+				A2(
+					_elm_lang$core$List$map,
+					_user$project$View$patchButton(model.selectedPatchIds),
+					model.patches))
+			]));
+};
+var _user$project$View$container = function (contents) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$classList(
 				_elm_lang$core$Native_List.fromArray(
 					[
-						A2(
-						_elm_lang$html$Html$div,
-						_elm_lang$core$Native_List.fromArray(
-							[]),
-						A2(
-							_elm_lang$core$List$map,
-							_user$project$View$patchButton(model.selectedPatchIds),
-							model.patches))
+						{ctor: '_Tuple2', _0: 'container', _1: true},
+						{ctor: '_Tuple2', _0: 'is-fluid', _1: true}
 					]))
-			]));
+			]),
+		contents);
 };
 var _user$project$View$heading = A2(
 	_elm_lang$html$Html$div,
 	_elm_lang$core$Native_List.fromArray(
 		[
-			_elm_lang$html$Html_Attributes$class('section')
+			_elm_lang$html$Html_Attributes$classList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'nav', _1: true},
+					{ctor: '_Tuple2', _0: 'has-shadow', _1: true}
+				]))
 		]),
 	_elm_lang$core$Native_List.fromArray(
 		[
-			A2(
-			_elm_lang$html$Html$div,
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html_Attributes$class('container')
-				]),
+			_user$project$View$container(
 			_elm_lang$core$Native_List.fromArray(
 				[
 					A2(
-					_elm_lang$html$Html$h1,
+					_elm_lang$html$Html$div,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_elm_lang$html$Html_Attributes$class('title is-1')
+							_elm_lang$html$Html_Attributes$class('nav-left')
 						]),
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_elm_lang$html$Html$text('Pumpkin')
+							A2(
+							_elm_lang$html$Html$a,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html_Attributes$class('nav-item is-brand')
+								]),
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html$text('Pumpkin')
+								]))
 						]))
 				]))
 		]));
