@@ -7,6 +7,8 @@ import Date
 type Msg
     = LoadedDetails (Result Http.Error Details)
     | RequestDetails String
+    | ClosedBug (Result Http.Error Details)
+    | CloseBug String
 
 
 type alias Details =

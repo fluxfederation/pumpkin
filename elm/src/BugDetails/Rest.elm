@@ -1,4 +1,4 @@
-module BugDetails.Rest exposing (loadDetails)
+module BugDetails.Rest exposing (loadDetails, closeBug)
 
 import Http
 import Task
@@ -10,6 +10,11 @@ import Date
 detailsUrl : String -> String
 detailsUrl bugId =
     "/bugs/" ++ bugId
+
+
+closeBugUrl : String -> String
+closeBugUrl bugId =
+    "/bugs/" ++ bugId ++ "/close"
 
 
 decodeDetails : Decoder Details
@@ -37,6 +42,16 @@ loadDetails bugId =
 stacktrace : Decoder (List String)
 stacktrace =
     at [ "data", "exception", "backtrace" ] (list string)
+
+
+closeBug : String -> Cmd Msg
+closeBug bugId =
+    Cmd.map ClosedBug
+        (Task.perform
+            Err
+            Ok
+            (Http.post decodeDetails (closeBugUrl bugId) Http.empty)
+        )
 
 
 

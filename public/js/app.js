@@ -9112,6 +9112,12 @@ var _user$project$BugDetails_Types$Details = F7(
 	function (a, b, c, d, e, f, g) {
 		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, stackTrace: f, occurrenceCount: g};
 	});
+var _user$project$BugDetails_Types$CloseBug = function (a) {
+	return {ctor: 'CloseBug', _0: a};
+};
+var _user$project$BugDetails_Types$ClosedBug = function (a) {
+	return {ctor: 'ClosedBug', _0: a};
+};
 var _user$project$BugDetails_Types$RequestDetails = function (a) {
 	return {ctor: 'RequestDetails', _0: a};
 };
@@ -9135,6 +9141,26 @@ var _user$project$BugDetails_Rest$decodeDetails = A8(
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'last_occurred_at', _user$project$BugDetails_Rest$date),
 	_user$project$BugDetails_Rest$stacktrace,
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'occurrence_count', _elm_lang$core$Json_Decode$int));
+var _user$project$BugDetails_Rest$closeBugUrl = function (bugId) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'/bugs/',
+		A2(_elm_lang$core$Basics_ops['++'], bugId, '/close'));
+};
+var _user$project$BugDetails_Rest$closeBug = function (bugId) {
+	return A2(
+		_elm_lang$core$Platform_Cmd$map,
+		_user$project$BugDetails_Types$ClosedBug,
+		A3(
+			_elm_lang$core$Task$perform,
+			_elm_lang$core$Result$Err,
+			_elm_lang$core$Result$Ok,
+			A3(
+				_evancz$elm_http$Http$post,
+				_user$project$BugDetails_Rest$decodeDetails,
+				_user$project$BugDetails_Rest$closeBugUrl(bugId),
+				_evancz$elm_http$Http$empty)));
+};
 var _user$project$BugDetails_Rest$detailsUrl = function (bugId) {
 	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', bugId);
 };
@@ -9154,26 +9180,50 @@ var _user$project$BugDetails_Rest$loadDetails = function (bugId) {
 
 var _user$project$BugDetails_State$update = function (message) {
 	var _p0 = message;
-	if (_p0.ctor === 'RequestDetails') {
-		return {
-			ctor: '_Tuple2',
-			_0: _elm_lang$core$Maybe$Nothing,
-			_1: _user$project$BugDetails_Rest$loadDetails(_p0._0)
-		};
-	} else {
-		var _p1 = _p0._0;
-		if (_p1.ctor === 'Err') {
-			return A2(
-				_elm_lang$core$Debug$log,
-				'error loading Bug details',
-				{ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: _elm_lang$core$Platform_Cmd$none});
-		} else {
+	switch (_p0.ctor) {
+		case 'RequestDetails':
 			return {
 				ctor: '_Tuple2',
-				_0: _elm_lang$core$Maybe$Just(_p1._0),
-				_1: _elm_lang$core$Platform_Cmd$none
+				_0: _elm_lang$core$Maybe$Nothing,
+				_1: _user$project$BugDetails_Rest$loadDetails(_p0._0)
 			};
-		}
+		case 'LoadedDetails':
+			var _p1 = _p0._0;
+			if (_p1.ctor === 'Err') {
+				return A2(
+					_elm_lang$core$Debug$log,
+					'error loading Bug details',
+					{ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: _elm_lang$core$Platform_Cmd$none});
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Maybe$Just(_p1._0),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			}
+		case 'ClosedBug':
+			var _p2 = _p0._0;
+			if (_p2.ctor === 'Err') {
+				return A2(
+					_elm_lang$core$Debug$log,
+					'error loading Bug details',
+					{ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: _elm_lang$core$Platform_Cmd$none});
+			} else {
+				return A2(
+					_elm_lang$core$Debug$log,
+					'closed Bug details',
+					{
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Maybe$Just(_p2._0),
+						_1: _elm_lang$core$Platform_Cmd$none
+					});
+			}
+		default:
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Maybe$Nothing,
+				_1: _user$project$BugDetails_Rest$closeBug(_p0._0)
+			};
 	}
 };
 
@@ -9219,6 +9269,24 @@ var _user$project$BugDetails_View$detailsView = function (bugDetails) {
 							_elm_lang$core$Basics_ops['++'],
 							'First occured at ',
 							A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y %H:%m:%S', bugDetails.firstOccurredAt)))
+					])),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$button,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Events$onClick(
+								_user$project$BugDetails_Types$CloseBug(bugDetails.id))
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('close')
+							]))
 					])),
 				A2(
 				_elm_lang$html$Html$br,
