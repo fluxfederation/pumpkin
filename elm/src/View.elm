@@ -135,7 +135,7 @@ bugDetails bug =
         [ div
             [ class "columns" ]
             [ div [ class "column is-11" ] [ h5 [ class "title" ] [ text bug.message ] ]
-            , div [ class "column is-1" ] [ button [ class "button is-warning", onClick HideBug ] [ text "<<" ] ]
+            , div [ class "column is-1" ] [ button [ class "delete", onClick HideBug ] [] ]
             ]
         , table [ class "table" ]
             [ tr []
