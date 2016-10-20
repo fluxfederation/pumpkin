@@ -2,10 +2,10 @@ module Main exposing (..)
 
 import Html.App as App
 import Http
-import BugDetails.State
 import Types exposing (..)
 import View
 import Rest
+import List.Extra as ListX
 
 
 init : ( Model, Cmd Msg )
@@ -66,9 +66,37 @@ update msg model =
         HidePatchBugs projectName ->
             { model | selectedPatchIds = List.filter (\x -> x /= projectName) model.selectedPatchIds } ! [ Cmd.none ]
 
-        BugDetailsMsg detailsMsg ->
-            let
-                ( details, command ) =
-                    BugDetails.State.update detailsMsg
-            in
-                { model | focusedBug = details } ! [ (Cmd.map BugDetailsMsg command) ]
+        RequestDetails bugId ->
+            model ! [ Rest.loadDetails bugId ]
+
+        LoadedDetails result ->
+            case result of
+                Err err ->
+                    -- TODO Actually handle errors
+                    Debug.log "error loading Bug details"
+                        model
+                        ! [ Cmd.none ]
+
+                Ok bugDetails ->
+                    { model | focusedBug = Just bugDetails } ! [ Cmd.none ]
+
+        ClosedBug result ->
+            case result of
+                Err err ->
+                    -- TODO Actually handle errors
+                    Debug.log "error closing Bug"
+                        model
+                        ! [ Cmd.none ]
+
+                Ok bugDetails ->
+                    let
+                        bug =
+                            Just bugDetails
+
+                        bugList =
+                            ListX.replaceIf (\x -> bugDetails.id == x.id) bugDetails model.bugs
+                    in
+                        { model | focusedBug = bug, bugs = bugList } ! [ Cmd.none ]
+
+        CloseBug bugId ->
+            model ! [ Rest.closeBug bugId ]

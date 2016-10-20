@@ -4,9 +4,8 @@ import Html exposing (..)
 import Html.App
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
-import BugDetails.View
-import BugDetails.Types
 import Date.Format as DF
+import String
 import Types exposing (..)
 
 
@@ -51,18 +50,17 @@ bugs model =
             , div [ class "column is-6" ] (bugPane model)
             ]
         ]
-        |> Html.App.map BugDetailsMsg
 
 
-bugPane : Model -> List (Html BugDetails.Types.Msg)
+bugPane : Model -> List (Html Msg)
 bugPane model =
     case model.focusedBug of
         Nothing ->
             []
 
-        _ ->
+        Just bug ->
             [ div [ class "box" ]
-                [ BugDetails.View.root model.focusedBug ]
+                [ detailsView bug ]
             ]
 
 
@@ -94,7 +92,7 @@ patchButton selectedPatchIds project =
             [ text project.name ]
 
 
-bugListView : Model -> List (Html BugDetails.Types.Msg)
+bugListView : Model -> List (Html Msg)
 bugListView model =
     let
         shouldShowBug =
@@ -106,7 +104,7 @@ bugListView model =
         (List.map (bugRow model.focusedBug) bugsToShow)
 
 
-bugRow : Maybe BugDetails.Types.Details -> BugDigest -> Html BugDetails.Types.Msg
+bugRow : Maybe Bug -> Bug -> Html Msg
 bugRow currentBug bug =
     let
         isActive =
@@ -120,11 +118,48 @@ bugRow currentBug bug =
     in
         div
             [ bugRowClasses
-            , onClick (BugDetails.Types.RequestDetails bug.id)
+            , onClick (RequestDetails bug.id)
             ]
             [ div [ class "columns" ]
                 [ div [ class "column is-2" ] [ text (DF.format "%e %b %Y" bug.lastOccurredAt) ]
                 , div [ class "column" ] [ text bug.message ]
                 , div [ class "column is-1" ] [ span [ class "tag is-warning" ] [ text (toString bug.occurrenceCount) ] ]
                 ]
+            ]
+
+
+timestamp ts =
+    (DF.format "%e %b %Y %H:%m:%S" ts)
+
+
+detailsView : Bug -> Html Msg
+detailsView bugDetails =
+    let
+        closed =
+            bugDetails.latestEvent.name == "closed"
+
+        stackTrace =
+            case bugDetails.stackTrace of
+                Nothing ->
+                    ""
+
+                Just trace ->
+                    String.join ",\n" trace
+    in
+        div
+            [ class "bug-pane" ]
+            [ h5 [ class "title is-5" ] [ text bugDetails.message ]
+            , table [ class "table" ]
+                [ tr []
+                    [ th [] [ text "Last occurred at" ]
+                    , td [] [ text <| timestamp bugDetails.lastOccurredAt ]
+                    ]
+                , tr []
+                    [ th [] [ text "First occurred at" ]
+                    , td [] [ text <| timestamp bugDetails.firstOccurredAt ]
+                    ]
+                ]
+            , div [] [ button [ disabled (closed), onClick (CloseBug bugDetails.id), classList [ ( "button", True ), ( "is-danger", True ) ] ] [ text "Close" ] ]
+            , br [] []
+            , div [ class "stacktrace" ] [ text stackTrace ]
             ]

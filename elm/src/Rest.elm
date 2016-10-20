@@ -20,6 +20,11 @@ bugsUrl =
     "/bugs"
 
 
+detailsUrl : String -> String
+detailsUrl bugId =
+    "/bugs/" ++ bugId
+
+
 
 -- Decoders
 
@@ -46,9 +51,9 @@ decodeBugs =
     list decodeBug
 
 
-decodeBug : Decoder BugDigest
+decodeBug : Decoder Bug
 decodeBug =
-    object7 BugDigest
+    object8 Bug
         ("id" := string)
         ("patch_id" := string)
         ("message" := string)
@@ -56,11 +61,42 @@ decodeBug =
         ("last_occurred_at" := date)
         ("occurrence_count" := int)
         ("latest_event" := event)
+        (stacktrace)
+
+
+stacktrace : Decoder (Maybe (List String))
+stacktrace =
+    maybe <| at [ "data", "exception", "backtrace" ] (list string)
+
+
+loadDetails : String -> Cmd Msg
+loadDetails bugId =
+    Cmd.map LoadedDetails
+        (Task.perform
+            Err
+            Ok
+            (Http.get decodeBug (detailsUrl bugId))
+        )
 
 
 event : Decoder (Event)
 event =
     object1 Event ("name" := string)
+
+
+closeBugUrl : String -> String
+closeBugUrl bugId =
+    "/bugs/" ++ bugId ++ "/close"
+
+
+closeBug : String -> Cmd Msg
+closeBug bugId =
+    Cmd.map ClosedBug
+        (Task.perform
+            Err
+            Ok
+            (Http.post decodeBug (closeBugUrl bugId) Http.empty)
+        )
 
 
 

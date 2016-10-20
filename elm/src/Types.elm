@@ -2,7 +2,6 @@ module Types exposing (..)
 
 import Http
 import Date
-import BugDetails.Types
 
 
 -- Messages
@@ -13,7 +12,10 @@ type Msg
     | LoadedBugs (Result Http.Error Bugs)
     | ShowPatchBugs String
     | HidePatchBugs String
-    | BugDetailsMsg BugDetails.Types.Msg
+    | LoadedDetails (Result Http.Error Bug)
+    | RequestDetails String
+    | ClosedBug (Result Http.Error Bug)
+    | CloseBug String
 
 
 
@@ -24,7 +26,7 @@ type alias Model =
     { selectedPatchIds : List String
     , patches : Patches
     , bugs : Bugs
-    , focusedBug : Maybe BugDetails.Types.Details
+    , focusedBug : Maybe Bug
     }
 
 
@@ -41,10 +43,10 @@ type alias Patch =
 
 
 type alias Bugs =
-    List BugDigest
+    List Bug
 
 
-type alias BugDigest =
+type alias Bug =
     { id : String
     , patchId : String
     , message : String
@@ -52,6 +54,7 @@ type alias BugDigest =
     , lastOccurredAt : Date.Date
     , occurrenceCount : Int
     , latestEvent : Event
+    , stackTrace : Maybe (List String)
     }
 
 
