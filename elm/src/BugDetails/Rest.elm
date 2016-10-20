@@ -19,7 +19,7 @@ closeBugUrl bugId =
 
 decodeDetails : Decoder Details
 decodeDetails =
-    object7 Details
+    object8 Details
         ("id" := string)
         ("patch_id" := string)
         ("message" := string)
@@ -27,6 +27,7 @@ decodeDetails =
         ("last_occurred_at" := date)
         (stacktrace)
         ("occurrence_count" := int)
+        ("latest_event" := event)
 
 
 loadDetails : String -> Cmd Msg
@@ -42,6 +43,11 @@ loadDetails bugId =
 stacktrace : Decoder (List String)
 stacktrace =
     at [ "data", "exception", "backtrace" ] (list string)
+
+
+event : Decoder (Event)
+event =
+    object1 Event ("name" := string)
 
 
 closeBug : String -> Cmd Msg

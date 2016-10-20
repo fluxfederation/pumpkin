@@ -7,13 +7,18 @@ class BugsController < ApplicationController
   end
 
   def show
-    bug = Bug.with_latest_details.find(params[:id])
+    bug = fetch_bug
     render json: bug, serializer: FullBugSerializer
   end
 
   def close
-    bug = Bug.with_latest_details.find(params[:id])
+    bug = fetch_bug
     bug.events.create!(name: 'closed')
-    render json: bug, serializer: FullBugSerializer
+    render json: fetch_bug, serializer: FullBugSerializer
+  end
+
+  private
+  def fetch_bug
+    Bug.with_latest_details.find(params[:id])
   end
 end

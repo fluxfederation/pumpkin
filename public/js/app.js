@@ -9014,12 +9014,6 @@ var _mgold$elm_date_format$Date_Format$formatToken = F2(
 			case 'Y':
 				return _elm_lang$core$Basics$toString(
 					_elm_lang$core$Date$year(d));
-			case 'y':
-				return A2(
-					_elm_lang$core$String$right,
-					2,
-					_elm_lang$core$Basics$toString(
-						_elm_lang$core$Date$year(d)));
 			case 'm':
 				return A3(
 					_elm_lang$core$String$padLeft,
@@ -9096,7 +9090,7 @@ var _mgold$elm_date_format$Date_Format$formatToken = F2(
 				return '';
 		}
 	});
-var _mgold$elm_date_format$Date_Format$re = _elm_lang$core$Regex$regex('%(%|Y|y|m|B|b|d|e|a|A|H|k|I|l|p|P|M|S)');
+var _mgold$elm_date_format$Date_Format$re = _elm_lang$core$Regex$regex('%(%|Y|m|B|b|d|e|a|A|H|k|I|l|p|P|M|S)');
 var _mgold$elm_date_format$Date_Format$format = F2(
 	function (s, d) {
 		return A4(
@@ -9108,9 +9102,12 @@ var _mgold$elm_date_format$Date_Format$format = F2(
 	});
 var _mgold$elm_date_format$Date_Format$formatISO8601 = _mgold$elm_date_format$Date_Format$format('%Y-%m-%dT%H:%M:%SZ');
 
-var _user$project$BugDetails_Types$Details = F7(
-	function (a, b, c, d, e, f, g) {
-		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, stackTrace: f, occurrenceCount: g};
+var _user$project$BugDetails_Types$Event = function (a) {
+	return {name: a};
+};
+var _user$project$BugDetails_Types$Details = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, stackTrace: f, occurrenceCount: g, latestEvent: h};
 	});
 var _user$project$BugDetails_Types$CloseBug = function (a) {
 	return {ctor: 'CloseBug', _0: a};
@@ -9124,15 +9121,21 @@ var _user$project$BugDetails_Types$RequestDetails = function (a) {
 var _user$project$BugDetails_Types$LoadedDetails = function (a) {
 	return {ctor: 'LoadedDetails', _0: a};
 };
+var _user$project$BugDetails_Types$Closed = {ctor: 'Closed'};
+var _user$project$BugDetails_Types$Open = {ctor: 'Open'};
 
 var _user$project$BugDetails_Rest$date = A2(_elm_lang$core$Json_Decode$customDecoder, _elm_lang$core$Json_Decode$string, _elm_lang$core$Date$fromString);
+var _user$project$BugDetails_Rest$event = A2(
+	_elm_lang$core$Json_Decode$object1,
+	_user$project$BugDetails_Types$Event,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'name', _elm_lang$core$Json_Decode$string));
 var _user$project$BugDetails_Rest$stacktrace = A2(
 	_elm_lang$core$Json_Decode$at,
 	_elm_lang$core$Native_List.fromArray(
 		['data', 'exception', 'backtrace']),
 	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string));
-var _user$project$BugDetails_Rest$decodeDetails = A8(
-	_elm_lang$core$Json_Decode$object7,
+var _user$project$BugDetails_Rest$decodeDetails = A9(
+	_elm_lang$core$Json_Decode$object8,
 	_user$project$BugDetails_Types$Details,
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'patch_id', _elm_lang$core$Json_Decode$string),
@@ -9140,7 +9143,8 @@ var _user$project$BugDetails_Rest$decodeDetails = A8(
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'first_occurred_at', _user$project$BugDetails_Rest$date),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'last_occurred_at', _user$project$BugDetails_Rest$date),
 	_user$project$BugDetails_Rest$stacktrace,
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'occurrence_count', _elm_lang$core$Json_Decode$int));
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'occurrence_count', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'latest_event', _user$project$BugDetails_Rest$event));
 var _user$project$BugDetails_Rest$closeBugUrl = function (bugId) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -9228,6 +9232,7 @@ var _user$project$BugDetails_State$update = function (message) {
 };
 
 var _user$project$BugDetails_View$detailsView = function (bugDetails) {
+	var closed = _elm_lang$core$Native_Utils.eq(bugDetails.latestEvent.name, 'closed');
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
@@ -9280,6 +9285,7 @@ var _user$project$BugDetails_View$detailsView = function (bugDetails) {
 						_elm_lang$html$Html$button,
 						_elm_lang$core$Native_List.fromArray(
 							[
+								_elm_lang$html$Html_Attributes$disabled(closed),
 								_elm_lang$html$Html_Events$onClick(
 								_user$project$BugDetails_Types$CloseBug(bugDetails.id)),
 								_elm_lang$html$Html_Attributes$classList(
@@ -9293,6 +9299,15 @@ var _user$project$BugDetails_View$detailsView = function (bugDetails) {
 							[
 								_elm_lang$html$Html$text('Close')
 							]))
+					])),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						_elm_lang$core$Basics$toString(closed))
 					])),
 				A2(
 				_elm_lang$html$Html$br,

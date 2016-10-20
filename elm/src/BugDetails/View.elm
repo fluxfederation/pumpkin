@@ -20,13 +20,18 @@ root focusedBug =
 
 detailsView : Details -> Html Msg
 detailsView bugDetails =
-    div
-        [ class "column bug-pane"
-        ]
-        [ h5 [ class "title is-5" ] [ text bugDetails.message ]
-        , div [] [ text ("Last occurred at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.lastOccurredAt)) ]
-        , div [] [ text ("First occured at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.firstOccurredAt)) ]
-        , div [] [ button [ onClick (CloseBug bugDetails.id), classList [ ( "button", True ), ( "is-danger", True ) ] ] [ text "Close" ] ]
-        , br [] []
-        , div [ class "stacktrace" ] [ text (String.join ",\n" bugDetails.stackTrace) ]
-        ]
+    let
+        closed =
+            bugDetails.latestEvent.name == "closed"
+    in
+        div
+            [ class "column bug-pane"
+            ]
+            [ h5 [ class "title is-5" ] [ text bugDetails.message ]
+            , div [] [ text ("Last occurred at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.lastOccurredAt)) ]
+            , div [] [ text ("First occured at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.firstOccurredAt)) ]
+            , div [] [ button [ disabled (closed), onClick (CloseBug bugDetails.id), classList [ ( "button", True ), ( "is-danger", True ) ] ] [ text "Close" ] ]
+            , div [] [ text (toString closed) ]
+            , br [] []
+            , div [ class "stacktrace" ] [ text (String.join ",\n" bugDetails.stackTrace) ]
+            ]

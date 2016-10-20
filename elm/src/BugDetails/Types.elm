@@ -11,6 +11,15 @@ type Msg
     | CloseBug String
 
 
+type alias Event =
+    { name : String }
+
+
+type State
+    = Open
+    | Closed
+
+
 type alias Details =
     { id : String
     , patchId : String
@@ -19,4 +28,5 @@ type alias Details =
     , lastOccurredAt : Date.Date
     , stackTrace : List String
     , occurrenceCount : Int
+    , latestEvent : Event
     }
