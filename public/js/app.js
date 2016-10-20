@@ -9102,121 +9102,76 @@ var _mgold$elm_date_format$Date_Format$format = F2(
 	});
 var _mgold$elm_date_format$Date_Format$formatISO8601 = _mgold$elm_date_format$Date_Format$format('%Y-%m-%dT%H:%M:%SZ');
 
-var _user$project$Types$Model = F4(
-	function (a, b, c, d) {
-		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d};
-	});
-var _user$project$Types$initialModel = A4(
-	_user$project$Types$Model,
-	_elm_lang$core$Native_List.fromArray(
-		[]),
-	_elm_lang$core$Native_List.fromArray(
-		[]),
-	_elm_lang$core$Native_List.fromArray(
-		[]),
-	_elm_lang$core$Maybe$Nothing);
-var _user$project$Types$Patch = F2(
-	function (a, b) {
-		return {id: a, name: b};
-	});
-var _user$project$Types$BugDigest = F6(
-	function (a, b, c, d, e, f) {
-		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f};
-	});
-var _user$project$Types$BugDetails = F7(
+var _user$project$BugDetails_Types$Details = F7(
 	function (a, b, c, d, e, f, g) {
 		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, stackTrace: f, occurrenceCount: g};
 	});
-var _user$project$Types$RequestBugDetails = function (a) {
-	return {ctor: 'RequestBugDetails', _0: a};
+var _user$project$BugDetails_Types$RequestDetails = function (a) {
+	return {ctor: 'RequestDetails', _0: a};
 };
-var _user$project$Types$HidePatchBugs = function (a) {
-	return {ctor: 'HidePatchBugs', _0: a};
-};
-var _user$project$Types$ShowPatchBugs = function (a) {
-	return {ctor: 'ShowPatchBugs', _0: a};
-};
-var _user$project$Types$LoadedBugDetails = function (a) {
-	return {ctor: 'LoadedBugDetails', _0: a};
-};
-var _user$project$Types$LoadedBugs = function (a) {
-	return {ctor: 'LoadedBugs', _0: a};
-};
-var _user$project$Types$LoadedPatches = function (a) {
-	return {ctor: 'LoadedPatches', _0: a};
+var _user$project$BugDetails_Types$LoadedDetails = function (a) {
+	return {ctor: 'LoadedDetails', _0: a};
 };
 
-var _user$project$Rest$decodePatch = A3(
-	_elm_lang$core$Json_Decode$object2,
-	_user$project$Types$Patch,
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'name', _elm_lang$core$Json_Decode$string));
-var _user$project$Rest$decodePatches = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodePatch);
-var _user$project$Rest$stacktrace = A2(
+var _user$project$BugDetails_Rest$date = A2(_elm_lang$core$Json_Decode$customDecoder, _elm_lang$core$Json_Decode$string, _elm_lang$core$Date$fromString);
+var _user$project$BugDetails_Rest$stacktrace = A2(
 	_elm_lang$core$Json_Decode$at,
 	_elm_lang$core$Native_List.fromArray(
 		['data', 'exception', 'backtrace']),
 	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string));
-var _user$project$Rest$date = A2(_elm_lang$core$Json_Decode$customDecoder, _elm_lang$core$Json_Decode$string, _elm_lang$core$Date$fromString);
-var _user$project$Rest$decodeBug = A7(
-	_elm_lang$core$Json_Decode$object6,
-	_user$project$Types$BugDigest,
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'patch_id', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'message', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'first_occurred_at', _user$project$Rest$date),
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'last_occurred_at', _user$project$Rest$date),
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'occurrence_count', _elm_lang$core$Json_Decode$int));
-var _user$project$Rest$decodeBugs = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeBug);
-var _user$project$Rest$decodeBugDetails = A8(
+var _user$project$BugDetails_Rest$decodeDetails = A8(
 	_elm_lang$core$Json_Decode$object7,
-	_user$project$Types$BugDetails,
+	_user$project$BugDetails_Types$Details,
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'patch_id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'message', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'first_occurred_at', _user$project$Rest$date),
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'last_occurred_at', _user$project$Rest$date),
-	_user$project$Rest$stacktrace,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'first_occurred_at', _user$project$BugDetails_Rest$date),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'last_occurred_at', _user$project$BugDetails_Rest$date),
+	_user$project$BugDetails_Rest$stacktrace,
 	A2(_elm_lang$core$Json_Decode_ops[':='], 'occurrence_count', _elm_lang$core$Json_Decode$int));
-var _user$project$Rest$bugsUrl = '/bugs';
-var _user$project$Rest$bugDetailsUrl = function (bugId) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_user$project$Rest$bugsUrl,
-		A2(_elm_lang$core$Basics_ops['++'], '/', bugId));
+var _user$project$BugDetails_Rest$detailsUrl = function (bugId) {
+	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', bugId);
 };
-var _user$project$Rest$loadBugDetails = function (bugId) {
+var _user$project$BugDetails_Rest$loadDetails = function (bugId) {
 	return A2(
 		_elm_lang$core$Platform_Cmd$map,
-		_user$project$Types$LoadedBugDetails,
+		_user$project$BugDetails_Types$LoadedDetails,
 		A3(
 			_elm_lang$core$Task$perform,
 			_elm_lang$core$Result$Err,
 			_elm_lang$core$Result$Ok,
 			A2(
 				_evancz$elm_http$Http$get,
-				_user$project$Rest$decodeBugDetails,
-				_user$project$Rest$bugDetailsUrl(bugId))));
+				_user$project$BugDetails_Rest$decodeDetails,
+				_user$project$BugDetails_Rest$detailsUrl(bugId))));
 };
-var _user$project$Rest$loadBugs = A2(
-	_elm_lang$core$Platform_Cmd$map,
-	_user$project$Types$LoadedBugs,
-	A3(
-		_elm_lang$core$Task$perform,
-		_elm_lang$core$Result$Err,
-		_elm_lang$core$Result$Ok,
-		A2(_evancz$elm_http$Http$get, _user$project$Rest$decodeBugs, _user$project$Rest$bugsUrl)));
-var _user$project$Rest$patchesUrl = '/patches';
-var _user$project$Rest$loadPatches = A2(
-	_elm_lang$core$Platform_Cmd$map,
-	_user$project$Types$LoadedPatches,
-	A3(
-		_elm_lang$core$Task$perform,
-		_elm_lang$core$Result$Err,
-		_elm_lang$core$Result$Ok,
-		A2(_evancz$elm_http$Http$get, _user$project$Rest$decodePatches, _user$project$Rest$patchesUrl)));
 
-var _user$project$View$bugDetailsPane = function (bugDetails) {
+var _user$project$BugDetails_State$update = function (message) {
+	var _p0 = message;
+	if (_p0.ctor === 'RequestDetails') {
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Maybe$Nothing,
+			_1: _user$project$BugDetails_Rest$loadDetails(_p0._0)
+		};
+	} else {
+		var _p1 = _p0._0;
+		if (_p1.ctor === 'Err') {
+			return A2(
+				_elm_lang$core$Debug$log,
+				'error loading Bug details',
+				{ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: _elm_lang$core$Platform_Cmd$none});
+		} else {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Maybe$Just(_p1._0),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
+		}
+	}
+};
+
+var _user$project$BugDetails_View$detailsView = function (bugDetails) {
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
@@ -9278,6 +9233,57 @@ var _user$project$View$bugDetailsPane = function (bugDetails) {
 					]))
 			]));
 };
+var _user$project$BugDetails_View$root = function (focusedBug) {
+	var _p0 = focusedBug;
+	if (_p0.ctor === 'Nothing') {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	} else {
+		return _user$project$BugDetails_View$detailsView(_p0._0);
+	}
+};
+
+var _user$project$Types$Model = F4(
+	function (a, b, c, d) {
+		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d};
+	});
+var _user$project$Types$initialModel = A4(
+	_user$project$Types$Model,
+	_elm_lang$core$Native_List.fromArray(
+		[]),
+	_elm_lang$core$Native_List.fromArray(
+		[]),
+	_elm_lang$core$Native_List.fromArray(
+		[]),
+	_elm_lang$core$Maybe$Nothing);
+var _user$project$Types$Patch = F2(
+	function (a, b) {
+		return {id: a, name: b};
+	});
+var _user$project$Types$BugDigest = F6(
+	function (a, b, c, d, e, f) {
+		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f};
+	});
+var _user$project$Types$BugDetailsMsg = function (a) {
+	return {ctor: 'BugDetailsMsg', _0: a};
+};
+var _user$project$Types$HidePatchBugs = function (a) {
+	return {ctor: 'HidePatchBugs', _0: a};
+};
+var _user$project$Types$ShowPatchBugs = function (a) {
+	return {ctor: 'ShowPatchBugs', _0: a};
+};
+var _user$project$Types$LoadedBugs = function (a) {
+	return {ctor: 'LoadedBugs', _0: a};
+};
+var _user$project$Types$LoadedPatches = function (a) {
+	return {ctor: 'LoadedPatches', _0: a};
+};
+
 var _user$project$View$bugRow = F2(
 	function (currentBug, bug) {
 		var bugRowClass = function () {
@@ -9289,67 +9295,80 @@ var _user$project$View$bugRow = F2(
 			}
 		}();
 		return A2(
-			_elm_lang$html$Html$div,
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html_Attributes$class(bugRowClass),
-					_elm_lang$html$Html_Events$onClick(
-					_user$project$Types$RequestBugDetails(bug.id))
-				]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					A2(
-					_elm_lang$html$Html$div,
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html_Attributes$class('columns')
-						]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A2(
-							_elm_lang$html$Html$div,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html_Attributes$class('column is-2')
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text(
-									A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y', bug.lastOccurredAt))
-								])),
-							A2(
-							_elm_lang$html$Html$div,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html_Attributes$class('column')
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text(bug.message)
-								])),
-							A2(
-							_elm_lang$html$Html$div,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html_Attributes$class('column is-1')
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									A2(
-									_elm_lang$html$Html$span,
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html_Attributes$class('tag is-warning')
-										]),
-									_elm_lang$core$Native_List.fromArray(
-										[
-											_elm_lang$html$Html$text(
-											_elm_lang$core$Basics$toString(bug.occurrenceCount))
-										]))
-								]))
-						]))
-				]));
+			_elm_lang$html$Html_App$map,
+			_user$project$Types$BugDetailsMsg,
+			A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class(bugRowClass),
+						_elm_lang$html$Html_Events$onClick(
+						_user$project$BugDetails_Types$RequestDetails(bug.id))
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('columns')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('column is-2')
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html$text(
+										A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y', bug.lastOccurredAt))
+									])),
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('column')
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html$text(bug.message)
+									])),
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('column is-1')
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(
+										_elm_lang$html$Html$span,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('tag is-warning')
+											]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html$text(
+												_elm_lang$core$Basics$toString(bug.occurrenceCount))
+											]))
+									]))
+							]))
+					])));
 	});
+var _user$project$View$bugListView = function (model) {
+	var shouldShowBug = function (bug) {
+		return A2(_elm_lang$core$List$member, bug.patchId, model.selectedPatchIds);
+	};
+	var bugsToShow = A2(_elm_lang$core$List$filter, shouldShowBug, model.bugs);
+	return A2(
+		_elm_lang$core$List$map,
+		_user$project$View$bugRow(model.focusedBug),
+		bugsToShow);
+};
 var _user$project$View$patchButton = F2(
 	function (selectedPatchIds, project) {
 		var baseClass = 'tag is-medium';
@@ -9369,68 +9388,6 @@ var _user$project$View$patchButton = F2(
 					_elm_lang$html$Html$text(project.name)
 				]));
 	});
-var _user$project$View$bugs = function (model) {
-	var focusedBug = function () {
-		var _p1 = model.focusedBug;
-		if (_p1.ctor === 'Nothing') {
-			return _elm_lang$core$Native_List.fromArray(
-				[]);
-		} else {
-			return _elm_lang$core$Native_List.fromArray(
-				[
-					_user$project$View$bugDetailsPane(_p1._0)
-				]);
-		}
-	}();
-	var shouldShowBug = function (bug) {
-		return A2(_elm_lang$core$List$member, bug.patchId, model.selectedPatchIds);
-	};
-	var bugsToShow = A2(_elm_lang$core$List$filter, shouldShowBug, model.bugs);
-	return A2(
-		_elm_lang$html$Html$div,
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$class('section')
-			]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('container')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$div,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('columns')
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								A2(
-								_elm_lang$html$Html$div,
-								_elm_lang$core$Native_List.fromArray(
-									[
-										_elm_lang$html$Html_Attributes$class('column is-6')
-									]),
-								A2(
-									_elm_lang$core$List$map,
-									_user$project$View$bugRow(model.focusedBug),
-									bugsToShow)),
-								A2(
-								_elm_lang$html$Html$div,
-								_elm_lang$core$Native_List.fromArray(
-									[
-										_elm_lang$html$Html_Attributes$class('column is-6')
-									]),
-								focusedBug)
-							]))
-					]))
-			]));
-};
 var _user$project$View$patches = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -9459,115 +9416,210 @@ var _user$project$View$patches = function (model) {
 					]))
 			]));
 };
+var _user$project$View$heading = A2(
+	_elm_lang$html$Html$div,
+	_elm_lang$core$Native_List.fromArray(
+		[
+			_elm_lang$html$Html_Attributes$class('section')
+		]),
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('container')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$h1,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('title is-1')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Pumpkin')
+						]))
+				]))
+		]));
 var _user$project$View$view = function (model) {
-	var heading = A2(
-		_elm_lang$html$Html$div,
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$class('section')
-			]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('container')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$h1,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('title is-1')
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('Pumpkin')
-							]))
-					]))
-			]));
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
 			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
-				heading,
+				_user$project$View$heading,
 				_user$project$View$patches(model),
-				_user$project$View$bugs(model)
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('section')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('container')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('columns')
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(
+										_elm_lang$html$Html$div,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('column is-6')
+											]),
+										_user$project$View$bugListView(model)),
+										A2(
+										_elm_lang$html$Html$div,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('column is-6')
+											]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												A2(
+												_elm_lang$html$Html_App$map,
+												_user$project$Types$BugDetailsMsg,
+												_user$project$BugDetails_View$root(model.focusedBug))
+											]))
+									]))
+							]))
+					]))
 			]));
 };
 
+var _user$project$Rest$decodePatch = A3(
+	_elm_lang$core$Json_Decode$object2,
+	_user$project$Types$Patch,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'name', _elm_lang$core$Json_Decode$string));
+var _user$project$Rest$decodePatches = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodePatch);
+var _user$project$Rest$date = A2(_elm_lang$core$Json_Decode$customDecoder, _elm_lang$core$Json_Decode$string, _elm_lang$core$Date$fromString);
+var _user$project$Rest$decodeBug = A7(
+	_elm_lang$core$Json_Decode$object6,
+	_user$project$Types$BugDigest,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'patch_id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'message', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'first_occurred_at', _user$project$Rest$date),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'last_occurred_at', _user$project$Rest$date),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'occurrence_count', _elm_lang$core$Json_Decode$int));
+var _user$project$Rest$decodeBugs = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeBug);
+var _user$project$Rest$bugsUrl = '/bugs';
+var _user$project$Rest$loadBugs = A2(
+	_elm_lang$core$Platform_Cmd$map,
+	_user$project$Types$LoadedBugs,
+	A3(
+		_elm_lang$core$Task$perform,
+		_elm_lang$core$Result$Err,
+		_elm_lang$core$Result$Ok,
+		A2(_evancz$elm_http$Http$get, _user$project$Rest$decodeBugs, _user$project$Rest$bugsUrl)));
+var _user$project$Rest$patchesUrl = '/patches';
+var _user$project$Rest$loadPatches = A2(
+	_elm_lang$core$Platform_Cmd$map,
+	_user$project$Types$LoadedPatches,
+	A3(
+		_elm_lang$core$Task$perform,
+		_elm_lang$core$Result$Err,
+		_elm_lang$core$Result$Ok,
+		A2(_evancz$elm_http$Http$get, _user$project$Rest$decodePatches, _user$project$Rest$patchesUrl)));
+
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var msg$ = function () {
-			var _p0 = msg;
-			if (_p0.ctor === 'RequestBugDetails') {
-				return _user$project$Rest$loadBugDetails(_p0._0);
-			} else {
-				return _elm_lang$core$Platform_Cmd$none;
-			}
-		}();
-		var model$ = function () {
-			var _p1 = msg;
-			switch (_p1.ctor) {
-				case 'LoadedPatches':
-					var _p2 = _p1._0;
-					if (_p2.ctor === 'Err') {
-						return A2(_elm_lang$core$Debug$log, 'error loading patches', model);
-					} else {
-						return _elm_lang$core$Native_Utils.update(
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'LoadedPatches':
+				var _p1 = _p0._0;
+				if (_p1.ctor === 'Err') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						A2(_elm_lang$core$Debug$log, 'error loading patches', model),
+						_elm_lang$core$Native_List.fromArray(
+							[_elm_lang$core$Platform_Cmd$none]));
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
 							model,
-							{patches: _p2._0});
-					}
-				case 'LoadedBugs':
-					var _p3 = _p1._0;
-					if (_p3.ctor === 'Err') {
-						return A2(_elm_lang$core$Debug$log, 'error loading Bug digests', model);
-					} else {
-						return _elm_lang$core$Native_Utils.update(
+							{patches: _p1._0}),
+						_elm_lang$core$Native_List.fromArray(
+							[_elm_lang$core$Platform_Cmd$none]));
+				}
+			case 'LoadedBugs':
+				var _p2 = _p0._0;
+				if (_p2.ctor === 'Err') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						A2(_elm_lang$core$Debug$log, 'error loading Bug digests', model),
+						_elm_lang$core$Native_List.fromArray(
+							[_elm_lang$core$Platform_Cmd$none]));
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
 							model,
-							{bugs: _p3._0});
-					}
-				case 'LoadedBugDetails':
-					var _p4 = _p1._0;
-					if (_p4.ctor === 'Err') {
-						return A2(_elm_lang$core$Debug$log, 'error loading Bug details', model);
-					} else {
-						return _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								focusedBug: _elm_lang$core$Maybe$Just(_p4._0)
-							});
-					}
-				case 'ShowPatchBugs':
-					return _elm_lang$core$Native_Utils.update(
+							{bugs: _p2._0}),
+						_elm_lang$core$Native_List.fromArray(
+							[_elm_lang$core$Platform_Cmd$none]));
+				}
+			case 'ShowPatchBugs':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
 						model,
 						{
 							selectedPatchIds: A2(
 								_elm_lang$core$Basics_ops['++'],
 								model.selectedPatchIds,
 								_elm_lang$core$Native_List.fromArray(
-									[_p1._0]))
-						});
-				case 'HidePatchBugs':
-					return _elm_lang$core$Native_Utils.update(
+									[_p0._0]))
+						}),
+					_elm_lang$core$Native_List.fromArray(
+						[_elm_lang$core$Platform_Cmd$none]));
+			case 'HidePatchBugs':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
 						model,
 						{
 							selectedPatchIds: A2(
 								_elm_lang$core$List$filter,
 								function (x) {
-									return !_elm_lang$core$Native_Utils.eq(x, _p1._0);
+									return !_elm_lang$core$Native_Utils.eq(x, _p0._0);
 								},
 								model.selectedPatchIds)
-						});
-				default:
-					return model;
-			}
-		}();
-		return {ctor: '_Tuple2', _0: model$, _1: msg$};
+						}),
+					_elm_lang$core$Native_List.fromArray(
+						[_elm_lang$core$Platform_Cmd$none]));
+			default:
+				var _p3 = _user$project$BugDetails_State$update(_p0._0);
+				var details = _p3._0;
+				var command = _p3._1;
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{focusedBug: details}),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(_elm_lang$core$Platform_Cmd$map, _user$project$Types$BugDetailsMsg, command)
+						]));
+		}
 	});
 var _user$project$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;

@@ -14,15 +14,9 @@ patchesUrl = "/patches"
 bugsUrl : String
 bugsUrl = "/bugs"
 
-bugDetailsUrl : String -> String
-bugDetailsUrl bugId = bugsUrl ++ "/" ++ bugId
-
 -- Decoders
 date : Decoder Date.Date
 date = customDecoder string Date.fromString
-
-stacktrace : Decoder (List String)
-stacktrace = at ["data", "exception", "backtrace"] (list string)
 
 decodePatches : Decoder Patches
 decodePatches =
@@ -47,16 +41,6 @@ decodeBug =
     ("last_occurred_at" := date)
     ("occurrence_count" := int)
 
-decodeBugDetails : Decoder BugDetails
-decodeBugDetails =
-  object7 BugDetails
-    ("id" := string)
-    ("patch_id" := string)
-    ("message" := string)
-    ("first_occurred_at" := date)
-    ("last_occurred_at" := date)
-    (stacktrace)
-    ("occurrence_count" := int)
 
 -- Web Requests
 
@@ -74,12 +58,4 @@ loadBugs =
     (Task.perform
     Err
     Ok (Http.get decodeBugs bugsUrl)
-    )
-
-loadBugDetails : String -> Cmd Msg
-loadBugDetails bugId =
-  Cmd.map LoadedBugDetails
-    (Task.perform
-    Err
-    Ok (Http.get decodeBugDetails (bugDetailsUrl bugId))
     )

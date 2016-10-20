@@ -2,6 +2,8 @@ import Html.App as App
 
 import Http
 
+import BugDetails.State
+
 import Types exposing (..)
 import View
 import Rest
@@ -28,46 +30,33 @@ subscriptions model =
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
-  let
-    model' = case msg of
-      LoadedPatches (result) ->
-        case result of
-          Err err ->
-            -- TODO Actually handle errors
-            Debug.log "error loading patches"
-            model
-          Ok patches ->
-            { model | patches = patches }
+  case msg of
+    LoadedPatches (result) ->
+      case result of
+        Err err ->
+          -- TODO Actually handle errors
+          Debug.log "error loading patches"
+          model ! [Cmd.none]
+        Ok patches ->
+          { model | patches = patches } ! [Cmd.none]
 
-      LoadedBugs (result) ->
-        case result of
-          Err err ->
-            -- TODO Actually handle errors
-            Debug.log "error loading Bug digests"
-            model
-          Ok bugs ->
-            { model | bugs = bugs }
+    LoadedBugs (result) ->
+      case result of
+        Err err ->
+          -- TODO Actually handle errors
+          Debug.log "error loading Bug digests"
+          model ! [Cmd.none]
+        Ok bugs ->
+          { model | bugs = bugs } ! [Cmd.none]
 
-      LoadedBugDetails (result) ->
-        case result of
-          Err err ->
-            -- TODO Actually handle errors
-            Debug.log "error loading Bug details"
-            model
-          Ok bugDetails ->
-            { model | focusedBug = Just bugDetails }
+    ShowPatchBugs projectName ->
+      { model | selectedPatchIds = model.selectedPatchIds ++ [projectName] } ! [Cmd.none]
 
-      ShowPatchBugs projectName ->
-        { model | selectedPatchIds = model.selectedPatchIds ++ [projectName] }
+    HidePatchBugs projectName ->
+      { model | selectedPatchIds = List.filter (\x -> x /= projectName) model.selectedPatchIds } ! [Cmd.none]
 
-      HidePatchBugs projectName ->
-        { model | selectedPatchIds = List.filter (\x -> x /= projectName) model.selectedPatchIds }
-
-      _ -> model
-
-    msg' = case msg of
-      RequestBugDetails bugId -> Rest.loadBugDetails bugId
-      _ -> Cmd.none
-
-  in
-     (model', msg')
+    BugDetailsMsg detailsMsg ->
+      let
+        (details, command) = BugDetails.State.update detailsMsg
+      in
+        { model | focusedBug = details } ! [ ( Cmd.map BugDetailsMsg command) ]

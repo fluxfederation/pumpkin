@@ -1,12 +1,12 @@
 module View exposing (..)
 
 import Html exposing (..)
+import Html.App
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 
-import String
-
-import Rest
+import BugDetails.View
+import BugDetails.Types
 
 import Date.Format as DF
 
@@ -14,38 +14,27 @@ import Types exposing (..)
 
 view : Model -> Html Msg
 view model =
-  let
-    heading = div [ class "section" ] [ div [ class "container" ] [ h1 [ class "title is-1" ] [ text "Pumpkin"] ] ]
-  in
-    div []
-      [ heading
-      , patches model
-      , bugs model
+  div []
+    [ heading
+    , patches model
+    , div [ class "section" ]
+      [ div [ class "container" ]
+        [ div [ class "columns" ]
+            [ div [ class "column is-6" ] ( bugListView model )
+            , div [ class "column is-6" ] [ Html.App.map BugDetailsMsg <| BugDetails.View.root model.focusedBug ]
+            ]
+        ]
       ]
+    ]
+
+heading : Html Msg
+heading = div [ class "section" ] [ div [ class "container" ] [ h1 [ class "title is-1" ] [ text "Pumpkin"] ] ]
 
 patches : Model -> Html Msg
 patches model =
   div [ class "section" ]
     [ div [ class "container" ]
       [ div [] ( List.map (patchButton model.selectedPatchIds) model.patches )
-      ]
-    ]
-
-bugs : Model -> Html Msg
-bugs model =
-  let
-    shouldShowBug = (\ bug -> List.member bug.patchId model.selectedPatchIds)
-    bugsToShow = List.filter (shouldShowBug) model.bugs
-    focusedBug = case model.focusedBug of
-      Nothing -> []
-      Just bugDetails -> [ bugDetailsPane bugDetails ]
-  in
-    div [ class "section" ]
-    [ div [ class "container" ]
-      [ div [ class "columns" ]
-          [ div [ class "column is-6" ] ( List.map (bugRow model.focusedBug) bugsToShow )
-          , div [ class "column is-6" ] focusedBug
-          ]
       ]
     ]
 
@@ -62,7 +51,15 @@ patchButton selectedPatchIds project =
       , onClick (toggleMsg project.id)
       ] [ text project.name ]
 
-bugRow : Maybe BugDetails -> BugDigest -> Html Msg
+bugListView : Model -> List (Html Msg)
+bugListView model =
+  let
+    shouldShowBug = (\ bug -> List.member bug.patchId model.selectedPatchIds)
+    bugsToShow = List.filter (shouldShowBug) model.bugs
+  in
+    ( List.map (bugRow model.focusedBug) bugsToShow )
+
+bugRow : Maybe BugDetails.Types.Details -> BugDigest -> Html Msg
 bugRow currentBug bug =
   let
     bugRowClass = case currentBug of
@@ -70,23 +67,14 @@ bugRow currentBug bug =
       Just otherBug ->
         if otherBug.id == bug.id then "bug is-active" else "bug"
   in
-    div
-      [ class bugRowClass
-      , onClick (RequestBugDetails bug.id)
-      ]
-      [ div [ class "columns" ]
-        [ div [ class "column is-2" ] [ text (DF.format "%e %b %Y" bug.lastOccurredAt) ],
-          div [ class "column" ] [ text bug.message ],
-          div [ class "column is-1" ] [ span [ class "tag is-warning" ] [ text (toString bug.occurrenceCount) ] ]
+    Html.App.map BugDetailsMsg <|
+      div
+        [ class bugRowClass
+        , onClick (BugDetails.Types.RequestDetails bug.id)
         ]
-      ]
-
-bugDetailsPane bugDetails = div
-  [ class "column bug-pane"
-  ]
-  [ h5 [ class "title is-5" ] [ text bugDetails.message ],
-    div [] [ text ( "Last occurred at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.lastOccurredAt) ) ],
-    div [] [ text ("First occured at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.firstOccurredAt) ) ],
-    br [] [],
-    div [ class "stacktrace" ] [ text ( String.join ",\n" bugDetails.stackTrace) ]
-  ]
+        [ div [ class "columns" ]
+          [ div [ class "column is-2" ] [ text (DF.format "%e %b %Y" bug.lastOccurredAt) ],
+            div [ class "column" ] [ text bug.message ],
+            div [ class "column is-1" ] [ span [ class "tag is-warning" ] [ text (toString bug.occurrenceCount) ] ]
+          ]
+        ]
