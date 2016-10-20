@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.App
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
+import Date
 import Date.Format as DF
 import Types exposing (..)
 
@@ -124,6 +125,7 @@ bugRow currentBug bug =
             ]
 
 
+timestamp : Date.Date -> String
 timestamp ts =
     (DF.format "%e %b %Y %H:%m:%S" ts)
 

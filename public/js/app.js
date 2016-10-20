@@ -10425,13 +10425,11 @@ var _user$project$View$bugDetails = function (bug) {
 								_elm_lang$html$Html$button,
 								_elm_lang$core$Native_List.fromArray(
 									[
-										_elm_lang$html$Html_Attributes$class('button is-warning'),
+										_elm_lang$html$Html_Attributes$class('delete'),
 										_elm_lang$html$Html_Events$onClick(_user$project$Types$HideBug)
 									]),
 								_elm_lang$core$Native_List.fromArray(
-									[
-										_elm_lang$html$Html$text('<<')
-									]))
+									[]))
 							]))
 					])),
 				A2(
