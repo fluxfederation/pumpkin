@@ -9281,11 +9281,17 @@ var _user$project$BugDetails_View$detailsView = function (bugDetails) {
 						_elm_lang$core$Native_List.fromArray(
 							[
 								_elm_lang$html$Html_Events$onClick(
-								_user$project$BugDetails_Types$CloseBug(bugDetails.id))
+								_user$project$BugDetails_Types$CloseBug(bugDetails.id)),
+								_elm_lang$html$Html_Attributes$classList(
+								_elm_lang$core$Native_List.fromArray(
+									[
+										{ctor: '_Tuple2', _0: 'button', _1: true},
+										{ctor: '_Tuple2', _0: 'is-danger', _1: true}
+									]))
 							]),
 						_elm_lang$core$Native_List.fromArray(
 							[
-								_elm_lang$html$Html$text('close')
+								_elm_lang$html$Html$text('Close')
 							]))
 					])),
 				A2(

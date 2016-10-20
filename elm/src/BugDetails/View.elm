@@ -26,7 +26,7 @@ detailsView bugDetails =
         [ h5 [ class "title is-5" ] [ text bugDetails.message ]
         , div [] [ text ("Last occurred at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.lastOccurredAt)) ]
         , div [] [ text ("First occured at " ++ (DF.format "%e %b %Y %H:%m:%S" bugDetails.firstOccurredAt)) ]
-        , div [] [ button [ onClick (CloseBug bugDetails.id) ] [ text "close" ] ]
+        , div [] [ button [ onClick (CloseBug bugDetails.id), classList [ ( "button", True ), ( "is-danger", True ) ] ] [ text "Close" ] ]
         , br [] []
         , div [ class "stacktrace" ] [ text (String.join ",\n" bugDetails.stackTrace) ]
         ]
