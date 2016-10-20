@@ -30,6 +30,12 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
     assert_response_schema "bugs/index.json"
   end
 
+  test "index with not closed filtering" do
+    get bugs_path, params: {closed: "false"}
+    assert_response :success
+    assert_response_schema "bugs/index.json"
+  end
+
   test "show" do
     get bug_path(bugs(:prod_normal))
     assert_response :success
