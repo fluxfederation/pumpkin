@@ -13,6 +13,8 @@ type Msg
     | LoadedBugs (Result Http.Error Bugs)
     | ShowPatchBugs String
     | HidePatchBugs String
+    | ShowClosedBugs
+    | HideClosedBugs
     | LoadedDetails (Result Http.Error Bug)
     | RequestDetails String
     | ClosedBug (Result Http.Error Bug)
@@ -31,6 +33,7 @@ type alias Model =
     , bugs : Bugs
     , focusedBug : Maybe Bug
     , error : Maybe String
+    , showClosedBugs : Bool
     }
 
 
@@ -64,7 +67,7 @@ type alias Bug =
 
 initialModel : Model
 initialModel =
-    Model [] [] [] Nothing Nothing
+    Model [] [] [] Nothing Nothing False
 
 
 isClosed : Bug -> Bool

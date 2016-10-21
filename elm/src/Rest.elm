@@ -15,8 +15,13 @@ patchesUrl =
     "/patches"
 
 
-bugsUrl : String
-bugsUrl =
+openBugsUrl : String
+openBugsUrl =
+    "/bugs" ++ "?closed=false"
+
+
+allBugsUrl : String
+allBugsUrl =
     "/bugs"
 
 
@@ -113,11 +118,18 @@ loadPatches =
         )
 
 
-loadBugs : Cmd Msg
-loadBugs =
-    Cmd.map LoadedBugs
-        (Task.perform
-            Err
-            Ok
-            (Http.get decodeBugs bugsUrl)
-        )
+loadBugs : Bool -> Cmd Msg
+loadBugs includeClosedBugs =
+    let
+        url =
+            if includeClosedBugs then
+                allBugsUrl
+            else
+                openBugsUrl
+    in
+        Cmd.map LoadedBugs
+            (Task.perform
+                Err
+                Ok
+                (Http.get decodeBugs url)
+            )

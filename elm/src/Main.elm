@@ -9,7 +9,7 @@ import List.Extra as ListX
 
 init : ( Model, Cmd Msg )
 init =
-    ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Rest.loadBugs ] )
+    ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Rest.loadBugs False ] )
 
 
 main : Program Never
@@ -52,7 +52,7 @@ update msg model =
             handleResult (\patches -> noCmd { model | patches = patches }) model result
 
         LoadedBugs result ->
-            handleResult (\bugs -> { model | bugs = bugs } ! [ Cmd.none ]) model result
+            handleResult (loadedBugs model) model result
 
         ShowPatchBugs projectName ->
             noCmd { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ] }
@@ -60,15 +60,10 @@ update msg model =
         HidePatchBugs patchId ->
             let
                 newFocusedBug =
-                    case Maybe.map (\bug -> bug.patchId == patchId) model.focusedBug of
-                        Nothing ->
-                            Nothing
-
-                        Just True ->
-                            Nothing
-
-                        Just False ->
-                            model.focusedBug
+                    if shouldHideFocusedBug model (bugInPatch patchId) then
+                        Nothing
+                    else
+                        model.focusedBug
 
                 newPatchIds =
                     List.filter (\x -> x /= patchId) model.selectedPatchIds
@@ -110,7 +105,50 @@ update msg model =
         ClearError ->
             noCmd { model | error = Nothing }
 
+        ShowClosedBugs ->
+            { model | showClosedBugs = True } ! [ Rest.loadBugs True ]
+
+        HideClosedBugs ->
+            { model | showClosedBugs = False } ! [ Rest.loadBugs False ]
+
 
 noCmd : model -> ( model, Cmd Msg )
 noCmd model =
     model ! [ Cmd.none ]
+
+
+loadedBugs : Model -> List Bug -> ( Model, Cmd Msg )
+loadedBugs model bugs =
+    let
+        newFocusedBug =
+            if shouldHideFocusedBug model (bugInList bugs) then
+                Nothing
+            else
+                model.focusedBug
+    in
+        noCmd { model | bugs = bugs, focusedBug = newFocusedBug }
+
+
+isJust : Maybe x -> Bool
+isJust x =
+    case x of
+        Just _ ->
+            True
+
+        Nothing ->
+            False
+
+
+bugInList : List Bug -> Bug -> Bool
+bugInList bugs bug =
+    not <| isJust <| (ListX.find (\x -> x.id == bug.id) bugs)
+
+
+bugInPatch : String -> Bug -> Bool
+bugInPatch patchId bug =
+    bug.patchId == patchId
+
+
+shouldHideFocusedBug : Model -> (Bug -> Bool) -> Bool
+shouldHideFocusedBug model f =
+    Maybe.withDefault False <| Maybe.map f model.focusedBug

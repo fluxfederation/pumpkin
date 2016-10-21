@@ -19,7 +19,7 @@ view model =
     div []
         ([ heading ]
             ++ errorMessages model
-            ++ [ patches model
+            ++ [ filters model
                , bugs model
                ]
         )
@@ -55,11 +55,25 @@ heading =
         ]
 
 
-patches : Model -> Html Msg
-patches model =
+filters : Model -> Html Msg
+filters model =
     div [ class "section" ]
         [ div [] (List.map (patchButton model.selectedPatchIds) model.patches)
+        , closedFilter model
         ]
+
+
+closedFilter : Model -> Html Msg
+closedFilter model =
+    let
+        -- TODO figure out why we can't extract these out to their own functions without elm exceptions
+        showHideButton =
+            if model.showClosedBugs then
+                button [ onClick HideClosedBugs, class "button is" ] [ text "Hide Closed Bugs" ]
+            else
+                button [ onClick ShowClosedBugs, class "button is-outlined is-danger" ] [ text "Show Closed Bugs" ]
+    in
+        div [ class "section" ] [ showHideButton ]
 
 
 bugs : Model -> Html Msg

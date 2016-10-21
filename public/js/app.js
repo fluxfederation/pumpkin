@@ -10324,11 +10324,11 @@ var _user$project$Types$isClosed = function (bug) {
 			},
 			bug.closedAt));
 };
-var _user$project$Types$Model = F5(
-	function (a, b, c, d, e) {
-		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, error: e};
+var _user$project$Types$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, error: e, showClosedBugs: f};
 	});
-var _user$project$Types$initialModel = A5(
+var _user$project$Types$initialModel = A6(
 	_user$project$Types$Model,
 	_elm_lang$core$Native_List.fromArray(
 		[]),
@@ -10337,7 +10337,8 @@ var _user$project$Types$initialModel = A5(
 	_elm_lang$core$Native_List.fromArray(
 		[]),
 	_elm_lang$core$Maybe$Nothing,
-	_elm_lang$core$Maybe$Nothing);
+	_elm_lang$core$Maybe$Nothing,
+	false);
 var _user$project$Types$Event = function (a) {
 	return {name: a};
 };
@@ -10363,6 +10364,8 @@ var _user$project$Types$RequestDetails = function (a) {
 var _user$project$Types$LoadedDetails = function (a) {
 	return {ctor: 'LoadedDetails', _0: a};
 };
+var _user$project$Types$HideClosedBugs = {ctor: 'HideClosedBugs'};
+var _user$project$Types$ShowClosedBugs = {ctor: 'ShowClosedBugs'};
 var _user$project$Types$HidePatchBugs = function (a) {
 	return {ctor: 'HidePatchBugs', _0: a};
 };
@@ -10704,7 +10707,38 @@ var _user$project$View$bugs = function (model) {
 					]))
 			]));
 };
-var _user$project$View$patches = function (model) {
+var _user$project$View$closedFilter = function (model) {
+	var showHideButton = model.showClosedBugs ? A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Events$onClick(_user$project$Types$HideClosedBugs),
+				_elm_lang$html$Html_Attributes$class('button is')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Hide Closed Bugs')
+			])) : A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Events$onClick(_user$project$Types$ShowClosedBugs),
+				_elm_lang$html$Html_Attributes$class('button is-outlined is-danger')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Show Closed Bugs')
+			]));
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('section')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[showHideButton]));
+};
+var _user$project$View$filters = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
@@ -10720,7 +10754,8 @@ var _user$project$View$patches = function (model) {
 				A2(
 					_elm_lang$core$List$map,
 					_user$project$View$patchButton(model.selectedPatchIds),
-					model.patches))
+					model.patches)),
+				_user$project$View$closedFilter(model)
 			]));
 };
 var _user$project$View$container = function (contents) {
@@ -10831,7 +10866,7 @@ var _user$project$View$view = function (model) {
 				_user$project$View$errorMessages(model),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_user$project$View$patches(model),
+						_user$project$View$filters(model),
 						_user$project$View$bugs(model)
 					]))));
 };
@@ -10904,15 +10939,19 @@ var _user$project$Rest$loadBugDetails = function (bugId) {
 				_user$project$Rest$decodeBug,
 				_user$project$Rest$detailsUrl(bugId))));
 };
-var _user$project$Rest$bugsUrl = '/bugs';
-var _user$project$Rest$loadBugs = A2(
-	_elm_lang$core$Platform_Cmd$map,
-	_user$project$Types$LoadedBugs,
-	A3(
-		_elm_lang$core$Task$perform,
-		_elm_lang$core$Result$Err,
-		_elm_lang$core$Result$Ok,
-		A2(_evancz$elm_http$Http$get, _user$project$Rest$decodeBugs, _user$project$Rest$bugsUrl)));
+var _user$project$Rest$allBugsUrl = '/bugs';
+var _user$project$Rest$openBugsUrl = A2(_elm_lang$core$Basics_ops['++'], '/bugs', '?closed=false');
+var _user$project$Rest$loadBugs = function (includeClosedBugs) {
+	var url = includeClosedBugs ? _user$project$Rest$allBugsUrl : _user$project$Rest$openBugsUrl;
+	return A2(
+		_elm_lang$core$Platform_Cmd$map,
+		_user$project$Types$LoadedBugs,
+		A3(
+			_elm_lang$core$Task$perform,
+			_elm_lang$core$Result$Err,
+			_elm_lang$core$Result$Ok,
+			A2(_evancz$elm_http$Http$get, _user$project$Rest$decodeBugs, url)));
+};
 var _user$project$Rest$patchesUrl = '/patches';
 var _user$project$Rest$loadPatches = A2(
 	_elm_lang$core$Platform_Cmd$map,
@@ -10923,6 +10962,36 @@ var _user$project$Rest$loadPatches = A2(
 		_elm_lang$core$Result$Ok,
 		A2(_evancz$elm_http$Http$get, _user$project$Rest$decodePatches, _user$project$Rest$patchesUrl)));
 
+var _user$project$Main$shouldHideFocusedBug = F2(
+	function (model, f) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			false,
+			A2(_elm_lang$core$Maybe$map, f, model.focusedBug));
+	});
+var _user$project$Main$bugInPatch = F2(
+	function (patchId, bug) {
+		return _elm_lang$core$Native_Utils.eq(bug.patchId, patchId);
+	});
+var _user$project$Main$isJust = function (x) {
+	var _p0 = x;
+	if (_p0.ctor === 'Just') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$Main$bugInList = F2(
+	function (bugs, bug) {
+		return _elm_lang$core$Basics$not(
+			_user$project$Main$isJust(
+				A2(
+					_elm_community$list_extra$List_Extra$find,
+					function (x) {
+						return _elm_lang$core$Native_Utils.eq(x.id, bug.id);
+					},
+					bugs)));
+	});
 var _user$project$Main$noCmd = function (model) {
 	return A2(
 		_elm_lang$core$Platform_Cmd_ops['!'],
@@ -10930,25 +10999,36 @@ var _user$project$Main$noCmd = function (model) {
 		_elm_lang$core$Native_List.fromArray(
 			[_elm_lang$core$Platform_Cmd$none]));
 };
+var _user$project$Main$loadedBugs = F2(
+	function (model, bugs) {
+		var newFocusedBug = A2(
+			_user$project$Main$shouldHideFocusedBug,
+			model,
+			_user$project$Main$bugInList(bugs)) ? _elm_lang$core$Maybe$Nothing : model.focusedBug;
+		return _user$project$Main$noCmd(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{bugs: bugs, focusedBug: newFocusedBug}));
+	});
 var _user$project$Main$handleResult = F3(
 	function (handler, model, result) {
-		var _p0 = result;
-		if (_p0.ctor === 'Err') {
+		var _p1 = result;
+		if (_p1.ctor === 'Err') {
 			return _user$project$Main$noCmd(
 				_elm_lang$core$Native_Utils.update(
 					model,
 					{
 						error: _elm_lang$core$Maybe$Just(
-							_elm_lang$core$Basics$toString(_p0._0))
+							_elm_lang$core$Basics$toString(_p1._0))
 					}));
 		} else {
-			return handler(_p0._0);
+			return handler(_p1._0);
 		}
 	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
 			case 'LoadedPatches':
 				return A3(
 					_user$project$Main$handleResult,
@@ -10959,21 +11039,13 @@ var _user$project$Main$update = F2(
 								{patches: patches}));
 					},
 					model,
-					_p1._0);
+					_p2._0);
 			case 'LoadedBugs':
 				return A3(
 					_user$project$Main$handleResult,
-					function (bugs) {
-						return A2(
-							_elm_lang$core$Platform_Cmd_ops['!'],
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{bugs: bugs}),
-							_elm_lang$core$Native_List.fromArray(
-								[_elm_lang$core$Platform_Cmd$none]));
-					},
+					_user$project$Main$loadedBugs(model),
 					model,
-					_p1._0);
+					_p2._0);
 			case 'ShowPatchBugs':
 				return _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
@@ -10983,33 +11055,20 @@ var _user$project$Main$update = F2(
 								_elm_lang$core$Basics_ops['++'],
 								model.selectedPatchIds,
 								_elm_lang$core$Native_List.fromArray(
-									[_p1._0]))
+									[_p2._0]))
 						}));
 			case 'HidePatchBugs':
-				var _p3 = _p1._0;
+				var _p3 = _p2._0;
 				var newPatchIds = A2(
 					_elm_lang$core$List$filter,
 					function (x) {
 						return !_elm_lang$core$Native_Utils.eq(x, _p3);
 					},
 					model.selectedPatchIds);
-				var newFocusedBug = function () {
-					var _p2 = A2(
-						_elm_lang$core$Maybe$map,
-						function (bug) {
-							return _elm_lang$core$Native_Utils.eq(bug.patchId, _p3);
-						},
-						model.focusedBug);
-					if (_p2.ctor === 'Nothing') {
-						return _elm_lang$core$Maybe$Nothing;
-					} else {
-						if (_p2._0 === true) {
-							return _elm_lang$core$Maybe$Nothing;
-						} else {
-							return model.focusedBug;
-						}
-					}
-				}();
+				var newFocusedBug = A2(
+					_user$project$Main$shouldHideFocusedBug,
+					model,
+					_user$project$Main$bugInPatch(_p3)) ? _elm_lang$core$Maybe$Nothing : model.focusedBug;
 				return _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
@@ -11020,7 +11079,7 @@ var _user$project$Main$update = F2(
 					model,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_user$project$Rest$loadBugDetails(_p1._0)
+							_user$project$Rest$loadBugDetails(_p2._0)
 						]));
 			case 'LoadedDetails':
 				return A3(
@@ -11034,7 +11093,7 @@ var _user$project$Main$update = F2(
 								}));
 					},
 					model,
-					_p1._0);
+					_p2._0);
 			case 'ClosedBug':
 				return A3(
 					_user$project$Main$handleResult,
@@ -11053,25 +11112,45 @@ var _user$project$Main$update = F2(
 								{focusedBug: bug, bugs: bugList}));
 					},
 					model,
-					_p1._0);
+					_p2._0);
 			case 'CloseBug':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_user$project$Rest$closeBug(_p1._0)
+							_user$project$Rest$closeBug(_p2._0)
 						]));
 			case 'HideBug':
 				return _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{focusedBug: _elm_lang$core$Maybe$Nothing}));
-			default:
+			case 'ClearError':
 				return _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{error: _elm_lang$core$Maybe$Nothing}));
+			case 'ShowClosedBugs':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showClosedBugs: true}),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_user$project$Rest$loadBugs(true)
+						]));
+			default:
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showClosedBugs: false}),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_user$project$Rest$loadBugs(false)
+						]));
 		}
 	});
 var _user$project$Main$subscriptions = function (model) {
@@ -11082,7 +11161,10 @@ var _user$project$Main$init = {
 	_0: _user$project$Types$initialModel,
 	_1: _elm_lang$core$Platform_Cmd$batch(
 		_elm_lang$core$Native_List.fromArray(
-			[_user$project$Rest$loadPatches, _user$project$Rest$loadBugs]))
+			[
+				_user$project$Rest$loadPatches,
+				_user$project$Rest$loadBugs(false)
+			]))
 };
 var _user$project$Main$main = {
 	main: _elm_lang$html$Html_App$program(
