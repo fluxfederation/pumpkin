@@ -83,16 +83,7 @@ update msg model =
 
         ClosedBug result ->
             handleResult
-                (\bugDetails ->
-                    let
-                        bug =
-                            Just bugDetails
-
-                        bugList =
-                            ListX.replaceIf (\x -> bugDetails.id == x.id) bugDetails model.bugs
-                    in
-                        noCmd { model | focusedBug = bug, bugs = bugList }
-                )
+                (closedBug model)
                 model
                 result
 
@@ -106,10 +97,10 @@ update msg model =
             noCmd { model | error = Nothing }
 
         ShowClosedBugs ->
-            { model | showClosedBugs = True } ! [ Rest.loadBugs True ]
+            { model | showClosedBugs = True } ! [ Rest.loadPatches, Rest.loadBugs True ]
 
         HideClosedBugs ->
-            { model | showClosedBugs = False } ! [ Rest.loadBugs False ]
+            { model | showClosedBugs = False } ! [ Rest.loadPatches, Rest.loadBugs False ]
 
 
 noCmd : model -> ( model, Cmd Msg )
@@ -127,6 +118,18 @@ loadedBugs model bugs =
                 model.focusedBug
     in
         noCmd { model | bugs = bugs, focusedBug = newFocusedBug }
+
+
+closedBug : Model -> Bug -> ( Model, Cmd Msg )
+closedBug model bugDetails =
+    let
+        bug =
+            Just bugDetails
+
+        bugList =
+            ListX.replaceIf (\x -> bugDetails.id == x.id) bugDetails model.bugs
+    in
+        noCmd { model | focusedBug = bug, bugs = bugList }
 
 
 isJust : Maybe x -> Bool

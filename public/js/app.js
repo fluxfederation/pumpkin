@@ -11015,6 +11015,21 @@ var _user$project$Main$loadedBugs = F2(
 				model,
 				{bugs: bugs, focusedBug: newFocusedBug}));
 	});
+var _user$project$Main$closedBug = F2(
+	function (model, bugDetails) {
+		var bugList = A3(
+			_elm_community$list_extra$List_Extra$replaceIf,
+			function (x) {
+				return _elm_lang$core$Native_Utils.eq(bugDetails.id, x.id);
+			},
+			bugDetails,
+			model.bugs);
+		var bug = _elm_lang$core$Maybe$Just(bugDetails);
+		return _user$project$Main$noCmd(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{focusedBug: bug, bugs: bugList}));
+	});
 var _user$project$Main$handleResult = F3(
 	function (handler, model, result) {
 		var _p1 = result;
@@ -11102,20 +11117,7 @@ var _user$project$Main$update = F2(
 			case 'ClosedBug':
 				return A3(
 					_user$project$Main$handleResult,
-					function (bugDetails) {
-						var bugList = A3(
-							_elm_community$list_extra$List_Extra$replaceIf,
-							function (x) {
-								return _elm_lang$core$Native_Utils.eq(bugDetails.id, x.id);
-							},
-							bugDetails,
-							model.bugs);
-						var bug = _elm_lang$core$Maybe$Just(bugDetails);
-						return _user$project$Main$noCmd(
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{focusedBug: bug, bugs: bugList}));
-					},
+					_user$project$Main$closedBug(model),
 					model,
 					_p2._0);
 			case 'CloseBug':
@@ -11144,6 +11146,7 @@ var _user$project$Main$update = F2(
 						{showClosedBugs: true}),
 					_elm_lang$core$Native_List.fromArray(
 						[
+							_user$project$Rest$loadPatches,
 							_user$project$Rest$loadBugs(true)
 						]));
 			default:
@@ -11154,6 +11157,7 @@ var _user$project$Main$update = F2(
 						{showClosedBugs: false}),
 					_elm_lang$core$Native_List.fromArray(
 						[
+							_user$project$Rest$loadPatches,
 							_user$project$Rest$loadBugs(false)
 						]));
 		}
