@@ -32,7 +32,8 @@ errorMessages model =
             [ div [ class "section" ]
                 [ container
                     [ div [ class "message is-danger" ]
-                        [ div [ class "message-header" ] [ text "Error" ]
+                        [ div [ class "message-header" ]
+                            [ withCloseButton [ text "Error" ] ClearError ]
                         , div [ class "message-body" ] [ text e ]
                         ]
                     ]
@@ -150,14 +151,23 @@ timestamp ts =
     (DF.format "%e %b %Y %H:%m:%S" ts)
 
 
+withCloseButton : List (Html Msg) -> Msg -> Html Msg
+withCloseButton content msg =
+    div [ class "columns" ]
+        [ div [ class "column is-11" ] content
+        , div [ class "column is-1" ] [ button [ class "delete", onClick msg ] [] ]
+        ]
+
+
 bugDetails : Bug -> Html Msg
 bugDetails bug =
     div
         [ class "bug-pane" ]
         [ div
             [ class "columns" ]
-            [ div [ class "column is-11" ] [ h5 [ class "title" ] [ text bug.message ] ]
-            , div [ class "column is-1" ] [ button [ class "delete", onClick HideBug ] [] ]
+            [ withCloseButton
+                [ h5 [ class "title" ] [ text bug.message ] ]
+                HideBug
             ]
         , table [ class "table" ]
             [ tr []

@@ -10376,6 +10376,43 @@ var _user$project$Types$LoadedPatches = function (a) {
 	return {ctor: 'LoadedPatches', _0: a};
 };
 
+var _user$project$View$withCloseButton = F2(
+	function (content, msg) {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('columns')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('column is-11')
+						]),
+					content),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('column is-1')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_elm_lang$html$Html$button,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html_Attributes$class('delete'),
+									_elm_lang$html$Html_Events$onClick(msg)
+								]),
+							_elm_lang$core$Native_List.fromArray(
+								[]))
+						]))
+				]));
+	});
 var _user$project$View$timestamp = function (ts) {
 	return A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y %H:%m:%S', ts);
 };
@@ -10397,11 +10434,7 @@ var _user$project$View$bugDetails = function (bug) {
 				_elm_lang$core$Native_List.fromArray(
 					[
 						A2(
-						_elm_lang$html$Html$div,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('column is-11')
-							]),
+						_user$project$View$withCloseButton,
 						_elm_lang$core$Native_List.fromArray(
 							[
 								A2(
@@ -10414,25 +10447,8 @@ var _user$project$View$bugDetails = function (bug) {
 									[
 										_elm_lang$html$Html$text(bug.message)
 									]))
-							])),
-						A2(
-						_elm_lang$html$Html$div,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('column is-1')
 							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								A2(
-								_elm_lang$html$Html$button,
-								_elm_lang$core$Native_List.fromArray(
-									[
-										_elm_lang$html$Html_Attributes$class('delete'),
-										_elm_lang$html$Html_Events$onClick(_user$project$Types$HideBug)
-									]),
-								_elm_lang$core$Native_List.fromArray(
-									[]))
-							]))
+						_user$project$Types$HideBug)
 					])),
 				A2(
 				_elm_lang$html$Html$table,
@@ -10769,7 +10785,13 @@ var _user$project$View$errorMessages = function (model) {
 											]),
 										_elm_lang$core$Native_List.fromArray(
 											[
-												_elm_lang$html$Html$text('Error')
+												A2(
+												_user$project$View$withCloseButton,
+												_elm_lang$core$Native_List.fromArray(
+													[
+														_elm_lang$html$Html$text('Error')
+													]),
+												_user$project$Types$ClearError)
 											])),
 										A2(
 										_elm_lang$html$Html$div,
