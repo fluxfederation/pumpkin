@@ -3,13 +3,17 @@ lock '3.6.1'
 
 set :application, 'com-test-pumpkin'
 
+set :pty, true
 set :use_sudo, false
 set :scm, :git
 set :repo_url, 'git@git.powershop.co.nz:pumpkin/api.git'
+set :passenger_restart_with_sudo, true
 
 set :bundle_without, [:development, :test, :deployment]
 
 set(:deploy_to) { "/apps/com-test-pumpkin" }
+
+set(:linked_dirs) { %w(log) }
 
 set :rails_env, 'production'
 
