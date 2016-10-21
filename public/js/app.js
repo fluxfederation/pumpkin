@@ -10689,7 +10689,7 @@ var _user$project$View$closedFilter = function (model) {
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
 			[
-				_elm_lang$html$Html_Attributes$class('section')
+				_elm_lang$html$Html_Attributes$class('control')
 			]),
 		_elm_lang$core$Native_List.fromArray(
 			[showHideButton]));
@@ -10698,15 +10698,15 @@ var _user$project$View$filters = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$class('section')
-			]),
+			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[]),
+					[
+						_elm_lang$html$Html_Attributes$class('control')
+					]),
 				A2(
 					_elm_lang$core$List$map,
 					_user$project$View$patchButton(model.selectedPatchIds),

@@ -51,8 +51,8 @@ heading =
 
 filters : Model -> Html Msg
 filters model =
-    div [ class "section" ]
-        [ div [] (List.map (patchButton model.selectedPatchIds) model.patches)
+    div []
+        [ div [ class "control" ] (List.map (patchButton model.selectedPatchIds) model.patches)
         , closedFilter model
         ]
 
@@ -67,7 +67,7 @@ closedFilter model =
             else
                 button [ onClick ShowClosedBugs, class "button is-outlined is-danger" ] [ text "Show Closed Bugs" ]
     in
-        div [ class "section" ] [ showHideButton ]
+        div [ class "control" ] [ showHideButton ]
 
 
 bugs : Model -> Html Msg
