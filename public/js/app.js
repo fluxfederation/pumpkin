@@ -10623,16 +10623,6 @@ var _user$project$View$bugRow = F2(
 						]))
 				]));
 	});
-var _user$project$View$bugList = function (model) {
-	var shouldShowBug = function (bug) {
-		return A2(_elm_lang$core$List$member, bug.patchId, model.selectedPatchIds);
-	};
-	var bugsToShow = A2(_elm_lang$core$List$filter, shouldShowBug, model.bugs);
-	return A2(
-		_elm_lang$core$List$map,
-		_user$project$View$bugRow(model.focusedBug),
-		bugsToShow);
-};
 var _user$project$View$patchButton = F2(
 	function (selectedPatchIds, project) {
 		var baseClass = 'tag is-medium';
@@ -10672,40 +10662,6 @@ var _user$project$View$bugPane = function (model) {
 					]))
 			]);
 	}
-};
-var _user$project$View$bugs = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$class('section')
-			]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('columns')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$div,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('column is-6')
-							]),
-						_user$project$View$bugList(model)),
-						A2(
-						_elm_lang$html$Html$div,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('column is-6')
-							]),
-						_user$project$View$bugPane(model))
-					]))
-			]));
 };
 var _user$project$View$closedFilter = function (model) {
 	var showHideButton = model.showClosedBugs ? A2(
@@ -10756,6 +10712,56 @@ var _user$project$View$filters = function (model) {
 					_user$project$View$patchButton(model.selectedPatchIds),
 					model.patches)),
 				_user$project$View$closedFilter(model)
+			]));
+};
+var _user$project$View$bugList = function (model) {
+	var shouldShowBug = function (bug) {
+		return A2(_elm_lang$core$List$member, bug.patchId, model.selectedPatchIds);
+	};
+	var bugsToShow = A2(_elm_lang$core$List$filter, shouldShowBug, model.bugs);
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_user$project$View$filters(model)
+			]),
+		A2(
+			_elm_lang$core$List$map,
+			_user$project$View$bugRow(model.focusedBug),
+			bugsToShow));
+};
+var _user$project$View$bugs = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('section')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('columns')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('column is-6')
+							]),
+						_user$project$View$bugList(model)),
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('column is-6')
+							]),
+						_user$project$View$bugPane(model))
+					]))
 			]));
 };
 var _user$project$View$container = function (contents) {
@@ -10866,7 +10872,6 @@ var _user$project$View$view = function (model) {
 				_user$project$View$errorMessages(model),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_user$project$View$filters(model),
 						_user$project$View$bugs(model)
 					]))));
 };

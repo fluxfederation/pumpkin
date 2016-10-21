@@ -16,13 +16,7 @@ container contents =
 
 view : Model -> Html Msg
 view model =
-    div []
-        ([ heading ]
-            ++ errorMessages model
-            ++ [ filters model
-               , bugs model
-               ]
-        )
+    div [] ([ heading ] ++ errorMessages model ++ [ bugs model ])
 
 
 errorMessages : Model -> List (Html Msg)
@@ -135,7 +129,7 @@ bugList model =
         bugsToShow =
             List.filter (shouldShowBug) model.bugs
     in
-        (List.map (bugRow model.focusedBug) bugsToShow)
+        [ filters model ] ++ (List.map (bugRow model.focusedBug) bugsToShow)
 
 
 bugRow : Maybe Bug -> Bug -> Html Msg
