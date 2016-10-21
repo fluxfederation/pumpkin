@@ -17,10 +17,30 @@ container contents =
 view : Model -> Html Msg
 view model =
     div []
-        [ heading
-        , patches model
-        , bugs model
-        ]
+        ([ heading ]
+            ++ errorMessages model
+            ++ [ patches model
+               , bugs model
+               ]
+        )
+
+
+errorMessages : Model -> List (Html Msg)
+errorMessages model =
+    case model.error of
+        Just e ->
+            [ div [ class "section" ]
+                [ container
+                    [ div [ class "message is-danger" ]
+                        [ div [ class "message-header" ] [ text "Error" ]
+                        , div [ class "message-body" ] [ text e ]
+                        ]
+                    ]
+                ]
+            ]
+
+        _ ->
+            []
 
 
 heading : Html Msg

@@ -10324,11 +10324,11 @@ var _user$project$Types$isClosed = function (bug) {
 			},
 			bug.closedAt));
 };
-var _user$project$Types$Model = F4(
-	function (a, b, c, d) {
-		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d};
+var _user$project$Types$Model = F5(
+	function (a, b, c, d, e) {
+		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, error: e};
 	});
-var _user$project$Types$initialModel = A4(
+var _user$project$Types$initialModel = A5(
 	_user$project$Types$Model,
 	_elm_lang$core$Native_List.fromArray(
 		[]),
@@ -10336,6 +10336,7 @@ var _user$project$Types$initialModel = A4(
 		[]),
 	_elm_lang$core$Native_List.fromArray(
 		[]),
+	_elm_lang$core$Maybe$Nothing,
 	_elm_lang$core$Maybe$Nothing);
 var _user$project$Types$Event = function (a) {
 	return {name: a};
@@ -10348,6 +10349,7 @@ var _user$project$Types$Bug = F8(
 	function (a, b, c, d, e, f, g, h) {
 		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
 	});
+var _user$project$Types$ClearError = {ctor: 'ClearError'};
 var _user$project$Types$HideBug = {ctor: 'HideBug'};
 var _user$project$Types$CloseBug = function (a) {
 	return {ctor: 'CloseBug', _0: a};
@@ -10735,6 +10737,59 @@ var _user$project$View$container = function (contents) {
 			]),
 		contents);
 };
+var _user$project$View$errorMessages = function (model) {
+	var _p1 = model.error;
+	if (_p1.ctor === 'Just') {
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('section')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_user$project$View$container(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('message is-danger')
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(
+										_elm_lang$html$Html$div,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('message-header')
+											]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html$text('Error')
+											])),
+										A2(
+										_elm_lang$html$Html$div,
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html_Attributes$class('message-body')
+											]),
+										_elm_lang$core$Native_List.fromArray(
+											[
+												_elm_lang$html$Html$text(_p1._0)
+											]))
+									]))
+							]))
+					]))
+			]);
+	} else {
+		return _elm_lang$core$Native_List.fromArray(
+			[]);
+	}
+};
 var _user$project$View$heading = A2(
 	_elm_lang$html$Html$div,
 	_elm_lang$core$Native_List.fromArray(
@@ -10777,12 +10832,18 @@ var _user$project$View$view = function (model) {
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
 			[]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_user$project$View$heading,
-				_user$project$View$patches(model),
-				_user$project$View$bugs(model)
-			]));
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Native_List.fromArray(
+				[_user$project$View$heading]),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_user$project$View$errorMessages(model),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_user$project$View$patches(model),
+						_user$project$View$bugs(model)
+					]))));
 };
 
 var _user$project$Rest$closeBugUrl = function (bugId) {
@@ -10872,53 +10933,59 @@ var _user$project$Rest$loadPatches = A2(
 		_elm_lang$core$Result$Ok,
 		A2(_evancz$elm_http$Http$get, _user$project$Rest$decodePatches, _user$project$Rest$patchesUrl)));
 
+var _user$project$Main$noCmd = function (model) {
+	return A2(
+		_elm_lang$core$Platform_Cmd_ops['!'],
+		model,
+		_elm_lang$core$Native_List.fromArray(
+			[_elm_lang$core$Platform_Cmd$none]));
+};
+var _user$project$Main$handleResult = F3(
+	function (handler, model, result) {
+		var _p0 = result;
+		if (_p0.ctor === 'Err') {
+			return _user$project$Main$noCmd(
+				_elm_lang$core$Native_Utils.update(
+					model,
+					{
+						error: _elm_lang$core$Maybe$Just(
+							_elm_lang$core$Basics$toString(_p0._0))
+					}));
+		} else {
+			return handler(_p0._0);
+		}
+	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'LoadedPatches':
-				var _p1 = _p0._0;
-				if (_p1.ctor === 'Err') {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						A2(
-							_elm_lang$core$Debug$log,
-							_elm_lang$core$Basics$toString(_p1._0),
-							model),
-						_elm_lang$core$Native_List.fromArray(
-							[_elm_lang$core$Platform_Cmd$none]));
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{patches: _p1._0}),
-						_elm_lang$core$Native_List.fromArray(
-							[_elm_lang$core$Platform_Cmd$none]));
-				}
+				return A3(
+					_user$project$Main$handleResult,
+					function (patches) {
+						return _user$project$Main$noCmd(
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{patches: patches}));
+					},
+					model,
+					_p1._0);
 			case 'LoadedBugs':
-				var _p2 = _p0._0;
-				if (_p2.ctor === 'Err') {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						A2(
-							_elm_lang$core$Debug$log,
-							_elm_lang$core$Basics$toString(_p2._0),
-							model),
-						_elm_lang$core$Native_List.fromArray(
-							[_elm_lang$core$Platform_Cmd$none]));
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{bugs: _p2._0}),
-						_elm_lang$core$Native_List.fromArray(
-							[_elm_lang$core$Platform_Cmd$none]));
-				}
+				return A3(
+					_user$project$Main$handleResult,
+					function (bugs) {
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{bugs: bugs}),
+							_elm_lang$core$Native_List.fromArray(
+								[_elm_lang$core$Platform_Cmd$none]));
+					},
+					model,
+					_p1._0);
 			case 'ShowPatchBugs':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
+				return _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
@@ -10926,111 +10993,95 @@ var _user$project$Main$update = F2(
 								_elm_lang$core$Basics_ops['++'],
 								model.selectedPatchIds,
 								_elm_lang$core$Native_List.fromArray(
-									[_p0._0]))
-						}),
-					_elm_lang$core$Native_List.fromArray(
-						[_elm_lang$core$Platform_Cmd$none]));
+									[_p1._0]))
+						}));
 			case 'HidePatchBugs':
-				var _p4 = _p0._0;
+				var _p3 = _p1._0;
 				var newPatchIds = A2(
 					_elm_lang$core$List$filter,
 					function (x) {
-						return !_elm_lang$core$Native_Utils.eq(x, _p4);
+						return !_elm_lang$core$Native_Utils.eq(x, _p3);
 					},
 					model.selectedPatchIds);
 				var newFocusedBug = function () {
-					var _p3 = A2(
+					var _p2 = A2(
 						_elm_lang$core$Maybe$map,
 						function (bug) {
-							return _elm_lang$core$Native_Utils.eq(bug.patchId, _p4);
+							return _elm_lang$core$Native_Utils.eq(bug.patchId, _p3);
 						},
 						model.focusedBug);
-					if (_p3.ctor === 'Nothing') {
+					if (_p2.ctor === 'Nothing') {
 						return _elm_lang$core$Maybe$Nothing;
 					} else {
-						if (_p3._0 === true) {
+						if (_p2._0 === true) {
 							return _elm_lang$core$Maybe$Nothing;
 						} else {
 							return model.focusedBug;
 						}
 					}
 				}();
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
+				return _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selectedPatchIds: newPatchIds, focusedBug: newFocusedBug}),
-					_elm_lang$core$Native_List.fromArray(
-						[_elm_lang$core$Platform_Cmd$none]));
+						{selectedPatchIds: newPatchIds, focusedBug: newFocusedBug}));
 			case 'RequestDetails':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_user$project$Rest$loadBugDetails(_p0._0)
+							_user$project$Rest$loadBugDetails(_p1._0)
 						]));
 			case 'LoadedDetails':
-				var _p5 = _p0._0;
-				if (_p5.ctor === 'Err') {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						A2(_elm_lang$core$Debug$log, 'error loading Bug details', model),
-						_elm_lang$core$Native_List.fromArray(
-							[_elm_lang$core$Platform_Cmd$none]));
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								focusedBug: _elm_lang$core$Maybe$Just(_p5._0)
-							}),
-						_elm_lang$core$Native_List.fromArray(
-							[_elm_lang$core$Platform_Cmd$none]));
-				}
+				return A3(
+					_user$project$Main$handleResult,
+					function (bugDetails) {
+						return _user$project$Main$noCmd(
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									focusedBug: _elm_lang$core$Maybe$Just(bugDetails)
+								}));
+					},
+					model,
+					_p1._0);
 			case 'ClosedBug':
-				var _p6 = _p0._0;
-				if (_p6.ctor === 'Err') {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						A2(_elm_lang$core$Debug$log, 'error closing Bug', model),
-						_elm_lang$core$Native_List.fromArray(
-							[_elm_lang$core$Platform_Cmd$none]));
-				} else {
-					var _p7 = _p6._0;
-					var bugList = A3(
-						_elm_community$list_extra$List_Extra$replaceIf,
-						function (x) {
-							return _elm_lang$core$Native_Utils.eq(_p7.id, x.id);
-						},
-						_p7,
-						model.bugs);
-					var bug = _elm_lang$core$Maybe$Just(_p7);
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{focusedBug: bug, bugs: bugList}),
-						_elm_lang$core$Native_List.fromArray(
-							[_elm_lang$core$Platform_Cmd$none]));
-				}
+				return A3(
+					_user$project$Main$handleResult,
+					function (bugDetails) {
+						var bugList = A3(
+							_elm_community$list_extra$List_Extra$replaceIf,
+							function (x) {
+								return _elm_lang$core$Native_Utils.eq(bugDetails.id, x.id);
+							},
+							bugDetails,
+							model.bugs);
+						var bug = _elm_lang$core$Maybe$Just(bugDetails);
+						return _user$project$Main$noCmd(
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{focusedBug: bug, bugs: bugList}));
+					},
+					model,
+					_p1._0);
 			case 'CloseBug':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_user$project$Rest$closeBug(_p0._0)
+							_user$project$Rest$closeBug(_p1._0)
 						]));
-			default:
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
+			case 'HideBug':
+				return _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{focusedBug: _elm_lang$core$Maybe$Nothing}),
-					_elm_lang$core$Native_List.fromArray(
-						[_elm_lang$core$Platform_Cmd$none]));
+						{focusedBug: _elm_lang$core$Maybe$Nothing}));
+			default:
+				return _user$project$Main$noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{error: _elm_lang$core$Maybe$Nothing}));
 		}
 	});
 var _user$project$Main$subscriptions = function (model) {

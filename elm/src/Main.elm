@@ -1,7 +1,6 @@
 module Main exposing (..)
 
 import Html.App as App
-import Http
 import Types exposing (..)
 import View
 import Rest
@@ -13,6 +12,7 @@ init =
     ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Rest.loadBugs ] )
 
 
+main : Program Never
 main =
     App.program
         { init = init
@@ -35,33 +35,27 @@ subscriptions model =
 -- Updates
 
 
+handleResult : (b -> ( Model, Cmd Msg )) -> Model -> Result a b -> ( Model, Cmd Msg )
+handleResult handler model result =
+    case result of
+        Err err ->
+            noCmd { model | error = Just (toString err) }
+
+        Ok v ->
+            handler v
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         LoadedPatches result ->
-            case result of
-                Err err ->
-                    -- TODO Actually handle errors
-                    Debug.log (toString err)
-                        model
-                        ! [ Cmd.none ]
-
-                Ok patches ->
-                    { model | patches = patches } ! [ Cmd.none ]
+            handleResult (\patches -> noCmd { model | patches = patches }) model result
 
         LoadedBugs result ->
-            case result of
-                Err err ->
-                    -- TODO Actually handle errors
-                    Debug.log (toString err)
-                        model
-                        ! [ Cmd.none ]
-
-                Ok bugs ->
-                    { model | bugs = bugs } ! [ Cmd.none ]
+            handleResult (\bugs -> { model | bugs = bugs } ! [ Cmd.none ]) model result
 
         ShowPatchBugs projectName ->
-            { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ] } ! [ Cmd.none ]
+            noCmd { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ] }
 
         HidePatchBugs patchId ->
             let
@@ -79,31 +73,22 @@ update msg model =
                 newPatchIds =
                     List.filter (\x -> x /= patchId) model.selectedPatchIds
             in
-                { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug } ! [ Cmd.none ]
+                noCmd { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug }
 
         RequestDetails bugId ->
             model ! [ Rest.loadBugDetails bugId ]
 
         LoadedDetails result ->
-            case result of
-                Err err ->
-                    -- TODO Actually handle errors
-                    Debug.log "error loading Bug details"
-                        model
-                        ! [ Cmd.none ]
-
-                Ok bugDetails ->
-                    { model | focusedBug = Just bugDetails } ! [ Cmd.none ]
+            handleResult
+                (\bugDetails ->
+                    noCmd { model | focusedBug = Just bugDetails }
+                )
+                model
+                result
 
         ClosedBug result ->
-            case result of
-                Err err ->
-                    -- TODO Actually handle errors
-                    Debug.log "error closing Bug"
-                        model
-                        ! [ Cmd.none ]
-
-                Ok bugDetails ->
+            handleResult
+                (\bugDetails ->
                     let
                         bug =
                             Just bugDetails
@@ -111,10 +96,21 @@ update msg model =
                         bugList =
                             ListX.replaceIf (\x -> bugDetails.id == x.id) bugDetails model.bugs
                     in
-                        { model | focusedBug = bug, bugs = bugList } ! [ Cmd.none ]
+                        noCmd { model | focusedBug = bug, bugs = bugList }
+                )
+                model
+                result
 
         CloseBug bugId ->
             model ! [ Rest.closeBug bugId ]
 
         HideBug ->
-            { model | focusedBug = Nothing } ! [ Cmd.none ]
+            noCmd { model | focusedBug = Nothing }
+
+        ClearError ->
+            noCmd { model | error = Nothing }
+
+
+noCmd : model -> ( model, Cmd Msg )
+noCmd model =
+    model ! [ Cmd.none ]
