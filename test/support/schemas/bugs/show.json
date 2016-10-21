@@ -8,6 +8,7 @@
     "patch_id": { "type": "string" },
     "data": { "type": "object" },
     "closed_at": { "type": ["string", "null"] },
+    "issue_url": { "type": ["string", "null"] },
     "occurrences": {
       "type": "array",
       "properties": {
@@ -16,5 +17,5 @@
       "minItems": 1
     }
   },
-  "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id", "data", "closed_at", "occurrences"]
+  "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id", "data", "closed_at", "issue_url", "occurrences"]
 }

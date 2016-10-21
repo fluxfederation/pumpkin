@@ -23,6 +23,12 @@ class BugsController < ApplicationController
     render json: fetch_bug, serializer: FullBugSerializer
   end
 
+  def create_issue
+    bug = fetch_bug
+    CreateBugIssue.perform_later(bug)
+    render json: fetch_bug, serializer: FullBugSerializer
+  end
+
   private
   def fetch_bug
     Bug.with_latest_details.find(params[:id])

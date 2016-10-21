@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :bugs do
     member do
       post :close
+      post :create_issue
     end
   end
 end

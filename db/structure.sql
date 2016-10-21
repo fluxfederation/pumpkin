@@ -2,16 +2,12 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.4
--- Dumped by pg_dump version 9.5.4
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
-SET row_security = off;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
@@ -48,7 +44,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
+-- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE ar_internal_metadata (
@@ -60,19 +56,20 @@ CREATE TABLE ar_internal_metadata (
 
 
 --
--- Name: bugs; Type: TABLE; Schema: public; Owner: -
+-- Name: bugs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE bugs (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     primary_occurrence_id uuid NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    issue_url character varying
 );
 
 
 --
--- Name: events; Type: TABLE; Schema: public; Owner: -
+-- Name: events; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE events (
@@ -85,7 +82,7 @@ CREATE TABLE events (
 
 
 --
--- Name: occurrences; Type: TABLE; Schema: public; Owner: -
+-- Name: occurrences; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE occurrences (
@@ -109,6 +106,7 @@ CREATE VIEW bug_with_latest_details AS
     bugs.primary_occurrence_id,
     bugs.created_at,
     bugs.updated_at,
+    bugs.issue_url,
     ev_latest.id AS latest_event_id,
     ev_latest.name AS latest_event_name,
     occ_latest.occurred_at AS last_occurred_at
@@ -119,7 +117,7 @@ CREATE VIEW bug_with_latest_details AS
 
 
 --
--- Name: patches; Type: TABLE; Schema: public; Owner: -
+-- Name: patches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE patches (
@@ -131,7 +129,7 @@ CREATE TABLE patches (
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE schema_migrations (
@@ -140,7 +138,7 @@ CREATE TABLE schema_migrations (
 
 
 --
--- Name: ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY ar_internal_metadata
@@ -148,7 +146,7 @@ ALTER TABLE ONLY ar_internal_metadata
 
 
 --
--- Name: bugs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: bugs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY bugs
@@ -156,7 +154,7 @@ ALTER TABLE ONLY bugs
 
 
 --
--- Name: events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: events_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY events
@@ -164,7 +162,7 @@ ALTER TABLE ONLY events
 
 
 --
--- Name: occurrences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: occurrences_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY occurrences
@@ -172,7 +170,7 @@ ALTER TABLE ONLY occurrences
 
 
 --
--- Name: patches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: patches_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY patches
@@ -180,7 +178,7 @@ ALTER TABLE ONLY patches
 
 
 --
--- Name: schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY schema_migrations
@@ -188,35 +186,35 @@ ALTER TABLE ONLY schema_migrations
 
 
 --
--- Name: index_bugs_on_primary_occurrence_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_bugs_on_primary_occurrence_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_bugs_on_primary_occurrence_id ON bugs USING btree (primary_occurrence_id);
 
 
 --
--- Name: index_events_on_bug_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_events_on_bug_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_events_on_bug_id ON events USING btree (bug_id);
 
 
 --
--- Name: index_occurrences_on_bug_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_occurrences_on_bug_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_occurrences_on_bug_id ON occurrences USING btree (bug_id);
 
 
 --
--- Name: index_occurrences_on_patch_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_occurrences_on_patch_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_occurrences_on_patch_id ON occurrences USING btree (patch_id);
 
 
 --
--- Name: index_patches_on_name; Type: INDEX; Schema: public; Owner: -
+-- Name: index_patches_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX index_patches_on_name ON patches USING btree (name);
@@ -226,8 +224,8 @@ CREATE UNIQUE INDEX index_patches_on_name ON patches USING btree (name);
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user", public;
+SET search_path TO "$user",public;
 
-INSERT INTO schema_migrations (version) VALUES ('20160914224317'), ('20160914233248'), ('20160914233416'), ('20160914235925'), ('20160915001629'), ('20160915022656'), ('20161019211306'), ('20161020213813');
+INSERT INTO schema_migrations (version) VALUES ('20160914224317'), ('20160914233248'), ('20160914233416'), ('20160914235925'), ('20160915001629'), ('20160915022656'), ('20161019211306'), ('20161020213813'), ('20161021015303'), ('20161021020642');
 
 

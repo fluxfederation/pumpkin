@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class BugsControllerTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
   include ActiveModelSerializers::Test::Schema
 
   test "index" do
@@ -47,5 +48,13 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_response_schema "bugs/show.json"
     assert_equal "closed", bugs(:prod_normal).events.created_order.last!.name
+  end
+
+  test "create_issue" do
+    assert_enqueued_with(job: CreateBugIssue) do
+      post create_issue_bug_path(bugs(:prod_normal))
+    end
+    assert_response :success
+    assert_response_schema "bugs/show.json"
   end
 end
