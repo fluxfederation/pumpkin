@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html.App as App
+import Html
 import Types exposing (..)
 import View
 import Rest
@@ -12,9 +12,9 @@ init =
     ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Rest.loadBugs False ] )
 
 
-main : Program Never
+main : Program Never Model Msg
 main =
-    App.program
+    Html.program
         { init = init
         , view = View.view
         , update = update

@@ -1,7 +1,6 @@
 module View exposing (..)
 
 import Html exposing (..)
-import Html.App
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Date

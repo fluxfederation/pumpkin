@@ -2,7 +2,6 @@ module Rest exposing (..)
 
 import Http
 import Json.Decode exposing (..)
-import Task
 import Types exposing (..)
 import Date
 
@@ -36,7 +35,16 @@ detailsUrl bugId =
 
 date : Decoder Date.Date
 date =
-    customDecoder string Date.fromString
+    let
+        decodeDateFromString s =
+            case Date.fromString s of
+                Ok d ->
+                    succeed d
+
+                Err e ->
+                    fail ("Invalid date: " ++ s)
+    in
+        andThen decodeDateFromString string
 
 
 decodePatches : Decoder Patches
@@ -46,9 +54,9 @@ decodePatches =
 
 decodePatch : Decoder Patch
 decodePatch =
-    object2 Patch
-        ("id" := string)
-        ("name" := string)
+    map2 Patch
+        (field "id" string)
+        (field "name" string)
 
 
 decodeBugs : Decoder Bugs
@@ -58,14 +66,14 @@ decodeBugs =
 
 decodeBug : Decoder Bug
 decodeBug =
-    object8 Bug
-        ("id" := string)
-        ("patch_id" := string)
-        ("message" := string)
-        ("first_occurred_at" := date)
-        ("last_occurred_at" := date)
-        ("occurrence_count" := int)
-        ("closed_at" := (maybe date))
+    map8 Bug
+        (field "id" string)
+        (field "patch_id" string)
+        (field "message" string)
+        (field "first_occurred_at" date)
+        (field "last_occurred_at" date)
+        (field "occurrence_count" int)
+        (field "closed_at" (maybe date))
         (stacktrace)
 
 
@@ -74,9 +82,9 @@ stacktrace =
     maybe <| at [ "data", "exception", "backtrace" ] (list string)
 
 
-event : Decoder (Event)
+event : Decoder Event
 event =
-    object1 Event ("name" := string)
+    map Event (field "name" string)
 
 
 closeBugUrl : String -> String
@@ -90,32 +98,17 @@ closeBugUrl bugId =
 
 loadBugDetails : String -> Cmd Msg
 loadBugDetails bugId =
-    Cmd.map LoadedDetails
-        (Task.perform
-            Err
-            Ok
-            (Http.get decodeBug (detailsUrl bugId))
-        )
+    Http.send LoadedDetails <| Http.get (detailsUrl bugId) decodeBug
 
 
 closeBug : String -> Cmd Msg
 closeBug bugId =
-    Cmd.map ClosedBug
-        (Task.perform
-            Err
-            Ok
-            (Http.post decodeBug (closeBugUrl bugId) Http.empty)
-        )
+    Http.send ClosedBug <| Http.post (closeBugUrl bugId) Http.emptyBody decodeBug
 
 
 loadPatches : Cmd Msg
 loadPatches =
-    Cmd.map LoadedPatches
-        (Task.perform
-            Err
-            Ok
-            (Http.get decodePatches patchesUrl)
-        )
+    Http.send LoadedPatches <| Http.get patchesUrl decodePatches
 
 
 loadBugs : Bool -> Cmd Msg
@@ -127,9 +120,4 @@ loadBugs includeClosedBugs =
             else
                 openBugsUrl
     in
-        Cmd.map LoadedBugs
-            (Task.perform
-                Err
-                Ok
-                (Http.get decodeBugs url)
-            )
+        Http.send LoadedBugs <| Http.get url decodeBugs
