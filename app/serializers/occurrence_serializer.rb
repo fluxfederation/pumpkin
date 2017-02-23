@@ -1,6 +1,3 @@
 class OccurrenceSerializer < ActiveModel::Serializer
-  attributes :id, :message, :data
-
-  has_one :patch
-  has_one :bug
+  attributes :id, :patch_id, :bug_id, :occurred_at, :message, :data
 end

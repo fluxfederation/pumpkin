@@ -17,6 +17,7 @@ type Msg
     | ShowClosedBugs
     | HideClosedBugs
     | LoadedDetails (Result Http.Error Bug)
+    | LoadedOccurrences (Result Http.Error Occurrences)
     | RequestDetails String
     | ClosedBug (Result Http.Error Bug)
     | CloseBug String
@@ -37,6 +38,7 @@ type alias Model =
     , patches : Patches
     , bugs : Bugs
     , focusedBug : Maybe Bug
+    , focusedBugOccurrences : Maybe Occurrences
     , showFullStackTrace : Bool
     , error : Maybe String
     , showClosedBugs : Bool
@@ -74,12 +76,25 @@ type alias Bug =
     }
 
 
+type alias Occurrences =
+    List Occurrence
+
+
+type alias Occurrence =
+    { id : String
+    , patchId : String
+    , message : String
+    , occurredAt : Date.Date
+    }
+
+
 initialModel : Model
 initialModel =
     { selectedPatchIds = []
     , patches = []
     , bugs = []
     , focusedBug = Nothing
+    , focusedBugOccurrences = Nothing
     , showFullStackTrace = False
     , error = Nothing
     , showClosedBugs = False

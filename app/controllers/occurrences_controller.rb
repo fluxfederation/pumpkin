@@ -1,9 +1,10 @@
 class OccurrencesController < ApplicationController
   before_action :authenticate!, only: :create
 
-  def show
-    occurrence = Occurrence.find(params[:id])
-    render json: occurrence, include: [:patch]
+  def index
+    bug = Bug.find(params[:bug_id])
+
+    render json: bug.occurrences
   end
 
   def create

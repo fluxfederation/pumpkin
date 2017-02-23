@@ -3,6 +3,7 @@ module View exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
+import Date exposing (Date)
 import Date.Format as DF
 import Date.Extra.Period as Period
 import String.Extra exposing (pluralize)
@@ -64,7 +65,7 @@ currentPatchesAsTags : Model -> Html Msg
 currentPatchesAsTags model =
     let
         tag id =
-            span [ class "tag is-medium" ] [ text (patchName id model) ]
+            span [ class "tag is-medium" ] [ text (patchName model id) ]
     in
         span [ class "menu-button-tags" ] (List.map tag model.selectedPatchIds)
 
@@ -154,7 +155,7 @@ selectedBug model =
                 [ selectedBugHeader model bug
                 , linkedIssue bug
                 , stackTraceDisplay model bug
-                , occurrenceDisplay
+                , occurrencesDisplay model
                 ]
 
         Nothing ->
@@ -193,19 +194,12 @@ occurrenceCount bug =
 
 bugTimes : Model -> Bug -> Html Msg
 bugTimes model bug =
-    let
-        formatDate date =
-            if model.showTimeAgo then
-                timeAgo model.now date
-            else
-                DF.format "%e %b %Y %k:%M:%S" date
-    in
-        if bug.occurrenceCount == 1 then
-            span [ class "bug-times" ]
-                [ text (formatDate bug.lastOccurredAt) ]
-        else
-            span [ class "bug-times" ]
-                [ text (formatDate bug.lastOccurredAt ++ " ~ " ++ formatDate bug.firstOccurredAt) ]
+    if bug.occurrenceCount == 1 then
+        span [ class "bug-times" ]
+            [ text (formatDate model bug.lastOccurredAt) ]
+    else
+        span [ class "bug-times" ]
+            [ text (formatDate model bug.lastOccurredAt ++ " ~ " ++ formatDate model bug.firstOccurredAt) ]
 
 
 linkedIssue : Bug -> Html Msg
@@ -242,14 +236,27 @@ stackTraceLine line =
     code [] [ text line ]
 
 
-occurrenceDisplay : Html Msg
-occurrenceDisplay =
+occurrencesDisplay : Model -> Html Msg
+occurrencesDisplay model =
     div []
         [ div [ class "section-title" ]
             [ h3 [ class "menu-label" ] [ text "Occurrences" ]
             , button [ class "button is-small is-primary is-inverted" ] [ text "Filter" ]
             , button [ class "button is-small is-primary is-inverted" ] [ text "Map" ]
             , button [ class "button is-small is-primary is-inverted" ] [ text "Export JSON" ]
+            ]
+        , ul [ class "panel" ] <|
+            List.map (occurrenceDisplay model) (Maybe.withDefault [] model.focusedBugOccurrences)
+        ]
+
+
+occurrenceDisplay : Model -> Occurrence -> Html Msg
+occurrenceDisplay model occurrence =
+    li [ class "occurrence panel-block" ]
+        [ a [ class "occurrence-toggle" ]
+            [ text (patchName model occurrence.patchId)
+            , text " • "
+            , text (formatDate model occurrence.occurredAt)
             ]
         ]
 
@@ -262,6 +269,14 @@ icon name variant =
 
 
 -- Data wrangling
+
+
+formatDate : Model -> Date -> String
+formatDate model date =
+    if model.showTimeAgo then
+        timeAgo model.now date
+    else
+        DF.format "%e %b %Y %k:%M:%S" date
 
 
 bugGroups : Model -> List ( String, List Bug )
@@ -299,8 +314,8 @@ errorMessage bug =
     bug.message |> String.split " : " |> List.tail |> Maybe.withDefault [] |> String.join " : "
 
 
-patchName : String -> Model -> String
-patchName id model =
+patchName : Model -> String -> String
+patchName model id =
     let
         patch =
             List.head (List.filter (\patch -> patch.id == id) model.patches)

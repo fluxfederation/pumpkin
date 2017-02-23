@@ -82,6 +82,14 @@ update msg model =
                 model
                 result
 
+        LoadedOccurrences result ->
+            handleResult
+                (\occurrences ->
+                    noCmd { model | focusedBugOccurrences = Just occurrences }
+                )
+                model
+                result
+
         ClosedBug result ->
             handleResult
                 (closedBug model)

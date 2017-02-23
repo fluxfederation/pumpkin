@@ -16719,6 +16719,7 @@ var _user$project$Types$initialModel = {
 	patches: {ctor: '[]'},
 	bugs: {ctor: '[]'},
 	focusedBug: _elm_lang$core$Maybe$Nothing,
+	focusedBugOccurrences: _elm_lang$core$Maybe$Nothing,
 	showFullStackTrace: false,
 	error: _elm_lang$core$Maybe$Nothing,
 	showClosedBugs: false,
@@ -16736,7 +16737,9 @@ var _user$project$Types$Model = function (a) {
 							return function (h) {
 								return function (i) {
 									return function (j) {
-										return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, showFullStackTrace: e, error: f, showClosedBugs: g, showMenu: h, now: i, showTimeAgo: j};
+										return function (k) {
+											return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, focusedBugOccurrences: e, showFullStackTrace: f, error: g, showClosedBugs: h, showMenu: i, now: j, showTimeAgo: k};
+										};
 									};
 								};
 							};
@@ -16758,6 +16761,10 @@ var _user$project$Types$Bug = F8(
 	function (a, b, c, d, e, f, g, h) {
 		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
 	});
+var _user$project$Types$Occurrence = F4(
+	function (a, b, c, d) {
+		return {id: a, patchId: b, message: c, occurredAt: d};
+	});
 var _user$project$Types$TimeTick = function (a) {
 	return {ctor: 'TimeTick', _0: a};
 };
@@ -16774,6 +16781,9 @@ var _user$project$Types$ClosedBug = function (a) {
 };
 var _user$project$Types$RequestDetails = function (a) {
 	return {ctor: 'RequestDetails', _0: a};
+};
+var _user$project$Types$LoadedOccurrences = function (a) {
+	return {ctor: 'LoadedOccurrences', _0: a};
 };
 var _user$project$Types$LoadedDetails = function (a) {
 	return {ctor: 'LoadedDetails', _0: a};
@@ -16865,7 +16875,7 @@ var _user$project$View$filterStackTrace = F2(
 		}
 	});
 var _user$project$View$patchName = F2(
-	function (id, model) {
+	function (model, id) {
 		var patch = _elm_lang$core$List$head(
 			A2(
 				_elm_lang$core$List$filter,
@@ -16936,6 +16946,10 @@ var _user$project$View$bugGroups = function (model) {
 	};
 	return A2(_elm_lang$core$List$map, group, groupNames);
 };
+var _user$project$View$formatDate = F2(
+	function (model, date) {
+		return model.showTimeAgo ? A2(_user$project$TimeAgo$timeAgo, model.now, date) : A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y %k:%M:%S', date);
+	});
 var _user$project$View$icon = F2(
 	function (name, variant) {
 		return A2(
@@ -16960,44 +16974,67 @@ var _user$project$View$icon = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$View$occurrenceDisplay = A2(
-	_elm_lang$html$Html$div,
-	{ctor: '[]'},
-	{
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$div,
+var _user$project$View$occurrenceDisplay = F2(
+	function (model, occurrence) {
+		return A2(
+			_elm_lang$html$Html$li,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('section-title'),
+				_0: _elm_lang$html$Html_Attributes$class('occurrence panel-block'),
 				_1: {ctor: '[]'}
 			},
 			{
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$h3,
+					_elm_lang$html$Html$a,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('menu-label'),
+						_0: _elm_lang$html$Html_Attributes$class('occurrence-toggle'),
 						_1: {ctor: '[]'}
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('Occurrences'),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html$text(
+							A2(_user$project$View$patchName, model, occurrence.patchId)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(' • '),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									A2(_user$project$View$formatDate, model, occurrence.occurredAt)),
+								_1: {ctor: '[]'}
+							}
+						}
 					}),
-				_1: {
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$View$occurrencesDisplay = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('section-title'),
+					_1: {ctor: '[]'}
+				},
+				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$button,
+						_elm_lang$html$Html$h3,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
+							_0: _elm_lang$html$Html_Attributes$class('menu-label'),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Filter'),
+							_0: _elm_lang$html$Html$text('Occurrences'),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -17011,7 +17048,7 @@ var _user$project$View$occurrenceDisplay = A2(
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Map'),
+								_0: _elm_lang$html$Html$text('Filter'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -17025,16 +17062,48 @@ var _user$project$View$occurrenceDisplay = A2(
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Export JSON'),
+									_0: _elm_lang$html$Html$text('Map'),
 									_1: {ctor: '[]'}
 								}),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Export JSON'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
-				}
-			}),
-		_1: {ctor: '[]'}
-	});
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$ul,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('panel'),
+						_1: {ctor: '[]'}
+					},
+					A2(
+						_elm_lang$core$List$map,
+						_user$project$View$occurrenceDisplay(model),
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							{ctor: '[]'},
+							model.focusedBugOccurrences))),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$View$stackTraceLine = function (line) {
 	return A2(
 		_elm_lang$html$Html$code,
@@ -17168,9 +17237,6 @@ var _user$project$View$linkedIssue = function (bug) {
 };
 var _user$project$View$bugTimes = F2(
 	function (model, bug) {
-		var formatDate = function (date) {
-			return model.showTimeAgo ? A2(_user$project$TimeAgo$timeAgo, model.now, date) : A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y %k:%M:%S', date);
-		};
 		return _elm_lang$core$Native_Utils.eq(bug.occurrenceCount, 1) ? A2(
 			_elm_lang$html$Html$span,
 			{
@@ -17181,7 +17247,7 @@ var _user$project$View$bugTimes = F2(
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html$text(
-					formatDate(bug.lastOccurredAt)),
+					A2(_user$project$View$formatDate, model, bug.lastOccurredAt)),
 				_1: {ctor: '[]'}
 			}) : A2(
 			_elm_lang$html$Html$span,
@@ -17195,11 +17261,11 @@ var _user$project$View$bugTimes = F2(
 				_0: _elm_lang$html$Html$text(
 					A2(
 						_elm_lang$core$Basics_ops['++'],
-						formatDate(bug.lastOccurredAt),
+						A2(_user$project$View$formatDate, model, bug.lastOccurredAt),
 						A2(
 							_elm_lang$core$Basics_ops['++'],
 							' ~ ',
-							formatDate(bug.firstOccurredAt)))),
+							A2(_user$project$View$formatDate, model, bug.firstOccurredAt)))),
 				_1: {ctor: '[]'}
 			});
 	});
@@ -17352,7 +17418,7 @@ var _user$project$View$selectedBug = function (model) {
 						_0: A2(_user$project$View$stackTraceDisplay, model, _p2),
 						_1: {
 							ctor: '::',
-							_0: _user$project$View$occurrenceDisplay,
+							_0: _user$project$View$occurrencesDisplay(model),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -17622,7 +17688,7 @@ var _user$project$View$currentPatchesAsTags = function (model) {
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html$text(
-					A2(_user$project$View$patchName, id, model)),
+					A2(_user$project$View$patchName, model, id)),
 				_1: {ctor: '[]'}
 			});
 	};
@@ -17885,17 +17951,46 @@ var _user$project$Rest$closeBug = function (bugId) {
 			_elm_lang$http$Http$emptyBody,
 			_user$project$Rest$decodeBug));
 };
+var _user$project$Rest$decodeOccurrence = A5(
+	_elm_lang$core$Json_Decode$map4,
+	_user$project$Types$Occurrence,
+	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'patch_id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'occurred_at', _user$project$Rest$date));
+var _user$project$Rest$decodeOccurrences = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeOccurrence);
+var _user$project$Rest$occurrencesUrl = function (bugId) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'/bugs/',
+		A2(_elm_lang$core$Basics_ops['++'], bugId, '/occurrences'));
+};
 var _user$project$Rest$detailsUrl = function (bugId) {
 	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', bugId);
 };
 var _user$project$Rest$loadBugDetails = function (bugId) {
-	return A2(
-		_elm_lang$http$Http$send,
-		_user$project$Types$LoadedDetails,
-		A2(
-			_elm_lang$http$Http$get,
-			_user$project$Rest$detailsUrl(bugId),
-			_user$project$Rest$decodeBug));
+	return _elm_lang$core$Platform_Cmd$batch(
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$http$Http$send,
+				_user$project$Types$LoadedDetails,
+				A2(
+					_elm_lang$http$Http$get,
+					_user$project$Rest$detailsUrl(bugId),
+					_user$project$Rest$decodeBug)),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$http$Http$send,
+					_user$project$Types$LoadedOccurrences,
+					A2(
+						_elm_lang$http$Http$get,
+						_user$project$Rest$occurrencesUrl(bugId),
+						_user$project$Rest$decodeOccurrences)),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _user$project$Rest$allBugsUrl = '/bugs';
 var _user$project$Rest$openBugsUrl = A2(_elm_lang$core$Basics_ops['++'], '/bugs', '?closed=false');
@@ -18065,6 +18160,19 @@ var _user$project$Main$update = F2(
 					},
 					model,
 					_p2._0);
+			case 'LoadedOccurrences':
+				return A3(
+					_user$project$Main$handleResult,
+					function (occurrences) {
+						return _user$project$Main$noCmd(
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									focusedBugOccurrences: _elm_lang$core$Maybe$Just(occurrences)
+								}));
+					},
+					model,
+					_p2._0);
 			case 'ClosedBug':
 				return A3(
 					_user$project$Main$handleResult,
@@ -18171,7 +18279,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _user$project$Main$main !== 'undefined') {
-    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Date.Date":{"args":[],"tags":{"Date":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Types.Msg":{"args":[],"tags":{"ToggleTimeFormat":[],"LoadedBugs":["Result.Result Http.Error Types.Bugs"],"LoadedDetails":["Result.Result Http.Error Types.Bug"],"TimeTick":["Time.Time"],"ShowPatchBugs":["String"],"HideClosedBugs":[],"ToggleMenu":[],"LoadedPatches":["Result.Result Http.Error Types.Patches"],"ShowClosedBugs":[],"ClosedBug":["Result.Result Http.Error Types.Bug"],"HidePatchBugs":["String"],"HideBug":[],"RequestDetails":["String"],"CloseBug":["String"],"ToggleFullStackTrace":[],"ClearError":[]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}}},"aliases":{"Types.Bug":{"args":[],"type":"{ id : String , patchId : String , message : String , firstOccurredAt : Date.Date , lastOccurredAt : Date.Date , occurrenceCount : Int , closedAt : Maybe.Maybe Date.Date , stackTrace : Maybe.Maybe (List String) }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Types.Patch":{"args":[],"type":"{ id : String, name : String }"},"Types.Patches":{"args":[],"type":"List Types.Patch"},"Types.Bugs":{"args":[],"type":"List Types.Bug"},"Time.Time":{"args":[],"type":"Float"}},"message":"Types.Msg"},"versions":{"elm":"0.18.0"}});
+    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Date.Date":{"args":[],"tags":{"Date":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Types.Msg":{"args":[],"tags":{"ToggleTimeFormat":[],"LoadedBugs":["Result.Result Http.Error Types.Bugs"],"LoadedDetails":["Result.Result Http.Error Types.Bug"],"TimeTick":["Time.Time"],"ShowPatchBugs":["String"],"HideClosedBugs":[],"ToggleMenu":[],"LoadedPatches":["Result.Result Http.Error Types.Patches"],"ShowClosedBugs":[],"ClosedBug":["Result.Result Http.Error Types.Bug"],"HidePatchBugs":["String"],"HideBug":[],"LoadedOccurrences":["Result.Result Http.Error Types.Occurrences"],"RequestDetails":["String"],"CloseBug":["String"],"ToggleFullStackTrace":[],"ClearError":[]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}}},"aliases":{"Types.Occurrence":{"args":[],"type":"{ id : String , patchId : String , message : String , occurredAt : Date.Date }"},"Types.Bug":{"args":[],"type":"{ id : String , patchId : String , message : String , firstOccurredAt : Date.Date , lastOccurredAt : Date.Date , occurrenceCount : Int , closedAt : Maybe.Maybe Date.Date , stackTrace : Maybe.Maybe (List String) }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Types.Patch":{"args":[],"type":"{ id : String, name : String }"},"Types.Patches":{"args":[],"type":"List Types.Patch"},"Types.Bugs":{"args":[],"type":"List Types.Bug"},"Time.Time":{"args":[],"type":"Float"},"Types.Occurrences":{"args":[],"type":"List Types.Occurrence"}},"message":"Types.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])

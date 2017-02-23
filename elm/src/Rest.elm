@@ -29,6 +29,11 @@ detailsUrl bugId =
     "/bugs/" ++ bugId
 
 
+occurrencesUrl : String -> String
+occurrencesUrl bugId =
+    "/bugs/" ++ bugId ++ "/occurrences"
+
+
 
 -- Decoders
 
@@ -77,6 +82,20 @@ decodeBug =
         (stacktrace)
 
 
+decodeOccurrences : Decoder Occurrences
+decodeOccurrences =
+    list decodeOccurrence
+
+
+decodeOccurrence : Decoder Occurrence
+decodeOccurrence =
+    map4 Occurrence
+        (field "id" string)
+        (field "patch_id" string)
+        (field "message" string)
+        (field "occurred_at" date)
+
+
 stacktrace : Decoder (Maybe (List String))
 stacktrace =
     maybe <| at [ "data", "exception", "backtrace" ] (list string)
@@ -98,7 +117,10 @@ closeBugUrl bugId =
 
 loadBugDetails : String -> Cmd Msg
 loadBugDetails bugId =
-    Http.send LoadedDetails <| Http.get (detailsUrl bugId) decodeBug
+    Cmd.batch
+        [ Http.send LoadedDetails <| Http.get (detailsUrl bugId) decodeBug
+        , Http.send LoadedOccurrences <| Http.get (occurrencesUrl bugId) decodeOccurrences
+        ]
 
 
 closeBug : String -> Cmd Msg
