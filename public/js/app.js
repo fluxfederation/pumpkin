@@ -11354,72 +11354,144 @@ var _user$project$ViewNew$selectedBug = function (model) {
 			{ctor: '[]'});
 	}
 };
-var _user$project$ViewNew$sidebarBug = function (bug) {
-	var issueTag = A2(
-		_elm_lang$html$Html$span,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('tag is-warning'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('CI-000'),
-			_1: {ctor: '[]'}
-		});
-	return A2(
-		_elm_lang$html$Html$a,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('sidebar-bug is-active'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onClick(
-					_user$project$Types$RequestDetails(bug.id)),
-				_1: {ctor: '[]'}
+var _user$project$ViewNew$sidebarBug = F2(
+	function (model, bug) {
+		var isSelected = function () {
+			var _p3 = model.focusedBug;
+			if (_p3.ctor === 'Just') {
+				return _elm_lang$core$Native_Utils.eq(_p3._0.id, bug.id);
+			} else {
+				return false;
 			}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
+		}();
+		var clickMsg = isSelected ? _user$project$Types$HideBug : _user$project$Types$RequestDetails(bug.id);
+		var issueTag = A2(
+			_elm_lang$html$Html$span,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('tag is-warning'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('CI-000'),
+				_1: {ctor: '[]'}
+			});
+		return A2(
+			_elm_lang$html$Html$a,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('sidebar-bug'),
+				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-title'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$h4,
+					_0: _elm_lang$html$Html_Attributes$classList(
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('title is-6'),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(
-								_user$project$ViewNew$errorClass(bug)),
+							_0: {ctor: '_Tuple2', _0: 'is-active', _1: isSelected},
 							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(clickMsg),
+						_1: {ctor: '[]'}
+					}
+				}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-title'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$p,
+							_elm_lang$html$Html$h4,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('subtitle is-6'),
+								_0: _elm_lang$html$Html_Attributes$class('title is-6'),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									_user$project$ViewNew$errorMessage(bug)),
+									_user$project$ViewNew$errorClass(bug)),
 								_1: {ctor: '[]'}
 							}),
-						_1: {ctor: '[]'}
-					}
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$p,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('subtitle is-6'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										_user$project$ViewNew$errorMessage(bug)),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-tags'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$span,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('tag'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										_elm_lang$core$Basics$toString(bug.occurrenceCount)),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: issueTag,
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ViewNew$sidebarBugGroup = F2(
+	function (model, _p4) {
+		var _p5 = _p4;
+		var _p6 = _p5._1;
+		return (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$List$length(_p6),
+			0) > 0) ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h3,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('menu-label'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(_p5._0),
+					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
@@ -11427,67 +11499,17 @@ var _user$project$ViewNew$sidebarBug = function (bug) {
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-tags'),
+						_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-group box'),
 						_1: {ctor: '[]'}
 					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$span,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('tag'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(bug.occurrenceCount)),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: issueTag,
-							_1: {ctor: '[]'}
-						}
-					}),
+					A2(
+						_elm_lang$core$List$map,
+						_user$project$ViewNew$sidebarBug(model),
+						_p6)),
 				_1: {ctor: '[]'}
 			}
-		});
-};
-var _user$project$ViewNew$sidebarBugGroup = function (_p3) {
-	var _p4 = _p3;
-	var _p5 = _p4._1;
-	return (_elm_lang$core$Native_Utils.cmp(
-		_elm_lang$core$List$length(_p5),
-		0) > 0) ? {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$h3,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('menu-label'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(_p4._0),
-				_1: {ctor: '[]'}
-			}),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-group box'),
-					_1: {ctor: '[]'}
-				},
-				A2(_elm_lang$core$List$map, _user$project$ViewNew$sidebarBug, _p5)),
-			_1: {ctor: '[]'}
-		}
-	} : {ctor: '[]'};
-};
+		} : {ctor: '[]'};
+	});
 var _user$project$ViewNew$sidebarBugs = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -11507,11 +11529,13 @@ var _user$project$ViewNew$sidebarBugs = function (model) {
 		},
 		A2(
 			_elm_lang$core$List$concatMap,
-			_user$project$ViewNew$sidebarBugGroup,
+			_user$project$ViewNew$sidebarBugGroup(model),
 			_user$project$ViewNew$bugGroups(model)));
 };
-var _user$project$ViewNew$sidebarMenu = function (model) {
-	var patchItem = function (patch) {
+var _user$project$ViewNew$patchMenuItem = F2(
+	function (selectedPatchIds, patch) {
+		var isActive = A2(_elm_lang$core$List$member, patch.id, selectedPatchIds);
+		var toggleMsg = isActive ? _user$project$Types$HidePatchBugs : _user$project$Types$ShowPatchBugs;
 		return A2(
 			_elm_lang$html$Html$li,
 			{ctor: '[]'},
@@ -11521,8 +11545,18 @@ var _user$project$ViewNew$sidebarMenu = function (model) {
 					_elm_lang$html$Html$a,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('is-active'),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$classList(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'is-active', _1: isActive},
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(
+								toggleMsg(patch.id)),
+							_1: {ctor: '[]'}
+						}
 					},
 					{
 						ctor: '::',
@@ -11531,7 +11565,8 @@ var _user$project$ViewNew$sidebarMenu = function (model) {
 					}),
 				_1: {ctor: '[]'}
 			});
-	};
+	});
+var _user$project$ViewNew$sidebarMenu = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -11557,7 +11592,10 @@ var _user$project$ViewNew$sidebarMenu = function (model) {
 					_0: _elm_lang$html$Html_Attributes$class('menu-list'),
 					_1: {ctor: '[]'}
 				},
-				A2(_elm_lang$core$List$map, patchItem, model.patches)),
+				A2(
+					_elm_lang$core$List$map,
+					_user$project$ViewNew$patchMenuItem(model.selectedPatchIds),
+					model.patches)),
 			_1: {ctor: '[]'}
 		});
 };
@@ -11567,7 +11605,7 @@ var _user$project$ViewNew$currentPatchesAsTags = function (model) {
 			_elm_lang$html$Html$span,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('tag'),
+				_0: _elm_lang$html$Html_Attributes$class('tag is-medium'),
 				_1: {ctor: '[]'}
 			},
 			{
@@ -11581,7 +11619,7 @@ var _user$project$ViewNew$currentPatchesAsTags = function (model) {
 		_elm_lang$html$Html$span,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('tags'),
+			_0: _elm_lang$html$Html_Attributes$class('menu-button-tags'),
 			_1: {ctor: '[]'}
 		},
 		A2(_elm_lang$core$List$map, tag, model.selectedPatchIds));
@@ -11735,8 +11773,8 @@ var _user$project$ViewNew$content = function (model) {
 		});
 };
 var _user$project$ViewNew$errorMessages = function (model) {
-	var _p6 = model.error;
-	if (_p6.ctor === 'Just') {
+	var _p7 = model.error;
+	if (_p7.ctor === 'Just') {
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -11760,7 +11798,7 @@ var _user$project$ViewNew$errorMessages = function (model) {
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p6._0),
+					_0: _elm_lang$html$Html$text(_p7._0),
 					_1: {ctor: '[]'}
 				}
 			});

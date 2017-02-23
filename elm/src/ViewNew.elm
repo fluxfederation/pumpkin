@@ -58,45 +58,77 @@ currentPatchesAsTags : Model -> Html Msg
 currentPatchesAsTags model =
     let
         tag id =
-            span [ class "tag" ] [ text (patchName id model) ]
+            span [ class "tag is-medium" ] [ text (patchName id model) ]
     in
-        span [ class "tags" ] (List.map tag model.selectedPatchIds)
+        span [ class "menu-button-tags" ] (List.map tag model.selectedPatchIds)
 
 
 sidebarMenu : Model -> Html Msg
 sidebarMenu model =
+    div [ class "menu", classList [ ( "is-hidden", not model.showMenu ) ] ]
+        [ ul [ class "menu-list" ]
+            (List.map (patchMenuItem model.selectedPatchIds) model.patches)
+        ]
+
+
+patchMenuItem : List String -> Patch -> Html Msg
+patchMenuItem selectedPatchIds patch =
     let
-        patchItem patch =
-            li [] [ a [ class "is-active" ] [ text patch.name ] ]
+        isActive =
+            (List.member patch.id selectedPatchIds)
+
+        toggleMsg =
+            if isActive then
+                HidePatchBugs
+            else
+                ShowPatchBugs
     in
-        div [ class "menu", classList [ ( "is-hidden", not model.showMenu ) ] ]
-            [ ul [ class "menu-list" ] (List.map patchItem model.patches)
+        li []
+            [ a
+                [ classList [ ( "is-active", isActive ) ]
+                , onClick (toggleMsg patch.id)
+                ]
+                [ text patch.name ]
             ]
 
 
 sidebarBugs : Model -> Html Msg
 sidebarBugs model =
     div [ class "menu", classList [ ( "is-hidden", model.showMenu ) ] ]
-        (List.concatMap sidebarBugGroup (bugGroups model))
+        (List.concatMap (sidebarBugGroup model) (bugGroups model))
 
 
-sidebarBugGroup : ( String, List Bug ) -> List (Html Msg)
-sidebarBugGroup ( label, bugs ) =
+sidebarBugGroup : Model -> ( String, List Bug ) -> List (Html Msg)
+sidebarBugGroup model ( label, bugs ) =
     if List.length bugs > 0 then
         [ h3 [ class "menu-label" ] [ text label ]
-        , div [ class "sidebar-bug-group box" ] (List.map sidebarBug bugs)
+        , div [ class "sidebar-bug-group box" ] (List.map (sidebarBug model) bugs)
         ]
     else
         []
 
 
-sidebarBug : Bug -> Html Msg
-sidebarBug bug =
+sidebarBug : Model -> Bug -> Html Msg
+sidebarBug model bug =
     let
         issueTag =
             span [ class "tag is-warning" ] [ text "CI-000" ]
+
+        isSelected =
+            case model.focusedBug of
+                Just focusedBug ->
+                    focusedBug.id == bug.id
+
+                Nothing ->
+                    False
+
+        clickMsg =
+            if isSelected then
+                HideBug
+            else
+                RequestDetails bug.id
     in
-        a [ class "sidebar-bug is-active", onClick (RequestDetails bug.id) ]
+        a [ class "sidebar-bug", classList [ ( "is-active", isSelected ) ], onClick clickMsg ]
             [ div [ class "sidebar-bug-title" ]
                 [ h4 [ class "title is-6" ] [ text (errorClass bug) ]
                 , p [ class "subtitle is-6" ] [ text (errorMessage bug) ]

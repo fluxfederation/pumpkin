@@ -23,15 +23,23 @@ main {
 .menu-button {
   flex: 1;
   height: auto;
-  padding: 0.75rem 0.5rem;
+  min-height: 3.75rem;
+  padding: 0.5rem;
   justify-content: flex-start;
   align-items: center;
   line-height: 1;
 }
 
-.menu-button .tags {
+.menu-button-tags {
   flex: 1;
-  text-align: left;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.menu-button-tags > .tag {
+  margin: 0.25rem 0.25rem 0.25rem 0;
 }
 
 .search-button {
