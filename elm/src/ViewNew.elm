@@ -129,7 +129,7 @@ selectedBug model =
                         ]
                     ]
                 , linkedIssue bug
-                , stackTraceDisplay bug.stackTrace
+                , stackTraceDisplay model bug
                 , occurrenceDisplay
                 ]
 
@@ -145,20 +145,25 @@ linkedIssue bug =
         ]
 
 
-stackTraceDisplay : Maybe (List String) -> Html Msg
-stackTraceDisplay stackTrace =
-    case stackTrace of
-        Just lines ->
-            div [ class "section" ]
-                [ div [ class "section-title" ]
-                    [ h3 [ class "menu-label" ] [ text "Stack Trace" ]
-                    , button [ class "button is-small is-white" ] [ text "Show Context" ]
-                    , button [ class "button is-small is-white" ] [ text "Full Trace" ]
+stackTraceDisplay : Model -> Bug -> Html Msg
+stackTraceDisplay model bug =
+    let
+        lines =
+            filterStackTrace model bug.stackTrace
+    in
+        div [ class "section" ]
+            [ div [ class "section-title" ]
+                [ h3 [ class "menu-label" ] [ text "Stack Trace" ]
+                , button [ class "button is-small is-white" ] [ text "Show Context" ]
+                , button
+                    [ class "button is-small is-white"
+                    , classList [ ( "is-active", model.showFullStackTrace ) ]
+                    , onClick ToggleFullStackTrace
                     ]
-                , div [ class "stack-trace notification" ] (List.map stackTraceLine lines)
+                    [ text "Full Trace" ]
                 ]
-        Nothing ->
-            div [] []
+            , div [ class "stack-trace notification" ] (List.map stackTraceLine lines)
+            ]
 
 
 stackTraceLine : String -> Html Msg
@@ -176,6 +181,7 @@ occurrenceDisplay =
             , button [ class "button is-small is-white" ] [ text "Export JSON" ]
             ]
         ]
+
 
 
 -- Data wrangling
@@ -220,3 +226,20 @@ patchName id model =
             List.head (List.filter (\patch -> patch.id == id) model.patches)
     in
         (Maybe.withDefault { name = "", id = "" } patch).name
+
+
+filterStackTrace : Model -> Maybe (List String) -> List String
+filterStackTrace model stackTrace =
+    let
+        showLine line =
+            if model.showFullStackTrace then
+                True
+            else
+                not (String.contains "/lib/ruby/gems" line)
+    in
+        case stackTrace of
+            Just lines ->
+                List.filter showLine lines
+
+            Nothing ->
+                []

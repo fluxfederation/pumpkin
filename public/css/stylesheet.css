@@ -84,6 +84,17 @@ main {
 
 .sidebar-bug-title {
   flex: 1;
+  min-width: 0;
+}
+
+.sidebar-bug-title > * {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-bug-tags {
+  margin-left: 0.5rem;
 }
 
 .sidebar-bug-tags > * {

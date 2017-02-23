@@ -23,6 +23,7 @@ type Msg
     | HideBug
     | ClearError
     | ToggleMenu
+    | ToggleFullStackTrace
 
 
 
@@ -34,6 +35,7 @@ type alias Model =
     , patches : Patches
     , bugs : Bugs
     , focusedBug : Maybe Bug
+    , showFullStackTrace : Bool
     , error : Maybe String
     , showClosedBugs : Bool
     , showMenu : Bool
@@ -71,7 +73,16 @@ type alias Bug =
 
 initialModel : Model
 initialModel =
-    Model [] [] [] Nothing Nothing False False 0
+    { selectedPatchIds = []
+    , patches = []
+    , bugs = []
+    , focusedBug = Nothing
+    , showFullStackTrace = False
+    , error = Nothing
+    , showClosedBugs = False
+    , showMenu = False
+    , currentTime = 0
+    }
 
 
 isClosed : Bug -> Bool

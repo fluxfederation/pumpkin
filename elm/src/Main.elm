@@ -105,6 +105,9 @@ update msg model =
         ToggleMenu ->
             noCmd { model | showMenu = not model.showMenu }
 
+        ToggleFullStackTrace ->
+            noCmd { model | showFullStackTrace = not model.showFullStackTrace }
+
 
 noCmd : model -> ( model, Cmd Msg )
 noCmd model =

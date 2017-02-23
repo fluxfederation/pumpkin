@@ -10852,20 +10852,21 @@ var _user$project$Types$isClosed = function (bug) {
 			},
 			bug.closedAt));
 };
-var _user$project$Types$Model = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, error: e, showClosedBugs: f, showMenu: g, currentTime: h};
+var _user$project$Types$initialModel = {
+	selectedPatchIds: {ctor: '[]'},
+	patches: {ctor: '[]'},
+	bugs: {ctor: '[]'},
+	focusedBug: _elm_lang$core$Maybe$Nothing,
+	showFullStackTrace: false,
+	error: _elm_lang$core$Maybe$Nothing,
+	showClosedBugs: false,
+	showMenu: false,
+	currentTime: 0
+};
+var _user$project$Types$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, showFullStackTrace: e, error: f, showClosedBugs: g, showMenu: h, currentTime: i};
 	});
-var _user$project$Types$initialModel = A8(
-	_user$project$Types$Model,
-	{ctor: '[]'},
-	{ctor: '[]'},
-	{ctor: '[]'},
-	_elm_lang$core$Maybe$Nothing,
-	_elm_lang$core$Maybe$Nothing,
-	false,
-	false,
-	0);
 var _user$project$Types$Event = function (a) {
 	return {name: a};
 };
@@ -10877,6 +10878,7 @@ var _user$project$Types$Bug = F8(
 	function (a, b, c, d, e, f, g, h) {
 		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
 	});
+var _user$project$Types$ToggleFullStackTrace = {ctor: 'ToggleFullStackTrace'};
 var _user$project$Types$ToggleMenu = {ctor: 'ToggleMenu'};
 var _user$project$Types$ClearError = {ctor: 'ClearError'};
 var _user$project$Types$HideBug = {ctor: 'HideBug'};
@@ -10907,6 +10909,18 @@ var _user$project$Types$LoadedPatches = function (a) {
 	return {ctor: 'LoadedPatches', _0: a};
 };
 
+var _user$project$ViewNew$filterStackTrace = F2(
+	function (model, stackTrace) {
+		var showLine = function (line) {
+			return model.showFullStackTrace ? true : (!A2(_elm_lang$core$String$contains, '/lib/ruby/gems', line));
+		};
+		var _p0 = stackTrace;
+		if (_p0.ctor === 'Just') {
+			return A2(_elm_lang$core$List$filter, showLine, _p0._0);
+		} else {
+			return {ctor: '[]'};
+		}
+	});
 var _user$project$ViewNew$patchName = F2(
 	function (id, model) {
 		var patch = _elm_lang$core$List$head(
@@ -11066,9 +11080,9 @@ var _user$project$ViewNew$stackTraceLine = function (line) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$ViewNew$stackTraceDisplay = function (stackTrace) {
-	var _p0 = stackTrace;
-	if (_p0.ctor === 'Just') {
+var _user$project$ViewNew$stackTraceDisplay = F2(
+	function (model, bug) {
+		var lines = A2(_user$project$ViewNew$filterStackTrace, model, bug.stackTrace);
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -11120,7 +11134,20 @@ var _user$project$ViewNew$stackTraceDisplay = function (stackTrace) {
 									{
 										ctor: '::',
 										_0: _elm_lang$html$Html_Attributes$class('button is-small is-white'),
-										_1: {ctor: '[]'}
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$classList(
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showFullStackTrace},
+													_1: {ctor: '[]'}
+												}),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$ToggleFullStackTrace),
+												_1: {ctor: '[]'}
+											}
+										}
 									},
 									{
 										ctor: '::',
@@ -11140,17 +11167,11 @@ var _user$project$ViewNew$stackTraceDisplay = function (stackTrace) {
 							_0: _elm_lang$html$Html_Attributes$class('stack-trace notification'),
 							_1: {ctor: '[]'}
 						},
-						A2(_elm_lang$core$List$map, _user$project$ViewNew$stackTraceLine, _p0._0)),
+						A2(_elm_lang$core$List$map, _user$project$ViewNew$stackTraceLine, lines)),
 					_1: {ctor: '[]'}
 				}
 			});
-	} else {
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			{ctor: '[]'});
-	}
-};
+	});
 var _user$project$ViewNew$linkedIssue = function (bug) {
 	return A2(
 		_elm_lang$html$Html$a,
@@ -11317,7 +11338,7 @@ var _user$project$ViewNew$selectedBug = function (model) {
 					_0: _user$project$ViewNew$linkedIssue(_p2),
 					_1: {
 						ctor: '::',
-						_0: _user$project$ViewNew$stackTraceDisplay(_p2.stackTrace),
+						_0: A2(_user$project$ViewNew$stackTraceDisplay, model, _p2),
 						_1: {
 							ctor: '::',
 							_0: _user$project$ViewNew$occurrenceDisplay,
@@ -12070,11 +12091,16 @@ var _user$project$Main$update = F2(
 							_1: {ctor: '[]'}
 						}
 					});
-			default:
+			case 'ToggleMenu':
 				return _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{showMenu: !model.showMenu}));
+			default:
+				return _user$project$Main$noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showFullStackTrace: !model.showFullStackTrace}));
 		}
 	});
 var _user$project$Main$subscriptions = function (model) {
