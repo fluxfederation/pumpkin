@@ -15283,31 +15283,6 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
-var _fapian$elm_html_aria$Html_Attributes_Aria$role = _elm_lang$html$Html_Attributes$attribute('role');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaSelected = _elm_lang$html$Html_Attributes$attribute('aria-selected');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaLive = _elm_lang$html$Html_Attributes$attribute('aria-live');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaLabelledby = _elm_lang$html$Html_Attributes$attribute('aria-labelledby');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaLabel = _elm_lang$html$Html_Attributes$attribute('aria-label');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaExpanded = _elm_lang$html$Html_Attributes$attribute('aria-expanded');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaDescribedby = _elm_lang$html$Html_Attributes$attribute('aria-describedby');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaChecked = _elm_lang$html$Html_Attributes$attribute('aria-checked');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaActiveDescendant = _elm_lang$html$Html_Attributes$attribute('aria-activedescendant');
-var _fapian$elm_html_aria$Html_Attributes_Aria$boolAttribute = F2(
-	function (name, val) {
-		return A2(
-			_elm_lang$html$Html_Attributes$attribute,
-			name,
-			A2(
-				_elm_lang$core$Json_Encode$encode,
-				0,
-				_elm_lang$core$Json_Encode$bool(val)));
-	});
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaDisabled = _fapian$elm_html_aria$Html_Attributes_Aria$boolAttribute('aria-disabled');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaHidden = _fapian$elm_html_aria$Html_Attributes_Aria$boolAttribute('aria-hidden');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaPressed = _fapian$elm_html_aria$Html_Attributes_Aria$boolAttribute('aria-pressed');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaReadonly = _fapian$elm_html_aria$Html_Attributes_Aria$boolAttribute('aria-readonly');
-var _fapian$elm_html_aria$Html_Attributes_Aria$ariaRequired = _fapian$elm_html_aria$Html_Attributes_Aria$boolAttribute('aria-required');
-
 var _mgold$elm_date_format$Date_Local$international = {
 	date: {
 		months: {jan: 'January', feb: 'February', mar: 'March', apr: 'April', may: 'May', jun: 'June', jul: 'July', aug: 'August', sep: 'September', oct: 'October', nov: 'November', dec: 'December'},
@@ -16877,7 +16852,7 @@ var _user$project$TimeAgo$timeAgo = F2(
 		}
 	});
 
-var _user$project$ViewNew$filterStackTrace = F2(
+var _user$project$View$filterStackTrace = F2(
 	function (model, stackTrace) {
 		var showLine = function (line) {
 			return model.showFullStackTrace ? true : (!A2(_elm_lang$core$String$contains, '/lib/ruby/gems', line));
@@ -16889,7 +16864,7 @@ var _user$project$ViewNew$filterStackTrace = F2(
 			return {ctor: '[]'};
 		}
 	});
-var _user$project$ViewNew$patchName = F2(
+var _user$project$View$patchName = F2(
 	function (id, model) {
 		var patch = _elm_lang$core$List$head(
 			A2(
@@ -16903,7 +16878,7 @@ var _user$project$ViewNew$patchName = F2(
 			{name: '', id: ''},
 			patch).name;
 	});
-var _user$project$ViewNew$errorMessage = function (bug) {
+var _user$project$View$errorMessage = function (bug) {
 	return A2(
 		_elm_lang$core$String$join,
 		' : ',
@@ -16913,14 +16888,14 @@ var _user$project$ViewNew$errorMessage = function (bug) {
 			_elm_lang$core$List$tail(
 				A2(_elm_lang$core$String$split, ' : ', bug.message))));
 };
-var _user$project$ViewNew$errorClass = function (bug) {
+var _user$project$View$errorClass = function (bug) {
 	return A2(
 		_elm_lang$core$Maybe$withDefault,
 		'',
 		_elm_lang$core$List$head(
 			A2(_elm_lang$core$String$split, ' : ', bug.message)));
 };
-var _user$project$ViewNew$bugGroups = function (model) {
+var _user$project$View$bugGroups = function (model) {
 	var groupFor = function (diff) {
 		return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > 0) ? 'Earlier' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > 0) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > 0) ? 'Past Day' : 'Past Hour'));
 	};
@@ -16961,7 +16936,7 @@ var _user$project$ViewNew$bugGroups = function (model) {
 	};
 	return A2(_elm_lang$core$List$map, group, groupNames);
 };
-var _user$project$ViewNew$icon = F2(
+var _user$project$View$icon = F2(
 	function (name, variant) {
 		return A2(
 			_elm_lang$html$Html$span,
@@ -16985,7 +16960,7 @@ var _user$project$ViewNew$icon = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ViewNew$occurrenceDisplay = A2(
+var _user$project$View$occurrenceDisplay = A2(
 	_elm_lang$html$Html$div,
 	{ctor: '[]'},
 	{
@@ -17060,7 +17035,7 @@ var _user$project$ViewNew$occurrenceDisplay = A2(
 			}),
 		_1: {ctor: '[]'}
 	});
-var _user$project$ViewNew$stackTraceLine = function (line) {
+var _user$project$View$stackTraceLine = function (line) {
 	return A2(
 		_elm_lang$html$Html$code,
 		{ctor: '[]'},
@@ -17070,9 +17045,9 @@ var _user$project$ViewNew$stackTraceLine = function (line) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$ViewNew$stackTraceDisplay = F2(
+var _user$project$View$stackTraceDisplay = F2(
 	function (model, bug) {
-		var lines = A2(_user$project$ViewNew$filterStackTrace, model, bug.stackTrace);
+		var lines = A2(_user$project$View$filterStackTrace, model, bug.stackTrace);
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -17157,12 +17132,12 @@ var _user$project$ViewNew$stackTraceDisplay = F2(
 							_0: _elm_lang$html$Html_Attributes$class('stack-trace notification'),
 							_1: {ctor: '[]'}
 						},
-						A2(_elm_lang$core$List$map, _user$project$ViewNew$stackTraceLine, lines)),
+						A2(_elm_lang$core$List$map, _user$project$View$stackTraceLine, lines)),
 					_1: {ctor: '[]'}
 				}
 			});
 	});
-var _user$project$ViewNew$linkedIssue = function (bug) {
+var _user$project$View$linkedIssue = function (bug) {
 	return A2(
 		_elm_lang$html$Html$a,
 		{
@@ -17186,12 +17161,12 @@ var _user$project$ViewNew$linkedIssue = function (bug) {
 				}),
 			_1: {
 				ctor: '::',
-				_0: A2(_user$project$ViewNew$icon, 'cog', ''),
+				_0: A2(_user$project$View$icon, 'cog', ''),
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$ViewNew$bugTimes = F2(
+var _user$project$View$bugTimes = F2(
 	function (model, bug) {
 		var formatDate = function (date) {
 			return model.showTimeAgo ? A2(_user$project$TimeAgo$timeAgo, model.now, date) : A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y %k:%M:%S', date);
@@ -17228,7 +17203,7 @@ var _user$project$ViewNew$bugTimes = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ViewNew$occurrenceCount = function (bug) {
+var _user$project$View$occurrenceCount = function (bug) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{
@@ -17243,7 +17218,7 @@ var _user$project$ViewNew$occurrenceCount = function (bug) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$ViewNew$selectedBugHeader = F2(
+var _user$project$View$selectedBugHeader = F2(
 	function (model, bug) {
 		return A2(
 			_elm_lang$html$Html$div,
@@ -17273,7 +17248,7 @@ var _user$project$ViewNew$selectedBugHeader = F2(
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									_user$project$ViewNew$errorClass(bug)),
+									_user$project$View$errorClass(bug)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -17288,7 +17263,7 @@ var _user$project$ViewNew$selectedBugHeader = F2(
 								{
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(
-										_user$project$ViewNew$errorMessage(bug)),
+										_user$project$View$errorMessage(bug)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -17305,7 +17280,7 @@ var _user$project$ViewNew$selectedBugHeader = F2(
 						},
 						{
 							ctor: '::',
-							_0: _user$project$ViewNew$occurrenceCount(bug),
+							_0: _user$project$View$occurrenceCount(bug),
 							_1: {
 								ctor: '::',
 								_0: A2(
@@ -17335,13 +17310,13 @@ var _user$project$ViewNew$selectedBugHeader = F2(
 											},
 											{
 												ctor: '::',
-												_0: A2(_user$project$ViewNew$icon, 'clock-o', ''),
+												_0: A2(_user$project$View$icon, 'clock-o', ''),
 												_1: {
 													ctor: '::',
 													_0: _elm_lang$html$Html$text(' '),
 													_1: {
 														ctor: '::',
-														_0: A2(_user$project$ViewNew$bugTimes, model, bug),
+														_0: A2(_user$project$View$bugTimes, model, bug),
 														_1: {ctor: '[]'}
 													}
 												}
@@ -17355,7 +17330,7 @@ var _user$project$ViewNew$selectedBugHeader = F2(
 				}
 			});
 	});
-var _user$project$ViewNew$selectedBug = function (model) {
+var _user$project$View$selectedBug = function (model) {
 	var _p1 = model.focusedBug;
 	if (_p1.ctor === 'Just') {
 		var _p2 = _p1._0;
@@ -17368,16 +17343,16 @@ var _user$project$ViewNew$selectedBug = function (model) {
 			},
 			{
 				ctor: '::',
-				_0: A2(_user$project$ViewNew$selectedBugHeader, model, _p2),
+				_0: A2(_user$project$View$selectedBugHeader, model, _p2),
 				_1: {
 					ctor: '::',
-					_0: _user$project$ViewNew$linkedIssue(_p2),
+					_0: _user$project$View$linkedIssue(_p2),
 					_1: {
 						ctor: '::',
-						_0: A2(_user$project$ViewNew$stackTraceDisplay, model, _p2),
+						_0: A2(_user$project$View$stackTraceDisplay, model, _p2),
 						_1: {
 							ctor: '::',
-							_0: _user$project$ViewNew$occurrenceDisplay,
+							_0: _user$project$View$occurrenceDisplay,
 							_1: {ctor: '[]'}
 						}
 					}
@@ -17390,7 +17365,7 @@ var _user$project$ViewNew$selectedBug = function (model) {
 			{ctor: '[]'});
 	}
 };
-var _user$project$ViewNew$sidebarBug = F2(
+var _user$project$View$sidebarBug = F2(
 	function (model, bug) {
 		var isSelected = function () {
 			var _p3 = model.focusedBug;
@@ -17454,7 +17429,7 @@ var _user$project$ViewNew$sidebarBug = F2(
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									_user$project$ViewNew$errorClass(bug)),
+									_user$project$View$errorClass(bug)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -17469,7 +17444,7 @@ var _user$project$ViewNew$sidebarBug = F2(
 								{
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(
-										_user$project$ViewNew$errorMessage(bug)),
+										_user$project$View$errorMessage(bug)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -17509,7 +17484,7 @@ var _user$project$ViewNew$sidebarBug = F2(
 				}
 			});
 	});
-var _user$project$ViewNew$sidebarBugGroup = F2(
+var _user$project$View$sidebarBugGroup = F2(
 	function (model, _p4) {
 		var _p5 = _p4;
 		var _p6 = _p5._1;
@@ -17540,13 +17515,13 @@ var _user$project$ViewNew$sidebarBugGroup = F2(
 					},
 					A2(
 						_elm_lang$core$List$map,
-						_user$project$ViewNew$sidebarBug(model),
+						_user$project$View$sidebarBug(model),
 						_p6)),
 				_1: {ctor: '[]'}
 			}
 		} : {ctor: '[]'};
 	});
-var _user$project$ViewNew$sidebarBugs = function (model) {
+var _user$project$View$sidebarBugs = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -17565,10 +17540,10 @@ var _user$project$ViewNew$sidebarBugs = function (model) {
 		},
 		A2(
 			_elm_lang$core$List$concatMap,
-			_user$project$ViewNew$sidebarBugGroup(model),
-			_user$project$ViewNew$bugGroups(model)));
+			_user$project$View$sidebarBugGroup(model),
+			_user$project$View$bugGroups(model)));
 };
-var _user$project$ViewNew$patchMenuItem = F2(
+var _user$project$View$patchMenuItem = F2(
 	function (selectedPatchIds, patch) {
 		var isActive = A2(_elm_lang$core$List$member, patch.id, selectedPatchIds);
 		var toggleMsg = isActive ? _user$project$Types$HidePatchBugs : _user$project$Types$ShowPatchBugs;
@@ -17602,7 +17577,7 @@ var _user$project$ViewNew$patchMenuItem = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ViewNew$sidebarMenu = function (model) {
+var _user$project$View$sidebarMenu = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -17630,12 +17605,12 @@ var _user$project$ViewNew$sidebarMenu = function (model) {
 				},
 				A2(
 					_elm_lang$core$List$map,
-					_user$project$ViewNew$patchMenuItem(model.selectedPatchIds),
+					_user$project$View$patchMenuItem(model.selectedPatchIds),
 					model.patches)),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$ViewNew$currentPatchesAsTags = function (model) {
+var _user$project$View$currentPatchesAsTags = function (model) {
 	var tag = function (id) {
 		return A2(
 			_elm_lang$html$Html$span,
@@ -17647,7 +17622,7 @@ var _user$project$ViewNew$currentPatchesAsTags = function (model) {
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html$text(
-					A2(_user$project$ViewNew$patchName, id, model)),
+					A2(_user$project$View$patchName, id, model)),
 				_1: {ctor: '[]'}
 			});
 	};
@@ -17660,7 +17635,7 @@ var _user$project$ViewNew$currentPatchesAsTags = function (model) {
 		},
 		A2(_elm_lang$core$List$map, tag, model.selectedPatchIds));
 };
-var _user$project$ViewNew$sidebarHeader = function (model) {
+var _user$project$View$sidebarHeader = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -17706,11 +17681,11 @@ var _user$project$ViewNew$sidebarHeader = function (model) {
 						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
-						_0: _user$project$ViewNew$currentPatchesAsTags(model),
+						_0: _user$project$View$currentPatchesAsTags(model),
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_user$project$ViewNew$icon,
+								_user$project$View$icon,
 								'check',
 								model.showMenu ? '' : 'is-hidden'),
 							_1: {ctor: '[]'}
@@ -17737,14 +17712,14 @@ var _user$project$ViewNew$sidebarHeader = function (model) {
 					},
 					{
 						ctor: '::',
-						_0: A2(_user$project$ViewNew$icon, 'search', ''),
+						_0: A2(_user$project$View$icon, 'search', ''),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$ViewNew$content = function (model) {
+var _user$project$View$content = function (model) {
 	return A2(
 		_elm_lang$html$Html$main_,
 		{ctor: '[]'},
@@ -17759,7 +17734,7 @@ var _user$project$ViewNew$content = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: _user$project$ViewNew$sidebarHeader(model),
+					_0: _user$project$View$sidebarHeader(model),
 					_1: {
 						ctor: '::',
 						_0: A2(
@@ -17771,10 +17746,10 @@ var _user$project$ViewNew$content = function (model) {
 							},
 							{
 								ctor: '::',
-								_0: _user$project$ViewNew$sidebarMenu(model),
+								_0: _user$project$View$sidebarMenu(model),
 								_1: {
 									ctor: '::',
-									_0: _user$project$ViewNew$sidebarBugs(model),
+									_0: _user$project$View$sidebarBugs(model),
 									_1: {ctor: '[]'}
 								}
 							}),
@@ -17783,12 +17758,12 @@ var _user$project$ViewNew$content = function (model) {
 				}),
 			_1: {
 				ctor: '::',
-				_0: _user$project$ViewNew$selectedBug(model),
+				_0: _user$project$View$selectedBug(model),
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$ViewNew$errorMessages = function (model) {
+var _user$project$View$errorMessages = function (model) {
 	var _p7 = model.error;
 	if (_p7.ctor === 'Just') {
 		return A2(
@@ -17825,16 +17800,16 @@ var _user$project$ViewNew$errorMessages = function (model) {
 			{ctor: '[]'});
 	}
 };
-var _user$project$ViewNew$view = function (model) {
+var _user$project$View$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _user$project$ViewNew$errorMessages(model),
+			_0: _user$project$View$errorMessages(model),
 			_1: {
 				ctor: '::',
-				_0: _user$project$ViewNew$content(model),
+				_0: _user$project$View$content(model),
 				_1: {ctor: '[]'}
 			}
 		});
@@ -18191,7 +18166,7 @@ var _user$project$Main$init = {
 		})
 };
 var _user$project$Main$main = _elm_lang$html$Html$program(
-	{init: _user$project$Main$init, view: _user$project$ViewNew$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
+	{init: _user$project$Main$init, view: _user$project$View$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};

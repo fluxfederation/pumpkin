@@ -3,180 +3,323 @@ module View exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
-import Date
 import Date.Format as DF
+import Date.Extra.Period as Period
+import String.Extra exposing (pluralize)
 import Types exposing (..)
-
-
-container : List (Html Msg) -> Html Msg
-container contents =
-    div [ classList [ ( "container", True ), ( "is-fluid", True ) ] ] contents
+import TimeAgo exposing (timeAgo)
 
 
 view : Model -> Html Msg
 view model =
-    div [] ([ heading ] ++ errorMessages model ++ [ bugs model ])
+    div []
+        [ errorMessages model
+        , content model
+        ]
 
 
-errorMessages : Model -> List (Html Msg)
+errorMessages : Model -> Html Msg
 errorMessages model =
     case model.error of
         Just e ->
-            [ div [ class "section" ]
-                [ container
-                    [ div [ class "notification is-danger" ]
-                        [ button [ class "delete", onClick ClearError ] []
-                        , text e
-                        ]
-                    ]
+            div [ class "notification is-danger" ]
+                [ button [ class "delete", onClick ClearError ] []
+                , text e
                 ]
-            ]
 
-        _ ->
-            []
-
-
-heading : Html Msg
-heading =
-    div [ classList [ ( "nav", True ), ( "has-shadow", True ) ] ]
-        [ container
-            [ div [ class "nav-left" ]
-                [ a [ class "nav-item is-brand" ]
-                    [ text "Pumpkin" ]
-                ]
-            ]
-        ]
-
-
-filters : Model -> Html Msg
-filters model =
-    div []
-        [ div [ class "control" ] (List.map (patchButton model.selectedPatchIds) model.patches)
-        , closedFilter model
-        ]
-
-
-closedFilter : Model -> Html Msg
-closedFilter model =
-    let
-        -- TODO figure out why we can't extract these out to their own functions without elm exceptions
-        showHideButton =
-            if model.showClosedBugs then
-                button [ onClick HideClosedBugs, class "button is" ] [ text "Hide Closed Bugs" ]
-            else
-                button [ onClick ShowClosedBugs, class "button is-outlined is-danger" ] [ text "Show Closed Bugs" ]
-    in
-        div [ class "control" ] [ showHideButton ]
-
-
-bugs : Model -> Html Msg
-bugs model =
-    div [ class "section" ]
-        [ div [ class "columns" ]
-            [ div [ class "column is-6" ] (bugList model)
-            , div [ class "column is-6" ] (bugPane model)
-            ]
-        ]
-
-
-bugPane : Model -> List (Html Msg)
-bugPane model =
-    case model.focusedBug of
         Nothing ->
-            []
+            div [] []
 
-        Just bug ->
-            [ div [ class "box" ]
-                [ bugDetails bug ]
+
+content : Model -> Html Msg
+content model =
+    main_ []
+        [ div [ class "sidebar" ]
+            [ sidebarHeader model
+            , div [ class "sidebar-content" ] [ sidebarMenu model, sidebarBugs model ]
             ]
+        , selectedBug model
+        ]
 
 
-patchButton : List String -> Patch -> Html Msg
-patchButton selectedPatchIds project =
+sidebarHeader : Model -> Html Msg
+sidebarHeader model =
+    div [ class "sidebar-header" ]
+        [ a [ class "menu-button button", classList [ ( "is-active", model.showMenu ) ], onClick ToggleMenu ]
+            [ img [ src "/logo.png", class "logo" ] []
+            , currentPatchesAsTags model
+            , icon "check"
+                (if model.showMenu then
+                    ""
+                 else
+                    "is-hidden"
+                )
+            ]
+        , a [ class "search-button button", classList [ ( "is-hidden", model.showMenu ) ] ]
+            [ icon "search" "" ]
+        ]
+
+
+currentPatchesAsTags : Model -> Html Msg
+currentPatchesAsTags model =
     let
-        toggled =
-            (List.member project.id selectedPatchIds)
+        tag id =
+            span [ class "tag is-medium" ] [ text (patchName id model) ]
+    in
+        span [ class "menu-button-tags" ] (List.map tag model.selectedPatchIds)
 
-        baseClass =
-            "tag is-medium"
 
-        computedClass =
-            if toggled then
-                baseClass ++ " is-primary"
-            else
-                baseClass
+sidebarMenu : Model -> Html Msg
+sidebarMenu model =
+    div [ class "menu", classList [ ( "is-hidden", not model.showMenu ) ] ]
+        [ ul [ class "menu-list" ]
+            (List.map (patchMenuItem model.selectedPatchIds) model.patches)
+        ]
+
+
+patchMenuItem : List String -> Patch -> Html Msg
+patchMenuItem selectedPatchIds patch =
+    let
+        isActive =
+            (List.member patch.id selectedPatchIds)
 
         toggleMsg =
-            if toggled then
+            if isActive then
                 HidePatchBugs
             else
                 ShowPatchBugs
     in
-        span
-            [ class computedClass
-            , onClick (toggleMsg project.id)
-            ]
-            [ text project.name ]
-
-
-bugList : Model -> List (Html Msg)
-bugList model =
-    let
-        shouldShowBug =
-            (\bug -> List.member bug.patchId model.selectedPatchIds)
-
-        bugsToShow =
-            List.filter (shouldShowBug) model.bugs
-    in
-        [ filters model ] ++ (List.map (bugRow model.focusedBug) bugsToShow)
-
-
-bugRow : Maybe Bug -> Bug -> Html Msg
-bugRow currentBug bug =
-    let
-        isActive =
-            Maybe.withDefault False <| Maybe.map (\otherBug -> otherBug.id == bug.id) currentBug
-
-        bugRowClasses =
-            classList [ ( "bug", True ), ( "is-active", isActive ), ( "closed", isClosed bug ) ]
-    in
-        div
-            [ bugRowClasses
-            , onClick (RequestDetails bug.id)
-            ]
-            [ div [ class "columns" ]
-                [ div [ class "column is-2" ] [ text (DF.format "%e %b %Y" bug.lastOccurredAt) ]
-                , div [ class "column" ] [ text bug.message ]
-                , div [ class "column is-1" ] [ span [ class "tag is-warning" ] [ text (toString bug.occurrenceCount) ] ]
+        li []
+            [ a
+                [ classList [ ( "is-active", isActive ) ]
+                , onClick (toggleMsg patch.id)
                 ]
+                [ text patch.name ]
             ]
 
 
-timestamp : Date.Date -> String
-timestamp ts =
-    (DF.format "%e %b %Y %H:%m:%S" ts)
+sidebarBugs : Model -> Html Msg
+sidebarBugs model =
+    div [ class "menu", classList [ ( "is-hidden", model.showMenu ) ] ]
+        (List.concatMap (sidebarBugGroup model) (bugGroups model))
 
 
-bugDetails : Bug -> Html Msg
-bugDetails bug =
-    div
-        [ class "bug-pane" ]
-        [ div
-            [ class "columns" ]
-            [ div [ class "column is-11" ] [ h5 [ class "title" ] [ text bug.message ] ]
-            , div [ class "column is-1" ] [ button [ class "delete is-pulled-right", onClick HideBug ] [] ]
-            ]
-        , table [ class "table" ]
-            [ tr []
-                [ th [] [ text "Last occurred at" ]
-                , td [] [ text <| timestamp bug.lastOccurredAt ]
-                ]
-            , tr []
-                [ th [] [ text "First occurred at" ]
-                , td [] [ text <| timestamp bug.firstOccurredAt ]
-                ]
-            ]
-        , div [] [ button [ disabled (isClosed bug), onClick (CloseBug bug.id), classList [ ( "button", True ), ( "is-danger", True ) ] ] [ text "Close" ] ]
-        , br [] []
-        , div [ class "stacktrace" ] [ text <| stackTraceString bug ]
+sidebarBugGroup : Model -> ( String, List Bug ) -> List (Html Msg)
+sidebarBugGroup model ( label, bugs ) =
+    if List.length bugs > 0 then
+        [ h3 [ class "menu-label" ] [ text label ]
+        , div [ class "sidebar-bug-group box" ] (List.map (sidebarBug model) bugs)
         ]
+    else
+        []
+
+
+sidebarBug : Model -> Bug -> Html Msg
+sidebarBug model bug =
+    let
+        issueTag =
+            span [ class "tag is-warning" ] [ text "CI-000" ]
+
+        isSelected =
+            case model.focusedBug of
+                Just focusedBug ->
+                    focusedBug.id == bug.id
+
+                Nothing ->
+                    False
+
+        clickMsg =
+            if isSelected then
+                HideBug
+            else
+                RequestDetails bug.id
+    in
+        a [ class "sidebar-bug", classList [ ( "is-active", isSelected ) ], onClick clickMsg ]
+            [ div [ class "sidebar-bug-title" ]
+                [ h4 [ class "title is-6" ] [ text (errorClass bug) ]
+                , p [ class "subtitle is-6" ] [ text (errorMessage bug) ]
+                ]
+            , div [ class "sidebar-bug-tags" ]
+                [ span [ class "tag" ] [ text (toString bug.occurrenceCount) ]
+                , issueTag
+                ]
+            ]
+
+
+selectedBug : Model -> Html Msg
+selectedBug model =
+    case model.focusedBug of
+        Just bug ->
+            div [ class "selected-bug box" ]
+                [ selectedBugHeader model bug
+                , linkedIssue bug
+                , stackTraceDisplay model bug
+                , occurrenceDisplay
+                ]
+
+        Nothing ->
+            div [] []
+
+
+selectedBugHeader : Model -> Bug -> Html Msg
+selectedBugHeader model bug =
+    div [ class "selected-bug-header" ]
+        [ div [ class "selected-bug-title" ]
+            [ h1 [ class "title is-3" ] [ text (errorClass bug) ]
+            , p [ class "subtitle is-5" ] [ text (errorMessage bug) ]
+            ]
+        , div [ class "has-text-right" ]
+            [ occurrenceCount bug
+            , p []
+                [ button
+                    [ class "button is-primary is-inverted"
+                    , classList [ ( "is-active", not model.showTimeAgo ) ]
+                    , onClick ToggleTimeFormat
+                    ]
+                    [ icon "clock-o" ""
+                    , text " "
+                    , bugTimes model bug
+                    ]
+                ]
+            ]
+        ]
+
+
+occurrenceCount : Bug -> Html Msg
+occurrenceCount bug =
+    p [ class "occurrence-count" ]
+        [ text (pluralize "occurrence" "occurrences" bug.occurrenceCount) ]
+
+
+bugTimes : Model -> Bug -> Html Msg
+bugTimes model bug =
+    let
+        formatDate date =
+            if model.showTimeAgo then
+                timeAgo model.now date
+            else
+                DF.format "%e %b %Y %k:%M:%S" date
+    in
+        if bug.occurrenceCount == 1 then
+            span [ class "bug-times" ]
+                [ text (formatDate bug.lastOccurredAt) ]
+        else
+            span [ class "bug-times" ]
+                [ text (formatDate bug.lastOccurredAt ++ " ~ " ++ formatDate bug.firstOccurredAt) ]
+
+
+linkedIssue : Bug -> Html Msg
+linkedIssue bug =
+    a [ class "linked-issue notification" ]
+        [ span [ class "description" ] [ text "No linked incident." ]
+        , icon "cog" ""
+        ]
+
+
+stackTraceDisplay : Model -> Bug -> Html Msg
+stackTraceDisplay model bug =
+    let
+        lines =
+            filterStackTrace model bug.stackTrace
+    in
+        div [ class "section" ]
+            [ div [ class "section-title" ]
+                [ h3 [ class "menu-label" ] [ text "Stack Trace" ]
+                , button [ class "button is-small is-primary is-inverted" ] [ text "Show Context" ]
+                , button
+                    [ class "button is-small is-primary is-inverted"
+                    , classList [ ( "is-active", model.showFullStackTrace ) ]
+                    , onClick ToggleFullStackTrace
+                    ]
+                    [ text "Full Trace" ]
+                ]
+            , div [ class "stack-trace notification" ] (List.map stackTraceLine lines)
+            ]
+
+
+stackTraceLine : String -> Html Msg
+stackTraceLine line =
+    code [] [ text line ]
+
+
+occurrenceDisplay : Html Msg
+occurrenceDisplay =
+    div []
+        [ div [ class "section-title" ]
+            [ h3 [ class "menu-label" ] [ text "Occurrences" ]
+            , button [ class "button is-small is-primary is-inverted" ] [ text "Filter" ]
+            , button [ class "button is-small is-primary is-inverted" ] [ text "Map" ]
+            , button [ class "button is-small is-primary is-inverted" ] [ text "Export JSON" ]
+            ]
+        ]
+
+
+icon : String -> String -> Html Msg
+icon name variant =
+    span [ class ("icon is-small " ++ variant) ]
+        [ span [ class ("fa fa-" ++ name) ] [] ]
+
+
+
+-- Data wrangling
+
+
+bugGroups : Model -> List ( String, List Bug )
+bugGroups model =
+    let
+        periodDiff bug =
+            Period.diff model.now bug.lastOccurredAt
+
+        groupNames =
+            [ "Past Hour", "Past Day", "Past Week", "Earlier" ]
+
+        groupFor diff =
+            if diff.week > 1 then
+                "Earlier"
+            else if diff.day > 1 then
+                "Past Week"
+            else if diff.hour > 1 then
+                "Past Day"
+            else
+                "Past Hour"
+
+        group name =
+            ( name, List.filter (\bug -> groupFor (periodDiff bug) == name) model.bugs )
+    in
+        List.map group groupNames
+
+
+errorClass : Bug -> String
+errorClass bug =
+    bug.message |> String.split " : " |> List.head |> Maybe.withDefault ""
+
+
+errorMessage : Bug -> String
+errorMessage bug =
+    bug.message |> String.split " : " |> List.tail |> Maybe.withDefault [] |> String.join " : "
+
+
+patchName : String -> Model -> String
+patchName id model =
+    let
+        patch =
+            List.head (List.filter (\patch -> patch.id == id) model.patches)
+    in
+        (Maybe.withDefault { name = "", id = "" } patch).name
+
+
+filterStackTrace : Model -> Maybe (List String) -> List String
+filterStackTrace model stackTrace =
+    let
+        showLine line =
+            if model.showFullStackTrace then
+                True
+            else
+                not (String.contains "/lib/ruby/gems" line)
+    in
+        case stackTrace of
+            Just lines ->
+                List.filter showLine lines
+
+            Nothing ->
+                []

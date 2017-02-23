@@ -5,7 +5,7 @@ import Task
 import Time
 import Date
 import Types exposing (..)
-import ViewNew
+import View
 import Rest
 import List.Extra as ListX
 
@@ -18,7 +18,7 @@ main : Program Never Model Msg
 main =
     Html.program
         { init = init
-        , view = ViewNew.view
+        , view = View.view
         , update = update
         , subscriptions = subscriptions
         }
