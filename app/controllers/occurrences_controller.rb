@@ -1,4 +1,5 @@
 class OccurrencesController < ApplicationController
+  before_action :authenticate!, only: :create
 
   def show
     occurrence = Occurrence.find(params[:id])
@@ -21,5 +22,18 @@ class OccurrencesController < ApplicationController
 
   def occurrence_params
     params.require(:occurrence).permit(:occurred_at, :message)
+  end
+
+  def authenticate!
+    authorization = request.headers['Authorization']
+    if authorization.blank?
+      render json: {message: "Unauthorized"}, status: :unauthorized
+      return
+    end
+    raw_token = authorization.split(" ").last
+    if !ActiveSupport::SecurityUtils.secure_compare(raw_token, Rails.application.secrets.auth_token)
+      render json: {message: "Unauthorized"}, status: :unauthorized
+      return
+    end
   end
 end
