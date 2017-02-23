@@ -1,27 +1,157 @@
-div.bug {
-  width: 100%;
-  height: 60px;
-  padding: 4px;
-  box-sizing: border-box;
-  border-radius: 2px;
+main {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  background-color: #eee;
 }
 
-div.bug:hover {
-  background: #ddd;
+.sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 35vw;
+  padding: 0.75rem;
 }
 
-div.bug.is-active {
-  background: #eee;
+/* Sidebar header */
+
+.sidebar-header {
+  display: flex;
+  margin-bottom: 0.5rem;
 }
 
-div.bug.closed {
-  color: #ccc;
+.menu-button {
+  flex: 1;
+  height: auto;
+  padding: 0.75rem 0.5rem;
+  justify-content: flex-start;
+  align-items: center;
+  line-height: 1;
 }
 
-div.stacktrace {
-  height: 400px;
-  overflow-y: scroll;
-  border-left: 4px solid #ccc;
-  padding-left: 10px;
-  background: #eee;
+.menu-button .tags {
+  flex: 1;
+  text-align: left;
+}
+
+.search-button {
+  height: auto;
+  margin-left: 0.5rem;
+  padding: 0.75rem 1.25rem;
+}
+
+.logo {
+  width: 2rem;
+  margin-right: 0.25rem;
+}
+
+/* Sidebar content */
+
+.sidebar-content {
+  flex: 1;
+  position: relative;
+}
+
+.sidebar-content > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  background-color: #eee;
+}
+
+.sidebar-bug-group {
+  padding: 0;
+
+  /* Fix cut-off borders */
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+.sidebar-bug {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  margin-bottom: 0;
+}
+
+.sidebar-bug:not(:last-child) {
+  border-bottom: 1px solid #ddd;
+}
+
+.sidebar-bug-title {
+  flex: 1;
+}
+
+.sidebar-bug-tags > * {
+  margin-left: 0.25rem;
+}
+
+/* Selected bug */
+
+.selected-bug {
+  flex: 1;
+  margin: 0.75rem 0.75rem 0.75rem 0.25rem;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.selected-bug-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.selected-bug-title {
+  flex: 1;
+}
+
+.section {
+  padding: 0 0 1rem 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.section-title .menu-label {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.section-title .button {
+  margin-left: 0.5rem;
+}
+
+.linked-issue {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  line-height: 1;
+}
+
+.linked-issue .description {
+  flex: 1;
+}
+
+.stack-trace {
+  overflow-x: auto;
+  padding: 0.75rem;
+  padding-left: 2.75rem;
+  text-indent: -2rem;
+}
+
+.stack-trace code {
+  display: block;
+  background-color: transparent;
+}
+
+.occurrence-title {
+  background-color: transparent;
 }

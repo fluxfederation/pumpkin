@@ -597,8 +597,7 @@ function toString(v)
 	var type = typeof v;
 	if (type === 'function')
 	{
-		var name = v.func ? v.func.name : v.name;
-		return '<function' + (name === '' ? '' : ':') + name + '>';
+		return '<function>';
 	}
 
 	if (type === 'boolean')
@@ -1105,6 +1104,13 @@ var _elm_lang$core$List$sortWith = _elm_lang$core$Native_List.sortWith;
 var _elm_lang$core$List$sortBy = _elm_lang$core$Native_List.sortBy;
 var _elm_lang$core$List$sort = function (xs) {
 	return A2(_elm_lang$core$List$sortBy, _elm_lang$core$Basics$identity, xs);
+};
+var _elm_lang$core$List$singleton = function (value) {
+	return {
+		ctor: '::',
+		_0: value,
+		_1: {ctor: '[]'}
+	};
 };
 var _elm_lang$core$List$drop = F2(
 	function (n, list) {
@@ -1869,7 +1875,7 @@ function endsWith(sub, str)
 function indexes(sub, str)
 {
 	var subLen = sub.length;
-	
+
 	if (subLen < 1)
 	{
 		return _elm_lang$core$Native_List.Nil;
@@ -1882,74 +1888,78 @@ function indexes(sub, str)
 	{
 		is.push(i);
 		i = i + subLen;
-	}	
-	
+	}
+
 	return _elm_lang$core$Native_List.fromArray(is);
 }
+
 
 function toInt(s)
 {
 	var len = s.length;
+
+	// if empty
 	if (len === 0)
 	{
-		return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int" );
+		return intErr(s);
 	}
-	var start = 0;
-	if (s[0] === '-')
+
+	// if hex
+	var c = s[0];
+	if (c === '0' && s[1] === 'x')
 	{
-		if (len === 1)
+		for (var i = 2; i < len; ++i)
 		{
-			return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int" );
+			var c = s[i];
+			if (('0' <= c && c <= '9') || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f'))
+			{
+				continue;
+			}
+			return intErr(s);
 		}
-		start = 1;
+		return _elm_lang$core$Result$Ok(parseInt(s, 16));
 	}
-	for (var i = start; i < len; ++i)
+
+	// is decimal
+	if (c > '9' || (c < '0' && c !== '-' && c !== '+'))
+	{
+		return intErr(s);
+	}
+	for (var i = 1; i < len; ++i)
 	{
 		var c = s[i];
 		if (c < '0' || '9' < c)
 		{
-			return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int" );
+			return intErr(s);
 		}
 	}
+
 	return _elm_lang$core$Result$Ok(parseInt(s, 10));
 }
 
+function intErr(s)
+{
+	return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int");
+}
+
+
 function toFloat(s)
 {
-	var len = s.length;
-	if (len === 0)
+	// check if it is a hex, octal, or binary number
+	if (s.length === 0 || /[\sxbo]/.test(s))
 	{
-		return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float" );
+		return floatErr(s);
 	}
-	var start = 0;
-	if (s[0] === '-')
-	{
-		if (len === 1)
-		{
-			return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float" );
-		}
-		start = 1;
-	}
-	var dotCount = 0;
-	for (var i = start; i < len; ++i)
-	{
-		var c = s[i];
-		if ('0' <= c && c <= '9')
-		{
-			continue;
-		}
-		if (c === '.')
-		{
-			dotCount += 1;
-			if (dotCount <= 1)
-			{
-				continue;
-			}
-		}
-		return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float" );
-	}
-	return _elm_lang$core$Result$Ok(parseFloat(s));
+	var n = +s;
+	// faster isNaN check
+	return n === n ? _elm_lang$core$Result$Ok(n) : floatErr(s);
 }
+
+function floatErr(s)
+{
+	return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float");
+}
+
 
 function toList(str)
 {
@@ -3847,15 +3857,8 @@ function setupIncomingPort(name, callback)
 		sentBeforeInit.push(value);
 	}
 
-	function postInitSend(incomingValue)
+	function postInitSend(value)
 	{
-		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
-		if (result.ctor === 'Err')
-		{
-			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
-		}
-
-		var value = result._0;
 		var temp = subs;
 		while (temp.ctor !== '[]')
 		{
@@ -3866,7 +3869,13 @@ function setupIncomingPort(name, callback)
 
 	function send(incomingValue)
 	{
-		currentSend(incomingValue);
+		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
+		if (result.ctor === 'Err')
+		{
+			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
+		}
+
+		currentSend(result._0);
 	}
 
 	return { send: send };
@@ -7119,11 +7128,6 @@ function badToString(problem)
 				problem = problem.rest;
 				break;
 
-			case 'index':
-				context += '[' + problem.index + ']';
-				problem = problem.rest;
-				break;
-
 			case 'oneOf':
 				var problems = problem.problems;
 				for (var i = 0; i < problems.length; i++)
@@ -7961,9 +7965,9 @@ function on(name, options, decoder)
 
 function equalEvents(a, b)
 {
-	if (!a.options === b.options)
+	if (a.options !== b.options)
 	{
-		if (a.stopPropagation !== b.stopPropagation || a.preventDefault !== b.preventDefault)
+		if (a.options.stopPropagation !== b.options.stopPropagation || a.options.preventDefault !== b.options.preventDefault)
 		{
 			return false;
 		}
@@ -9239,7 +9243,7 @@ function normalRenderer(parentNode, view)
 var rAF =
 	typeof requestAnimationFrame !== 'undefined'
 		? requestAnimationFrame
-		: function(callback) { callback(); };
+		: function(callback) { setTimeout(callback, 1000 / 60); };
 
 function makeStepper(domNode, view, initialVirtualNode, eventNode)
 {
@@ -10563,6 +10567,52 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
+var _mgold$elm_date_format$Date_Local$international = {
+	date: {
+		months: {jan: 'January', feb: 'February', mar: 'March', apr: 'April', may: 'May', jun: 'June', jul: 'July', aug: 'August', sep: 'September', oct: 'October', nov: 'November', dec: 'December'},
+		monthsAbbrev: {jan: 'Jan', feb: 'Feb', mar: 'Mar', apr: 'Apr', may: 'May', jun: 'Jun', jul: 'Jul', aug: 'Aug', sep: 'Sep', oct: 'Oct', nov: 'Nov', dec: 'Dec'},
+		wdays: {mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday'},
+		wdaysAbbrev: {mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun'},
+		defaultFormat: _elm_lang$core$Maybe$Nothing
+	},
+	time: {am: 'am', pm: 'pm', defaultFormat: _elm_lang$core$Maybe$Nothing},
+	timeZones: _elm_lang$core$Maybe$Nothing,
+	defaultFormat: _elm_lang$core$Maybe$Nothing
+};
+var _mgold$elm_date_format$Date_Local$Local = F4(
+	function (a, b, c, d) {
+		return {date: a, time: b, timeZones: c, defaultFormat: d};
+	});
+var _mgold$elm_date_format$Date_Local$Months = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return {jan: a, feb: b, mar: c, apr: d, may: e, jun: f, jul: g, aug: h, sep: i, oct: j, nov: k, dec: l};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _mgold$elm_date_format$Date_Local$WeekDays = F7(
+	function (a, b, c, d, e, f, g) {
+		return {mon: a, tue: b, wed: c, thu: d, fri: e, sat: f, sun: g};
+	});
+
 var _mgold$elm_date_format$Date_Format$padWith = function (c) {
 	return function (_p0) {
 		return A3(
@@ -10578,54 +10628,56 @@ var _mgold$elm_date_format$Date_Format$zero2twelve = function (n) {
 var _mgold$elm_date_format$Date_Format$mod12 = function (h) {
 	return A2(_elm_lang$core$Basics_ops['%'], h, 12);
 };
-var _mgold$elm_date_format$Date_Format$fullDayOfWeek = function (dow) {
-	var _p1 = dow;
-	switch (_p1.ctor) {
-		case 'Mon':
-			return 'Monday';
-		case 'Tue':
-			return 'Tuesday';
-		case 'Wed':
-			return 'Wednesday';
-		case 'Thu':
-			return 'Thursday';
-		case 'Fri':
-			return 'Friday';
-		case 'Sat':
-			return 'Saturday';
-		default:
-			return 'Sunday';
-	}
-};
-var _mgold$elm_date_format$Date_Format$monthToFullName = function (m) {
-	var _p2 = m;
-	switch (_p2.ctor) {
-		case 'Jan':
-			return 'January';
-		case 'Feb':
-			return 'February';
-		case 'Mar':
-			return 'March';
-		case 'Apr':
-			return 'April';
-		case 'May':
-			return 'May';
-		case 'Jun':
-			return 'June';
-		case 'Jul':
-			return 'July';
-		case 'Aug':
-			return 'August';
-		case 'Sep':
-			return 'September';
-		case 'Oct':
-			return 'October';
-		case 'Nov':
-			return 'November';
-		default:
-			return 'December';
-	}
-};
+var _mgold$elm_date_format$Date_Format$dayOfWeekToWord = F2(
+	function (loc, dow) {
+		var _p1 = dow;
+		switch (_p1.ctor) {
+			case 'Mon':
+				return loc.mon;
+			case 'Tue':
+				return loc.tue;
+			case 'Wed':
+				return loc.wed;
+			case 'Thu':
+				return loc.thu;
+			case 'Fri':
+				return loc.fri;
+			case 'Sat':
+				return loc.sat;
+			default:
+				return loc.sun;
+		}
+	});
+var _mgold$elm_date_format$Date_Format$monthToWord = F2(
+	function (loc, m) {
+		var _p2 = m;
+		switch (_p2.ctor) {
+			case 'Jan':
+				return loc.jan;
+			case 'Feb':
+				return loc.feb;
+			case 'Mar':
+				return loc.mar;
+			case 'Apr':
+				return loc.apr;
+			case 'May':
+				return loc.may;
+			case 'Jun':
+				return loc.jun;
+			case 'Jul':
+				return loc.jul;
+			case 'Aug':
+				return loc.aug;
+			case 'Sep':
+				return loc.sep;
+			case 'Oct':
+				return loc.oct;
+			case 'Nov':
+				return loc.nov;
+			default:
+				return loc.dec;
+		}
+	});
 var _mgold$elm_date_format$Date_Format$monthToInt = function (m) {
 	var _p3 = m;
 	switch (_p3.ctor) {
@@ -10655,8 +10707,8 @@ var _mgold$elm_date_format$Date_Format$monthToInt = function (m) {
 			return 12;
 	}
 };
-var _mgold$elm_date_format$Date_Format$formatToken = F2(
-	function (d, m) {
+var _mgold$elm_date_format$Date_Format$formatToken = F3(
+	function (loc, d, m) {
 		var symbol = function () {
 			var _p4 = m.submatches;
 			if (((_p4.ctor === '::') && (_p4._0.ctor === 'Just')) && (_p4._1.ctor === '[]')) {
@@ -10687,10 +10739,14 @@ var _mgold$elm_date_format$Date_Format$formatToken = F2(
 						_mgold$elm_date_format$Date_Format$monthToInt(
 							_elm_lang$core$Date$month(d))));
 			case 'B':
-				return _mgold$elm_date_format$Date_Format$monthToFullName(
+				return A2(
+					_mgold$elm_date_format$Date_Format$monthToWord,
+					loc.date.months,
 					_elm_lang$core$Date$month(d));
 			case 'b':
-				return _elm_lang$core$Basics$toString(
+				return A2(
+					_mgold$elm_date_format$Date_Format$monthToWord,
+					loc.date.monthsAbbrev,
 					_elm_lang$core$Date$month(d));
 			case 'd':
 				return A2(
@@ -10703,10 +10759,14 @@ var _mgold$elm_date_format$Date_Format$formatToken = F2(
 					_elm_lang$core$Native_Utils.chr(' '),
 					_elm_lang$core$Date$day(d));
 			case 'a':
-				return _elm_lang$core$Basics$toString(
+				return A2(
+					_mgold$elm_date_format$Date_Format$dayOfWeekToWord,
+					loc.date.wdaysAbbrev,
 					_elm_lang$core$Date$dayOfWeek(d));
 			case 'A':
-				return _mgold$elm_date_format$Date_Format$fullDayOfWeek(
+				return A2(
+					_mgold$elm_date_format$Date_Format$dayOfWeekToWord,
+					loc.date.wdays,
 					_elm_lang$core$Date$dayOfWeek(d));
 			case 'H':
 				return A2(
@@ -10735,11 +10795,11 @@ var _mgold$elm_date_format$Date_Format$formatToken = F2(
 			case 'p':
 				return (_elm_lang$core$Native_Utils.cmp(
 					_elm_lang$core$Date$hour(d),
-					12) < 0) ? 'AM' : 'PM';
+					12) < 0) ? _elm_lang$core$String$toUpper(loc.time.am) : _elm_lang$core$String$toUpper(loc.time.pm);
 			case 'P':
 				return (_elm_lang$core$Native_Utils.cmp(
 					_elm_lang$core$Date$hour(d),
-					12) < 0) ? 'am' : 'pm';
+					12) < 0) ? loc.time.am : loc.time.pm;
 			case 'M':
 				return A2(
 					_mgold$elm_date_format$Date_Format$padWith,
@@ -10755,14 +10815,18 @@ var _mgold$elm_date_format$Date_Format$formatToken = F2(
 		}
 	});
 var _mgold$elm_date_format$Date_Format$re = _elm_lang$core$Regex$regex('%(%|Y|y|m|B|b|d|e|a|A|H|k|I|l|p|P|M|S)');
-var _mgold$elm_date_format$Date_Format$format = F2(
-	function (s, d) {
+var _mgold$elm_date_format$Date_Format$localFormat = F3(
+	function (loc, s, d) {
 		return A4(
 			_elm_lang$core$Regex$replace,
 			_elm_lang$core$Regex$All,
 			_mgold$elm_date_format$Date_Format$re,
-			_mgold$elm_date_format$Date_Format$formatToken(d),
+			A2(_mgold$elm_date_format$Date_Format$formatToken, loc, d),
 			s);
+	});
+var _mgold$elm_date_format$Date_Format$format = F2(
+	function (s, d) {
+		return A3(_mgold$elm_date_format$Date_Format$localFormat, _mgold$elm_date_format$Date_Local$international, s, d);
 	});
 var _mgold$elm_date_format$Date_Format$formatISO8601 = _mgold$elm_date_format$Date_Format$format('%Y-%m-%dT%H:%M:%SZ');
 
@@ -10788,18 +10852,20 @@ var _user$project$Types$isClosed = function (bug) {
 			},
 			bug.closedAt));
 };
-var _user$project$Types$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, error: e, showClosedBugs: f};
+var _user$project$Types$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, error: e, showClosedBugs: f, showMenu: g, currentTime: h};
 	});
-var _user$project$Types$initialModel = A6(
+var _user$project$Types$initialModel = A8(
 	_user$project$Types$Model,
 	{ctor: '[]'},
 	{ctor: '[]'},
 	{ctor: '[]'},
 	_elm_lang$core$Maybe$Nothing,
 	_elm_lang$core$Maybe$Nothing,
-	false);
+	false,
+	false,
+	0);
 var _user$project$Types$Event = function (a) {
 	return {name: a};
 };
@@ -10811,6 +10877,7 @@ var _user$project$Types$Bug = F8(
 	function (a, b, c, d, e, f, g, h) {
 		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
 	});
+var _user$project$Types$ToggleMenu = {ctor: 'ToggleMenu'};
 var _user$project$Types$ClearError = {ctor: 'ClearError'};
 var _user$project$Types$HideBug = {ctor: 'HideBug'};
 var _user$project$Types$CloseBug = function (a) {
@@ -10840,112 +10907,343 @@ var _user$project$Types$LoadedPatches = function (a) {
 	return {ctor: 'LoadedPatches', _0: a};
 };
 
-var _user$project$View$timestamp = function (ts) {
-	return A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y %H:%m:%S', ts);
-};
-var _user$project$View$bugDetails = function (bug) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('bug-pane'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('columns'),
-					_1: {ctor: '[]'}
+var _user$project$ViewNew$patchName = F2(
+	function (id, model) {
+		var patch = _elm_lang$core$List$head(
+			A2(
+				_elm_lang$core$List$filter,
+				function (patch) {
+					return _elm_lang$core$Native_Utils.eq(patch.id, id);
 				},
-				{
+				model.patches));
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			{name: '', id: ''},
+			patch).name;
+	});
+var _user$project$ViewNew$errorMessage = function (bug) {
+	return A2(
+		_elm_lang$core$String$join,
+		' : ',
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			{ctor: '[]'},
+			_elm_lang$core$List$tail(
+				A2(_elm_lang$core$String$split, ' : ', bug.message))));
+};
+var _user$project$ViewNew$errorClass = function (bug) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(
+			A2(_elm_lang$core$String$split, ' : ', bug.message)));
+};
+var _user$project$ViewNew$bugGroups = function (model) {
+	var groupFor = function (bug) {
+		return (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Date$toTime(bug.lastOccurredAt),
+			model.currentTime - _elm_lang$core$Time$hour) > 0) ? 'Past Hour' : ((_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Date$toTime(bug.lastOccurredAt),
+			model.currentTime - (_elm_lang$core$Time$hour * 24)) > 0) ? 'Past Day' : ((_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Date$toTime(bug.lastOccurredAt),
+			model.currentTime - ((_elm_lang$core$Time$hour * 24) * 7)) > 0) ? 'Past Week' : 'Earlier'));
+	};
+	var group = function (name) {
+		return {
+			ctor: '_Tuple2',
+			_0: name,
+			_1: A2(
+				_elm_lang$core$List$filter,
+				function (bug) {
+					return _elm_lang$core$Native_Utils.eq(
+						groupFor(bug),
+						name);
+				},
+				model.bugs)
+		};
+	};
+	var groupNames = {
+		ctor: '::',
+		_0: 'Past Hour',
+		_1: {
+			ctor: '::',
+			_0: 'Past Day',
+			_1: {
+				ctor: '::',
+				_0: 'Past Week',
+				_1: {
+					ctor: '::',
+					_0: 'Earlier',
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	};
+	return A2(_elm_lang$core$List$map, group, groupNames);
+};
+var _user$project$ViewNew$occurrenceDisplay = A2(
+	_elm_lang$html$Html$div,
+	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('section-title'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h3,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('menu-label'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Occurrences'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$div,
+						_elm_lang$html$Html$button,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('column is-11'),
+							_0: _elm_lang$html$Html_Attributes$class('button is-small is-white'),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$h5,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('title'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(bug.message),
-									_1: {ctor: '[]'}
-								}),
+							_0: _elm_lang$html$Html$text('Filter'),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$div,
+							_elm_lang$html$Html$button,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('column is-1'),
+								_0: _elm_lang$html$Html_Attributes$class('button is-small is-white'),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$button,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('delete is-pulled-right'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$HideBug),
-											_1: {ctor: '[]'}
-										}
-									},
-									{ctor: '[]'}),
+								_0: _elm_lang$html$Html$text('Map'),
 								_1: {ctor: '[]'}
 							}),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$button,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('button is-small is-white'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Export JSON'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
 					}
-				}),
-			_1: {
+				}
+			}),
+		_1: {ctor: '[]'}
+	});
+var _user$project$ViewNew$stackTraceLine = function (line) {
+	return A2(
+		_elm_lang$html$Html$code,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(line),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$ViewNew$stackTraceDisplay = function (stackTrace) {
+	var _p0 = stackTrace;
+	if (_p0.ctor === 'Just') {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('section'),
+				_1: {ctor: '[]'}
+			},
+			{
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$table,
+					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('table'),
+						_0: _elm_lang$html$Html_Attributes$class('section-title'),
 						_1: {ctor: '[]'}
 					},
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$tr,
-							{ctor: '[]'},
+							_elm_lang$html$Html$h3,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('menu-label'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Stack Trace'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$button,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('button is-small is-white'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Show Context'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('button is-small is-white'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Full Trace'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('stack-trace notification'),
+							_1: {ctor: '[]'}
+						},
+						A2(_elm_lang$core$List$map, _user$project$ViewNew$stackTraceLine, _p0._0)),
+					_1: {ctor: '[]'}
+				}
+			});
+	} else {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{ctor: '[]'});
+	}
+};
+var _user$project$ViewNew$linkedIssue = function (bug) {
+	return A2(
+		_elm_lang$html$Html$a,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('linked-issue notification'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$span,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('description'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('No linked incident.'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('fa fa-cog'),
+						_1: {ctor: '[]'}
+					},
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$ViewNew$selectedBug = function (model) {
+	var _p1 = model.focusedBug;
+	if (_p1.ctor === 'Just') {
+		var _p2 = _p1._0;
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('selected-bug box'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('selected-bug-header'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('selected-bug-title'),
+								_1: {ctor: '[]'}
+							},
 							{
 								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$th,
-									{ctor: '[]'},
+									_elm_lang$html$Html$h1,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Last occurred at'),
+										_0: _elm_lang$html$Html_Attributes$class('title is-3'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(
+											_user$project$ViewNew$errorClass(_p2)),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$td,
-										{ctor: '[]'},
+										_elm_lang$html$Html$p,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('subtitle is-5'),
+											_1: {ctor: '[]'}
+										},
 										{
 											ctor: '::',
 											_0: _elm_lang$html$Html$text(
-												_user$project$View$timestamp(bug.lastOccurredAt)),
+												_user$project$ViewNew$errorMessage(_p2)),
 											_1: {ctor: '[]'}
 										}),
 									_1: {ctor: '[]'}
@@ -10954,28 +11252,59 @@ var _user$project$View$bugDetails = function (bug) {
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$tr,
+								_elm_lang$html$Html$div,
 								{ctor: '[]'},
 								{
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$th,
+										_elm_lang$html$Html$p,
 										{ctor: '[]'},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('First occurred at'),
+											_0: _elm_lang$html$Html$text(
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													_elm_lang$core$Basics$toString(_p2.occurrenceCount),
+													' occurrences')),
 											_1: {ctor: '[]'}
 										}),
 									_1: {
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$td,
+											_elm_lang$html$Html$p,
 											{ctor: '[]'},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html$text(
-													_user$project$View$timestamp(bug.firstOccurredAt)),
-												_1: {ctor: '[]'}
+												_0: _elm_lang$html$Html$text('Between '),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$strong,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text(
+																A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y', _p2.lastOccurredAt)),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html$text(' and '),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$strong,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text(
+																		A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y', _p2.firstOccurredAt)),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
 											}),
 										_1: {ctor: '[]'}
 									}
@@ -10985,279 +11314,364 @@ var _user$project$View$bugDetails = function (bug) {
 					}),
 				_1: {
 					ctor: '::',
+					_0: _user$project$ViewNew$linkedIssue(_p2),
+					_1: {
+						ctor: '::',
+						_0: _user$project$ViewNew$stackTraceDisplay(_p2.stackTrace),
+						_1: {
+							ctor: '::',
+							_0: _user$project$ViewNew$occurrenceDisplay,
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			});
+	} else {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{ctor: '[]'});
+	}
+};
+var _user$project$ViewNew$sidebarBug = function (bug) {
+	var issueTag = A2(
+		_elm_lang$html$Html$span,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('tag is-warning'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('CI-000'),
+			_1: {ctor: '[]'}
+		});
+	return A2(
+		_elm_lang$html$Html$a,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('sidebar-bug is-active'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onClick(
+					_user$project$Types$RequestDetails(bug.id)),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-title'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$div,
-						{ctor: '[]'},
+						_elm_lang$html$Html$h4,
 						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$button,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$disabled(
-										_user$project$Types$isClosed(bug)),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(
-											_user$project$Types$CloseBug(bug.id)),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$classList(
-												{
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'button', _1: true},
-													_1: {
-														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'is-danger', _1: true},
-														_1: {ctor: '[]'}
-													}
-												}),
-											_1: {ctor: '[]'}
-										}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Close'),
-									_1: {ctor: '[]'}
-								}),
+							_0: _elm_lang$html$Html_Attributes$class('title is-6'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								_user$project$ViewNew$errorClass(bug)),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$br,
-							{ctor: '[]'},
-							{ctor: '[]'}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('stacktrace'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										_user$project$Types$stackTraceString(bug)),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		});
-};
-var _user$project$View$bugRow = F2(
-	function (currentBug, bug) {
-		var isActive = A2(
-			_elm_lang$core$Maybe$withDefault,
-			false,
-			A2(
-				_elm_lang$core$Maybe$map,
-				function (otherBug) {
-					return _elm_lang$core$Native_Utils.eq(otherBug.id, bug.id);
-				},
-				currentBug));
-		var bugRowClasses = _elm_lang$html$Html_Attributes$classList(
-			{
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'bug', _1: true},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'is-active', _1: isActive},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'closed',
-							_1: _user$project$Types$isClosed(bug)
-						},
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: bugRowClasses,
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						_user$project$Types$RequestDetails(bug.id)),
-					_1: {ctor: '[]'}
-				}
-			},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('columns'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
+							_elm_lang$html$Html$p,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('column is-2'),
+								_0: _elm_lang$html$Html_Attributes$class('subtitle is-6'),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y', bug.lastOccurredAt)),
+									_user$project$ViewNew$errorMessage(bug)),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-tags'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$span,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('tag'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									_elm_lang$core$Basics$toString(bug.occurrenceCount)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('column'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(bug.message),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('column is-1'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$span,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('tag is-warning'),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text(
-													_elm_lang$core$Basics$toString(bug.occurrenceCount)),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
+							_0: issueTag,
+							_1: {ctor: '[]'}
 						}
 					}),
 				_1: {ctor: '[]'}
-			});
-	});
-var _user$project$View$patchButton = F2(
-	function (selectedPatchIds, project) {
-		var baseClass = 'tag is-medium';
-		var toggled = A2(_elm_lang$core$List$member, project.id, selectedPatchIds);
-		var computedClass = toggled ? A2(_elm_lang$core$Basics_ops['++'], baseClass, ' is-primary') : baseClass;
-		var toggleMsg = toggled ? _user$project$Types$HidePatchBugs : _user$project$Types$ShowPatchBugs;
-		return A2(
-			_elm_lang$html$Html$span,
+			}
+		});
+};
+var _user$project$ViewNew$sidebarBugGroup = function (_p3) {
+	var _p4 = _p3;
+	var _p5 = _p4._1;
+	return (_elm_lang$core$Native_Utils.cmp(
+		_elm_lang$core$List$length(_p5),
+		0) > 0) ? {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$h3,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class(computedClass),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						toggleMsg(project.id)),
-					_1: {ctor: '[]'}
-				}
+				_0: _elm_lang$html$Html_Attributes$class('menu-label'),
+				_1: {ctor: '[]'}
 			},
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html$text(project.name),
+				_0: _elm_lang$html$Html$text(_p4._0),
 				_1: {ctor: '[]'}
-			});
-	});
-var _user$project$View$bugPane = function (model) {
-	var _p0 = model.focusedBug;
-	if (_p0.ctor === 'Nothing') {
-		return {ctor: '[]'};
-	} else {
-		return {
+			}),
+		_1: {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('box'),
+					_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-group box'),
 					_1: {ctor: '[]'}
+				},
+				A2(_elm_lang$core$List$map, _user$project$ViewNew$sidebarBug, _p5)),
+			_1: {ctor: '[]'}
+		}
+	} : {ctor: '[]'};
+};
+var _user$project$ViewNew$sidebarBugs = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('menu'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'is-hidden', _1: model.showMenu},
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		},
+		A2(
+			_elm_lang$core$List$concatMap,
+			_user$project$ViewNew$sidebarBugGroup,
+			_user$project$ViewNew$bugGroups(model)));
+};
+var _user$project$ViewNew$sidebarMenu = function (model) {
+	var patchItem = function (patch) {
+		return A2(
+			_elm_lang$html$Html$li,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$a,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('is-active'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(patch.name),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	};
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('menu'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'is-hidden', _1: !model.showMenu},
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$ul,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('menu-list'),
+					_1: {ctor: '[]'}
+				},
+				A2(_elm_lang$core$List$map, patchItem, model.patches)),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$ViewNew$currentPatchesAsTags = function (model) {
+	var tag = function (id) {
+		return A2(
+			_elm_lang$html$Html$span,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('tag'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_user$project$ViewNew$patchName, id, model)),
+				_1: {ctor: '[]'}
+			});
+	};
+	return A2(
+		_elm_lang$html$Html$span,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('tags'),
+			_1: {ctor: '[]'}
+		},
+		A2(_elm_lang$core$List$map, tag, model.selectedPatchIds));
+};
+var _user$project$ViewNew$sidebarHeader = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('sidebar-header'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$a,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('menu-button button'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$classList(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showMenu},
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$ToggleMenu),
+							_1: {ctor: '[]'}
+						}
+					}
 				},
 				{
 					ctor: '::',
-					_0: _user$project$View$bugDetails(_p0._0),
-					_1: {ctor: '[]'}
+					_0: A2(
+						_elm_lang$html$Html$img,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$src('/logo.png'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('logo'),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: _user$project$ViewNew$currentPatchesAsTags(model),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$span,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('fa fa-check'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$classList(
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'is-hidden', _1: !model.showMenu},
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {ctor: '[]'}
+						}
+					}
 				}),
-			_1: {ctor: '[]'}
-		};
-	}
-};
-var _user$project$View$closedFilter = function (model) {
-	var showHideButton = model.showClosedBugs ? A2(
-		_elm_lang$html$Html$button,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$HideClosedBugs),
 			_1: {
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('button is'),
+				_0: A2(
+					_elm_lang$html$Html$a,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('search-button button'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$classList(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'is-hidden', _1: model.showMenu},
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$span,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('fa fa-search'),
+								_1: {ctor: '[]'}
+							},
+							{ctor: '[]'}),
+						_1: {ctor: '[]'}
+					}),
 				_1: {ctor: '[]'}
 			}
-		},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Hide Closed Bugs'),
-			_1: {ctor: '[]'}
-		}) : A2(
-		_elm_lang$html$Html$button,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$ShowClosedBugs),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('button is-outlined is-danger'),
-				_1: {ctor: '[]'}
-			}
-		},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Show Closed Bugs'),
-			_1: {ctor: '[]'}
-		});
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('control'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: showHideButton,
-			_1: {ctor: '[]'}
 		});
 };
-var _user$project$View$filters = function (model) {
+var _user$project$ViewNew$content = function (model) {
 	return A2(
-		_elm_lang$html$Html$div,
+		_elm_lang$html$Html$main_,
 		{ctor: '[]'},
 		{
 			ctor: '::',
@@ -11265,220 +11679,90 @@ var _user$project$View$filters = function (model) {
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('control'),
-					_1: {ctor: '[]'}
-				},
-				A2(
-					_elm_lang$core$List$map,
-					_user$project$View$patchButton(model.selectedPatchIds),
-					model.patches)),
-			_1: {
-				ctor: '::',
-				_0: _user$project$View$closedFilter(model),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$View$bugList = function (model) {
-	var shouldShowBug = function (bug) {
-		return A2(_elm_lang$core$List$member, bug.patchId, model.selectedPatchIds);
-	};
-	var bugsToShow = A2(_elm_lang$core$List$filter, shouldShowBug, model.bugs);
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		{
-			ctor: '::',
-			_0: _user$project$View$filters(model),
-			_1: {ctor: '[]'}
-		},
-		A2(
-			_elm_lang$core$List$map,
-			_user$project$View$bugRow(model.focusedBug),
-			bugsToShow));
-};
-var _user$project$View$bugs = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('section'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('columns'),
+					_0: _elm_lang$html$Html_Attributes$class('sidebar'),
 					_1: {ctor: '[]'}
 				},
 				{
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('column is-6'),
-							_1: {ctor: '[]'}
-						},
-						_user$project$View$bugList(model)),
+					_0: _user$project$ViewNew$sidebarHeader(model),
 					_1: {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$div,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('column is-6'),
+								_0: _elm_lang$html$Html_Attributes$class('sidebar-content'),
 								_1: {ctor: '[]'}
 							},
-							_user$project$View$bugPane(model)),
+							{
+								ctor: '::',
+								_0: _user$project$ViewNew$sidebarMenu(model),
+								_1: {
+									ctor: '::',
+									_0: _user$project$ViewNew$sidebarBugs(model),
+									_1: {ctor: '[]'}
+								}
+							}),
 						_1: {ctor: '[]'}
 					}
 				}),
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: _user$project$ViewNew$selectedBug(model),
+				_1: {ctor: '[]'}
+			}
 		});
 };
-var _user$project$View$container = function (contents) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$classList(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'container', _1: true},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'is-fluid', _1: true},
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
-		},
-		contents);
-};
-var _user$project$View$errorMessages = function (model) {
-	var _p1 = model.error;
-	if (_p1.ctor === 'Just') {
-		return {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('section'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _user$project$View$container(
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('notification is-danger'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$button,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('delete'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$ClearError),
-												_1: {ctor: '[]'}
-											}
-										},
-										{ctor: '[]'}),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html$text(_p1._0),
-										_1: {ctor: '[]'}
-									}
-								}),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
-		};
-	} else {
-		return {ctor: '[]'};
-	}
-};
-var _user$project$View$heading = A2(
-	_elm_lang$html$Html$div,
-	{
-		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$classList(
+var _user$project$ViewNew$errorMessages = function (model) {
+	var _p6 = model.error;
+	if (_p6.ctor === 'Just') {
+		return A2(
+			_elm_lang$html$Html$div,
 			{
 				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'nav', _1: true},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'has-shadow', _1: true},
-					_1: {ctor: '[]'}
-				}
-			}),
-		_1: {ctor: '[]'}
-	},
-	{
-		ctor: '::',
-		_0: _user$project$View$container(
+				_0: _elm_lang$html$Html_Attributes$class('notification is-danger'),
+				_1: {ctor: '[]'}
+			},
 			{
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$div,
+					_elm_lang$html$Html$button,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('nav-left'),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$class('delete'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$ClearError),
+							_1: {ctor: '[]'}
+						}
 					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$a,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('nav-item is-brand'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Pumpkin'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}),
-		_1: {ctor: '[]'}
-	});
-var _user$project$View$view = function (model) {
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(_p6._0),
+					_1: {ctor: '[]'}
+				}
+			});
+	} else {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{ctor: '[]'});
+	}
+};
+var _user$project$ViewNew$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
+		{
+			ctor: '::',
+			_0: _user$project$ViewNew$errorMessages(model),
+			_1: {
 				ctor: '::',
-				_0: _user$project$View$heading,
+				_0: _user$project$ViewNew$content(model),
 				_1: {ctor: '[]'}
-			},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_user$project$View$errorMessages(model),
-				{
-					ctor: '::',
-					_0: _user$project$View$bugs(model),
-					_1: {ctor: '[]'}
-				})));
+			}
+		});
 };
 
 var _user$project$Rest$closeBugUrl = function (bugId) {
@@ -11771,7 +12055,7 @@ var _user$project$Main$update = F2(
 							_1: {ctor: '[]'}
 						}
 					});
-			default:
+			case 'HideClosedBugs':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
@@ -11786,6 +12070,11 @@ var _user$project$Main$update = F2(
 							_1: {ctor: '[]'}
 						}
 					});
+			default:
+				return _user$project$Main$noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showMenu: !model.showMenu}));
 		}
 	});
 var _user$project$Main$subscriptions = function (model) {
@@ -11806,7 +12095,7 @@ var _user$project$Main$init = {
 		})
 };
 var _user$project$Main$main = _elm_lang$html$Html$program(
-	{init: _user$project$Main$init, view: _user$project$View$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
+	{init: _user$project$Main$init, view: _user$project$ViewNew$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};

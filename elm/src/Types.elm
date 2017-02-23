@@ -2,6 +2,7 @@ module Types exposing (..)
 
 import Http
 import Date
+import Time
 import String
 
 
@@ -21,6 +22,7 @@ type Msg
     | CloseBug String
     | HideBug
     | ClearError
+    | ToggleMenu
 
 
 
@@ -34,6 +36,8 @@ type alias Model =
     , focusedBug : Maybe Bug
     , error : Maybe String
     , showClosedBugs : Bool
+    , showMenu : Bool
+    , currentTime : Time.Time
     }
 
 
@@ -67,7 +71,7 @@ type alias Bug =
 
 initialModel : Model
 initialModel =
-    Model [] [] [] Nothing Nothing False
+    Model [] [] [] Nothing Nothing False False 0
 
 
 isClosed : Bug -> Bool

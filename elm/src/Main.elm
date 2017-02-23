@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html
 import Types exposing (..)
-import View
+import ViewNew
 import Rest
 import List.Extra as ListX
 
@@ -16,7 +16,7 @@ main : Program Never Model Msg
 main =
     Html.program
         { init = init
-        , view = View.view
+        , view = ViewNew.view
         , update = update
         , subscriptions = subscriptions
         }
@@ -101,6 +101,9 @@ update msg model =
 
         HideClosedBugs ->
             { model | showClosedBugs = False } ! [ Rest.loadPatches, Rest.loadBugs False ]
+
+        ToggleMenu ->
+            noCmd { model | showMenu = not model.showMenu }
 
 
 noCmd : model -> ( model, Cmd Msg )
