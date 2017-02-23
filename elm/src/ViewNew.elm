@@ -3,10 +3,12 @@ module ViewNew exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
-import Time
-import Date
+import Html.Attributes.Aria exposing (ariaLabel)
 import Date.Format as DF
+import Date.Extra.Period as Period
+import String.Extra exposing (pluralize)
 import Types exposing (..)
+import TimeAgo exposing (timeAgo)
 
 
 view : Model -> Html Msg
@@ -47,10 +49,15 @@ sidebarHeader model =
         [ a [ class "menu-button button", classList [ ( "is-active", model.showMenu ) ], onClick ToggleMenu ]
             [ img [ src "/logo.png", class "logo" ] []
             , currentPatchesAsTags model
-            , span [ class "fa fa-check", classList [ ( "is-hidden", not model.showMenu ) ] ] []
+            , icon "check"
+                (if model.showMenu then
+                    ""
+                 else
+                    "is-hidden"
+                )
             ]
         , a [ class "search-button button", classList [ ( "is-hidden", model.showMenu ) ] ]
-            [ span [ class "fa fa-search" ] [] ]
+            [ icon "search" "" ]
         ]
 
 
@@ -145,21 +152,7 @@ selectedBug model =
     case model.focusedBug of
         Just bug ->
             div [ class "selected-bug box" ]
-                [ div [ class "selected-bug-header" ]
-                    [ div [ class "selected-bug-title" ]
-                        [ h1 [ class "title is-3" ] [ text (errorClass bug) ]
-                        , p [ class "subtitle is-5" ] [ text (errorMessage bug) ]
-                        ]
-                    , div []
-                        [ p [] [ text (toString bug.occurrenceCount ++ " occurrences") ]
-                        , p []
-                            [ text "Between "
-                            , strong [] [ text (DF.format "%e %b %Y" bug.lastOccurredAt) ]
-                            , text " and "
-                            , strong [] [ text (DF.format "%e %b %Y" bug.firstOccurredAt) ]
-                            ]
-                        ]
-                    ]
+                [ selectedBugHeader model bug
                 , linkedIssue bug
                 , stackTraceDisplay model bug
                 , occurrenceDisplay
@@ -169,11 +162,58 @@ selectedBug model =
             div [] []
 
 
+selectedBugHeader : Model -> Bug -> Html Msg
+selectedBugHeader model bug =
+    div [ class "selected-bug-header" ]
+        [ div [ class "selected-bug-title" ]
+            [ h1 [ class "title is-3" ] [ text (errorClass bug) ]
+            , p [ class "subtitle is-5" ] [ text (errorMessage bug) ]
+            ]
+        , div [ class "has-text-right" ]
+            [ occurrenceCount bug
+            , p []
+                [ button
+                    [ class "button is-primary is-inverted"
+                    , classList [ ( "is-active", not model.showTimeAgo ) ]
+                    , onClick ToggleTimeFormat
+                    ]
+                    [ icon "clock-o" ""
+                    , text " "
+                    , bugTimes model bug
+                    ]
+                ]
+            ]
+        ]
+
+
+occurrenceCount : Bug -> Html Msg
+occurrenceCount bug =
+    p [ class "occurrence-count" ]
+        [ text (pluralize "occurrence" "occurrences" bug.occurrenceCount) ]
+
+
+bugTimes : Model -> Bug -> Html Msg
+bugTimes model bug =
+    let
+        formatDate date =
+            if model.showTimeAgo then
+                timeAgo model.now date
+            else
+                DF.format "%e %b %Y %k:%M:%S" date
+    in
+        if bug.occurrenceCount == 1 then
+            span [ class "bug-times" ]
+                [ text (formatDate bug.lastOccurredAt) ]
+        else
+            span [ class "bug-times" ]
+                [ text (formatDate bug.lastOccurredAt ++ " ~ " ++ formatDate bug.firstOccurredAt) ]
+
+
 linkedIssue : Bug -> Html Msg
 linkedIssue bug =
     a [ class "linked-issue notification" ]
         [ span [ class "description" ] [ text "No linked incident." ]
-        , span [ class "fa fa-cog" ] []
+        , icon "cog" ""
         ]
 
 
@@ -186,9 +226,9 @@ stackTraceDisplay model bug =
         div [ class "section" ]
             [ div [ class "section-title" ]
                 [ h3 [ class "menu-label" ] [ text "Stack Trace" ]
-                , button [ class "button is-small is-white" ] [ text "Show Context" ]
+                , button [ class "button is-small is-primary is-inverted" ] [ text "Show Context" ]
                 , button
-                    [ class "button is-small is-white"
+                    [ class "button is-small is-primary is-inverted"
                     , classList [ ( "is-active", model.showFullStackTrace ) ]
                     , onClick ToggleFullStackTrace
                     ]
@@ -208,11 +248,17 @@ occurrenceDisplay =
     div []
         [ div [ class "section-title" ]
             [ h3 [ class "menu-label" ] [ text "Occurrences" ]
-            , button [ class "button is-small is-white" ] [ text "Filter" ]
-            , button [ class "button is-small is-white" ] [ text "Map" ]
-            , button [ class "button is-small is-white" ] [ text "Export JSON" ]
+            , button [ class "button is-small is-primary is-inverted" ] [ text "Filter" ]
+            , button [ class "button is-small is-primary is-inverted" ] [ text "Map" ]
+            , button [ class "button is-small is-primary is-inverted" ] [ text "Export JSON" ]
             ]
         ]
+
+
+icon : String -> String -> Html Msg
+icon name variant =
+    span [ class ("icon is-small " ++ variant) ]
+        [ span [ class ("fa fa-" ++ name) ] [] ]
 
 
 
@@ -222,21 +268,24 @@ occurrenceDisplay =
 bugGroups : Model -> List ( String, List Bug )
 bugGroups model =
     let
+        periodDiff bug =
+            Period.diff model.now bug.lastOccurredAt
+
         groupNames =
             [ "Past Hour", "Past Day", "Past Week", "Earlier" ]
 
-        groupFor bug =
-            if (Date.toTime bug.lastOccurredAt) > (model.currentTime - Time.hour) then
-                "Past Hour"
-            else if (Date.toTime bug.lastOccurredAt) > (model.currentTime - Time.hour * 24) then
-                "Past Day"
-            else if (Date.toTime bug.lastOccurredAt) > (model.currentTime - Time.hour * 24 * 7) then
-                "Past Week"
-            else
+        groupFor diff =
+            if diff.week > 1 then
                 "Earlier"
+            else if diff.day > 1 then
+                "Past Week"
+            else if diff.hour > 1 then
+                "Past Day"
+            else
+                "Past Hour"
 
         group name =
-            ( name, List.filter (\bug -> groupFor bug == name) model.bugs )
+            ( name, List.filter (\bug -> groupFor (periodDiff bug) == name) model.bugs )
     in
         List.map group groupNames
 

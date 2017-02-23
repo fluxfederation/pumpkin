@@ -1,15 +1,17 @@
 module Main exposing (..)
 
 import Html
+import Task
+import Time
+import Date
 import Types exposing (..)
 import ViewNew
 import Rest
 import List.Extra as ListX
 
-
 init : ( Model, Cmd Msg )
 init =
-    ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Rest.loadBugs False ] )
+    ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Rest.loadBugs False, Task.perform TimeTick Time.now ] )
 
 
 main : Program Never Model Msg
@@ -28,8 +30,7 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
-
+    Time.every Time.minute TimeTick
 
 
 -- Updates
@@ -107,6 +108,12 @@ update msg model =
 
         ToggleFullStackTrace ->
             noCmd { model | showFullStackTrace = not model.showFullStackTrace }
+
+        ToggleTimeFormat ->
+            noCmd { model | showTimeAgo = not model.showTimeAgo }
+
+        TimeTick time ->
+            noCmd { model | now = (Date.fromTime time) }
 
 
 noCmd : model -> ( model, Cmd Msg )

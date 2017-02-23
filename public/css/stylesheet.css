@@ -129,6 +129,15 @@ main {
   flex: 1;
 }
 
+.occurrence-count {
+  padding-right: 0.75rem;
+}
+
+.bug-times {
+  color: #363636;
+  font-size: 1rem;
+}
+
 .section {
   padding: 0 0 1rem 0;
 }

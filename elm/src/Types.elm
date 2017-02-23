@@ -24,6 +24,8 @@ type Msg
     | ClearError
     | ToggleMenu
     | ToggleFullStackTrace
+    | ToggleTimeFormat
+    | TimeTick Time.Time
 
 
 
@@ -39,7 +41,8 @@ type alias Model =
     , error : Maybe String
     , showClosedBugs : Bool
     , showMenu : Bool
-    , currentTime : Time.Time
+    , now : Date.Date
+    , showTimeAgo : Bool
     }
 
 
@@ -81,7 +84,8 @@ initialModel =
     , error = Nothing
     , showClosedBugs = False
     , showMenu = False
-    , currentTime = 0
+    , now = (Date.fromTime 0)
+    , showTimeAgo = True
     }
 
 
