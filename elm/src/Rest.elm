@@ -14,19 +14,29 @@ patchesUrl =
     "/patches"
 
 
-openBugsUrl : String
-openBugsUrl =
-    "/bugs" ++ "?closed=false"
+openBugsUrl : List String -> String
+openBugsUrl patchIds =
+    "/bugs"
+        ++ "?closed=false&"
+        ++ (String.join
+                "&"
+                (List.map (\id -> "patch_ids[]=" ++ id) patchIds)
+           )
 
 
-allBugsUrl : String
-allBugsUrl =
+allBugsUrl : List String -> String
+allBugsUrl patchIds =
     "/bugs"
 
 
 detailsUrl : String -> String
 detailsUrl bugId =
     "/bugs/" ++ bugId
+
+
+occurrencesUrl : String -> String
+occurrencesUrl bugId =
+    "/bugs/" ++ bugId ++ "/occurrences"
 
 
 
@@ -77,6 +87,21 @@ decodeBug =
         (stacktrace)
 
 
+decodeOccurrences : Decoder Occurrences
+decodeOccurrences =
+    list decodeOccurrence
+
+
+decodeOccurrence : Decoder Occurrence
+decodeOccurrence =
+    map5 Occurrence
+        (field "id" string)
+        (field "patch_id" string)
+        (field "message" string)
+        (field "occurred_at" date)
+        (field "data" value)
+
+
 stacktrace : Decoder (Maybe (List String))
 stacktrace =
     maybe <| at [ "data", "exception", "backtrace" ] (list string)
@@ -98,7 +123,10 @@ closeBugUrl bugId =
 
 loadBugDetails : String -> Cmd Msg
 loadBugDetails bugId =
-    Http.send LoadedDetails <| Http.get (detailsUrl bugId) decodeBug
+    Cmd.batch
+        [ Http.send LoadedDetails <| Http.get (detailsUrl bugId) decodeBug
+        , Http.send LoadedOccurrences <| Http.get (occurrencesUrl bugId) decodeOccurrences
+        ]
 
 
 closeBug : String -> Cmd Msg
@@ -111,13 +139,13 @@ loadPatches =
     Http.send LoadedPatches <| Http.get patchesUrl decodePatches
 
 
-loadBugs : Bool -> Cmd Msg
-loadBugs includeClosedBugs =
+loadBugs : List String -> Bool -> Cmd Msg
+loadBugs patchIds includeClosedBugs =
     let
         url =
             if includeClosedBugs then
-                allBugsUrl
+                allBugsUrl patchIds
             else
-                openBugsUrl
+                openBugsUrl patchIds
     in
         Http.send LoadedBugs <| Http.get url decodeBugs

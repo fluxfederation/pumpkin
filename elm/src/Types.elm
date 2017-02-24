@@ -2,7 +2,9 @@ module Types exposing (..)
 
 import Http
 import Date
+import Time
 import String
+import Json.Decode
 
 
 -- Messages
@@ -13,14 +15,21 @@ type Msg
     | LoadedBugs (Result Http.Error Bugs)
     | ShowPatchBugs String
     | HidePatchBugs String
+    | SetSelectedPatchIds (List String)
     | ShowClosedBugs
     | HideClosedBugs
     | LoadedDetails (Result Http.Error Bug)
+    | LoadedOccurrences (Result Http.Error Occurrences)
     | RequestDetails String
     | ClosedBug (Result Http.Error Bug)
     | CloseBug String
     | HideBug
     | ClearError
+    | ToggleMenu
+    | ToggleFullStackTrace
+    | ToggleOccurrence String
+    | ToggleTimeFormat
+    | TimeTick Time.Time
 
 
 
@@ -32,8 +41,14 @@ type alias Model =
     , patches : Patches
     , bugs : Bugs
     , focusedBug : Maybe Bug
+    , focusedBugOccurrences : Maybe Occurrences
+    , expandedOccurrences : List String
+    , showFullStackTrace : Bool
     , error : Maybe String
     , showClosedBugs : Bool
+    , showMenu : Bool
+    , now : Date.Date
+    , showTimeAgo : Bool
     }
 
 
@@ -65,9 +80,34 @@ type alias Bug =
     }
 
 
+type alias Occurrences =
+    List Occurrence
+
+
+type alias Occurrence =
+    { id : String
+    , patchId : String
+    , message : String
+    , occurredAt : Date.Date
+    , data : Json.Decode.Value
+    }
+
+
 initialModel : Model
 initialModel =
-    Model [] [] [] Nothing Nothing False
+    { selectedPatchIds = []
+    , patches = []
+    , bugs = []
+    , focusedBug = Nothing
+    , focusedBugOccurrences = Nothing
+    , expandedOccurrences = []
+    , showFullStackTrace = False
+    , error = Nothing
+    , showClosedBugs = False
+    , showMenu = False
+    , now = (Date.fromTime 0)
+    , showTimeAgo = True
+    }
 
 
 isClosed : Bug -> Bool

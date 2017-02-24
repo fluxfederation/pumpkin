@@ -1,25 +1,79 @@
 module Main exposing (..)
 
-import Html
+import Task
+import Time
+import Date
 import Types exposing (..)
 import View
 import Rest
 import List.Extra as ListX
+import Navigation exposing (..)
+import RouteUrl exposing (..)
+import RouteUrl.Builder as BuildUrl
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Rest.loadBugs False ] )
+    ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Task.perform TimeTick Time.now ] )
 
 
-main : Program Never Model Msg
+main : RouteUrlProgram Never Model Msg
 main =
-    Html.program
-        { init = init
+    RouteUrl.program
+        { delta2url = delta2url
+        , location2messages = location2messages
+        , init = init
         , view = View.view
         , update = update
         , subscriptions = subscriptions
         }
+
+
+
+-- Routing
+
+
+delta2url : Model -> Model -> Maybe UrlChange
+delta2url _ model =
+    let
+        selectedPatches =
+            if List.length model.selectedPatchIds > 0 then
+                "?patches=" ++ (String.join "," model.selectedPatchIds)
+            else
+                "?patches="
+
+        selectedBug =
+            case model.focusedBug of
+                Just bug ->
+                    "#" ++ bug.id
+
+                Nothing ->
+                    "#"
+    in
+        Just { entry = NewEntry, url = selectedPatches ++ selectedBug }
+
+
+location2messages : Location -> List Msg
+location2messages location =
+    let
+        builder =
+            BuildUrl.fromUrl location.href
+
+        selectedPatchIds =
+            case BuildUrl.getQuery "patches" builder of
+                Just patches ->
+                    List.filter (\s -> String.length s > 0) (String.split "," patches)
+
+                Nothing ->
+                    []
+
+        focusBug =
+            if String.length (BuildUrl.hash builder) > 0 then
+                [ RequestDetails (BuildUrl.hash builder) ]
+            else
+                []
+    in
+        [ SetSelectedPatchIds selectedPatchIds ] ++ focusBug
 
 
 
@@ -28,7 +82,7 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Time.every Time.minute TimeTick
 
 
 
@@ -55,7 +109,11 @@ update msg model =
             handleResult (loadedBugs model) model result
 
         ShowPatchBugs projectName ->
-            noCmd { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ] }
+            let
+                newModel =
+                    { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ] }
+            in
+                newModel ! [ Rest.loadBugs newModel.selectedPatchIds False ]
 
         HidePatchBugs patchId ->
             let
@@ -68,15 +126,26 @@ update msg model =
                 newPatchIds =
                     List.filter (\x -> x /= patchId) model.selectedPatchIds
             in
-                noCmd { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug }
+                { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug } ! [ Rest.loadBugs newPatchIds False ]
+
+        SetSelectedPatchIds ids ->
+            { model | selectedPatchIds = ids } ! [ Rest.loadBugs ids False ]
 
         RequestDetails bugId ->
-            model ! [ Rest.loadBugDetails bugId ]
+            { model | expandedOccurrences = [] } ! [ Rest.loadBugDetails bugId ]
 
         LoadedDetails result ->
             handleResult
                 (\bugDetails ->
                     noCmd { model | focusedBug = Just bugDetails }
+                )
+                model
+                result
+
+        LoadedOccurrences result ->
+            handleResult
+                (\occurrences ->
+                    noCmd { model | focusedBugOccurrences = Just occurrences }
                 )
                 model
                 result
@@ -97,10 +166,28 @@ update msg model =
             noCmd { model | error = Nothing }
 
         ShowClosedBugs ->
-            { model | showClosedBugs = True } ! [ Rest.loadPatches, Rest.loadBugs True ]
+            { model | showClosedBugs = True } ! [ Rest.loadPatches, Rest.loadBugs model.selectedPatchIds True ]
 
         HideClosedBugs ->
-            { model | showClosedBugs = False } ! [ Rest.loadPatches, Rest.loadBugs False ]
+            { model | showClosedBugs = False } ! [ Rest.loadPatches, Rest.loadBugs model.selectedPatchIds False ]
+
+        ToggleMenu ->
+            noCmd { model | showMenu = not model.showMenu }
+
+        ToggleFullStackTrace ->
+            noCmd { model | showFullStackTrace = not model.showFullStackTrace }
+
+        ToggleOccurrence id ->
+            if List.member id model.expandedOccurrences then
+                noCmd { model | expandedOccurrences = (List.filter (\oId -> oId /= id) model.expandedOccurrences) }
+            else
+                noCmd { model | expandedOccurrences = id :: model.expandedOccurrences }
+
+        ToggleTimeFormat ->
+            noCmd { model | showTimeAgo = not model.showTimeAgo }
+
+        TimeTick time ->
+            noCmd { model | now = (Date.fromTime time) }
 
 
 noCmd : model -> ( model, Cmd Msg )

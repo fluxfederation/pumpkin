@@ -1,12 +1,6 @@
 class BugSerializer < ActiveModel::Serializer
   attributes :id, :message, :first_occurred_at, :last_occurred_at, :patch_id, :occurrence_count, :closed_at, :issue_url
 
-  has_many :occurrences
-
-  class OccurrenceSerializer < ActiveModel::Serializer
-    attributes :id
-  end
-
   def message
     object.primary_occurrence.message
   end

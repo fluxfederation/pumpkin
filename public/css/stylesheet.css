@@ -1,27 +1,269 @@
-div.bug {
-  width: 100%;
-  height: 60px;
-  padding: 4px;
-  box-sizing: border-box;
-  border-radius: 2px;
+main {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  background-color: #eee;
 }
 
-div.bug:hover {
-  background: #ddd;
+.sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 35vw;
+  padding: 0.75rem;
 }
 
-div.bug.is-active {
-  background: #eee;
+/* Sidebar header */
+
+.sidebar-header {
+  display: flex;
+  margin-bottom: 0.5rem;
 }
 
-div.bug.closed {
-  color: #ccc;
+.menu-button {
+  flex: 1;
+  height: auto;
+  min-height: 3.75rem;
+  padding: 0.5rem;
+  justify-content: flex-start;
+  align-items: center;
+  line-height: 1;
 }
 
-div.stacktrace {
-  height: 400px;
-  overflow-y: scroll;
-  border-left: 4px solid #ccc;
-  padding-left: 10px;
-  background: #eee;
+.menu-button-tags {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.menu-button-tags > .tag {
+  margin: 0.25rem 0.25rem 0.25rem 0;
+}
+
+.search-button {
+  height: auto;
+  margin-left: 0.5rem;
+  padding: 0.75rem 1.25rem;
+}
+
+.logo {
+  width: 2rem;
+  margin-right: 0.25rem;
+}
+
+/* Sidebar content */
+
+.sidebar-content {
+  flex: 1;
+  position: relative;
+}
+
+.sidebar-content > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  background-color: #eee;
+}
+
+.sidebar-bug-group {
+  padding: 0;
+
+  /* Fix cut-off borders */
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+.sidebar-bug {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  margin-bottom: 0;
+  transition: background-color 0.2s;
+}
+
+.sidebar-bug:first-child {
+  border-top-left-radius: 0.3rem;
+  border-top-right-radius: 0.3rem;
+}
+
+.sidebar-bug:last-child {
+  border-bottom-left-radius: 0.3rem;
+  border-bottom-right-radius: 0.3rem;
+}
+
+.sidebar-bug.is-active {
+  background: #00d1b2;
+}
+
+.sidebar-bug.is-active .sidebar-bug-title > * {
+  color: white;
+}
+
+.sidebar-bug:not(:last-child) {
+  border-bottom: 1px solid #ddd;
+}
+
+.sidebar-bug-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-bug-title > * {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-bug-tags {
+  margin-left: 0.5rem;
+}
+
+.sidebar-bug-tags > * {
+  margin-left: 0.25rem;
+}
+
+/* Selected bug */
+
+.selected-bug {
+  flex: 1;
+  margin: 0.75rem 0.75rem 0.75rem 0.25rem;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.selected-bug-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.selected-bug-title {
+  flex: 1;
+}
+
+.occurrence-count {
+  padding-right: 0.75rem;
+}
+
+.bug-times {
+  color: #363636;
+  font-size: 1rem;
+}
+
+.section {
+  padding: 0 0 1rem 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.section-title .menu-label {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.section-title .button {
+  margin-left: 0.5rem;
+}
+
+.linked-issue {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  line-height: 1;
+}
+
+.linked-issue .description {
+  flex: 1;
+}
+
+.stack-trace {
+  overflow-x: auto;
+  padding: 0.75rem;
+  padding-left: 2.75rem;
+  text-indent: -2rem;
+}
+
+.stack-trace code {
+  display: block;
+  background-color: transparent;
+}
+
+.occurrence {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
+
+.occurrence-toggle {
+  display: block;
+  padding: 0.5em 0.75em;
+  color: #363636;
+  transition: background-color 0.2s;
+}
+
+.occurrence-toggle:hover {
+  background-color: #f5f5f5;
+}
+
+.occurrence-data {
+  padding: 0.25rem 0.75rem 0.5rem 0.75rem;
+}
+
+.json-object,
+.json-array {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1rem;
+}
+
+.json-object:empty,
+.json-array:empty {
+  /* This does weird things with the :before and :after ... */
+  flex-direction: row-reverse;
+  padding-left: 0.5rem;
+}
+
+.json-object:before {
+  content: "{";
+  margin-left: -1rem;
+}
+
+.json-object:after {
+  content: "}";
+  margin-left: -1rem;
+}
+
+.json-array:before {
+  content: "[";
+  margin-left: -1rem;
+}
+
+.json-array:after {
+  content: "]";
+  margin-left: -1rem;
+}
+
+.json-object-entry {
+  display: flex;
+}
+
+.json-object-key {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.json-object-key:after {
+  content: ":";
 }
