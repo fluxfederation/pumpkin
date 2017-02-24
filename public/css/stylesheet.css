@@ -84,6 +84,25 @@ main {
   align-items: center;
   padding: 0.5rem 0.5rem 0.5rem 1rem;
   margin-bottom: 0;
+  transition: background-color 0.2s;
+}
+
+.sidebar-bug:first-child {
+  border-top-left-radius: 0.3rem;
+  border-top-right-radius: 0.3rem;
+}
+
+.sidebar-bug:last-child {
+  border-bottom-left-radius: 0.3rem;
+  border-bottom-right-radius: 0.3rem;
+}
+
+.sidebar-bug.is-active {
+  background: #00d1b2;
+}
+
+.sidebar-bug.is-active .sidebar-bug-title > * {
+  color: white;
 }
 
 .sidebar-bug:not(:last-child) {

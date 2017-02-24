@@ -18848,7 +18848,11 @@ var _user$project$View$occurrenceDisplay = F2(
 						},
 						A2(
 							_user$project$FormatData$formatData,
-							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: 'backtrace',
+								_1: {ctor: '[]'}
+							},
 							occurrence.data)),
 					_1: {ctor: '[]'}
 				}
