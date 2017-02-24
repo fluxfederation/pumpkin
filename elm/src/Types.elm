@@ -15,6 +15,7 @@ type Msg
     | LoadedBugs (Result Http.Error Bugs)
     | ShowPatchBugs String
     | HidePatchBugs String
+    | SetSelectedPatchIds (List String)
     | ShowClosedBugs
     | HideClosedBugs
     | LoadedDetails (Result Http.Error Bug)

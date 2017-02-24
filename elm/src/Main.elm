@@ -1,6 +1,5 @@
 module Main exposing (..)
 
-import Html
 import Task
 import Time
 import Date
@@ -8,21 +7,74 @@ import Types exposing (..)
 import View
 import Rest
 import List.Extra as ListX
+import Navigation exposing (..)
+import RouteUrl exposing (..)
+import RouteUrl.Builder as BuildUrl
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Rest.loadBugs False, Task.perform TimeTick Time.now ] )
+    ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Task.perform TimeTick Time.now ] )
 
 
-main : Program Never Model Msg
+main : RouteUrlProgram Never Model Msg
 main =
-    Html.program
-        { init = init
+    RouteUrl.program
+        { delta2url = delta2url
+        , location2messages = location2messages
+        , init = init
         , view = View.view
         , update = update
         , subscriptions = subscriptions
         }
+
+
+
+-- Routing
+
+
+delta2url : Model -> Model -> Maybe UrlChange
+delta2url _ model =
+    let
+        selectedPatches =
+            if List.length model.selectedPatchIds > 0 then
+                "?patches=" ++ (String.join "," model.selectedPatchIds)
+            else
+                "?patches="
+
+        selectedBug =
+            case model.focusedBug of
+                Just bug ->
+                    "#" ++ bug.id
+
+                Nothing ->
+                    "#"
+    in
+        Just { entry = NewEntry, url = selectedPatches ++ selectedBug }
+
+
+location2messages : Location -> List Msg
+location2messages location =
+    let
+        builder =
+            BuildUrl.fromUrl location.href
+
+        selectedPatchIds =
+            case BuildUrl.getQuery "patches" builder of
+                Just patches ->
+                    List.filter (\s -> String.length s > 0) (String.split "," patches)
+
+                Nothing ->
+                    []
+
+        focusBug =
+            if String.length (BuildUrl.hash builder) > 0 then
+                [ RequestDetails (BuildUrl.hash builder) ]
+            else
+                []
+
+    in
+        [ SetSelectedPatchIds selectedPatchIds ] ++ focusBug
 
 
 
