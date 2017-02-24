@@ -41,7 +41,7 @@ formatPairs : List String -> Result String (List ( String, Value )) -> List (Htm
 formatPairs blacklist result =
     let
         filteredPairs pairs =
-            List.filter (\(key, _) -> not (List.member key blacklist)) pairs
+            List.filter (\( key, _ ) -> not (List.member key blacklist)) pairs
 
         formatPair ( key, value ) =
             div [ class "json-object-entry" ]

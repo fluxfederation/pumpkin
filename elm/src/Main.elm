@@ -72,7 +72,6 @@ location2messages location =
                 [ RequestDetails (BuildUrl.hash builder) ]
             else
                 []
-
     in
         [ SetSelectedPatchIds selectedPatchIds ] ++ focusBug
 
@@ -110,7 +109,11 @@ update msg model =
             handleResult (loadedBugs model) model result
 
         ShowPatchBugs projectName ->
-            noCmd { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ] }
+            let
+                newModel =
+                    { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ] }
+            in
+                newModel ! [ Rest.loadBugs newModel.selectedPatchIds False ]
 
         HidePatchBugs patchId ->
             let
@@ -123,7 +126,10 @@ update msg model =
                 newPatchIds =
                     List.filter (\x -> x /= patchId) model.selectedPatchIds
             in
-                noCmd { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug }
+                { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug } ! [ Rest.loadBugs newPatchIds False ]
+
+        SetSelectedPatchIds ids ->
+            { model | selectedPatchIds = ids } ! [ Rest.loadBugs ids False ]
 
         RequestDetails bugId ->
             { model | expandedOccurrences = [] } ! [ Rest.loadBugDetails bugId ]
@@ -160,10 +166,10 @@ update msg model =
             noCmd { model | error = Nothing }
 
         ShowClosedBugs ->
-            { model | showClosedBugs = True } ! [ Rest.loadPatches, Rest.loadBugs True ]
+            { model | showClosedBugs = True } ! [ Rest.loadPatches, Rest.loadBugs model.selectedPatchIds True ]
 
         HideClosedBugs ->
-            { model | showClosedBugs = False } ! [ Rest.loadPatches, Rest.loadBugs False ]
+            { model | showClosedBugs = False } ! [ Rest.loadPatches, Rest.loadBugs model.selectedPatchIds False ]
 
         ToggleMenu ->
             noCmd { model | showMenu = not model.showMenu }

@@ -14,13 +14,18 @@ patchesUrl =
     "/patches"
 
 
-openBugsUrl : String
-openBugsUrl =
-    "/bugs" ++ "?closed=false"
+openBugsUrl : List String -> String
+openBugsUrl patchIds =
+    "/bugs"
+        ++ "?closed=false&"
+        ++ (String.join
+                "&"
+                (List.map (\id -> "patch_ids[]=" ++ id) patchIds)
+           )
 
 
-allBugsUrl : String
-allBugsUrl =
+allBugsUrl : List String -> String
+allBugsUrl patchIds =
     "/bugs"
 
 
@@ -134,13 +139,13 @@ loadPatches =
     Http.send LoadedPatches <| Http.get patchesUrl decodePatches
 
 
-loadBugs : Bool -> Cmd Msg
-loadBugs includeClosedBugs =
+loadBugs : List String -> Bool -> Cmd Msg
+loadBugs patchIds includeClosedBugs =
     let
         url =
             if includeClosedBugs then
-                allBugsUrl
+                allBugsUrl patchIds
             else
-                openBugsUrl
+                openBugsUrl patchIds
     in
         Http.send LoadedBugs <| Http.get url decodeBugs
