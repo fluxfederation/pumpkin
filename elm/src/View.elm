@@ -9,6 +9,7 @@ import Date.Extra.Period as Period
 import String.Extra exposing (pluralize)
 import Types exposing (..)
 import TimeAgo exposing (timeAgo)
+import FormatData exposing (formatData)
 
 
 view : Model -> Html Msg
@@ -253,11 +254,13 @@ occurrencesDisplay model =
 occurrenceDisplay : Model -> Occurrence -> Html Msg
 occurrenceDisplay model occurrence =
     li [ class "occurrence panel-block" ]
-        [ a [ class "occurrence-toggle" ]
+        [ a [ class "occurrence-toggle", onClick (ToggleOccurrence occurrence.id) ]
             [ text (patchName model occurrence.patchId)
             , text " • "
             , text (formatDate model occurrence.occurredAt)
             ]
+        , div [ class "occurrence-data", classList [ ( "is-hidden", not (List.member occurrence.id model.expandedOccurrences) ) ] ]
+            (formatData [ "backtrace" ] occurrence.data)
         ]
 
 
@@ -291,10 +294,10 @@ bugGroups model =
         groupFor diff =
             if diff.week > 1 then
                 "Earlier"
-            else if diff.day > 1 then
+            else if diff.day >= 1 then
                 "Past Week"
             else if diff.hour > 1 then
-                "Past Day"
+                "Earlier Today"
             else
                 "Past Hour"
 

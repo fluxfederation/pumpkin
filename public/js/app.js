@@ -16720,6 +16720,7 @@ var _user$project$Types$initialModel = {
 	bugs: {ctor: '[]'},
 	focusedBug: _elm_lang$core$Maybe$Nothing,
 	focusedBugOccurrences: _elm_lang$core$Maybe$Nothing,
+	expandedOccurrences: {ctor: '[]'},
 	showFullStackTrace: false,
 	error: _elm_lang$core$Maybe$Nothing,
 	showClosedBugs: false,
@@ -16738,7 +16739,9 @@ var _user$project$Types$Model = function (a) {
 								return function (i) {
 									return function (j) {
 										return function (k) {
-											return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, focusedBugOccurrences: e, showFullStackTrace: f, error: g, showClosedBugs: h, showMenu: i, now: j, showTimeAgo: k};
+											return function (l) {
+												return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, focusedBugOccurrences: e, expandedOccurrences: f, showFullStackTrace: g, error: h, showClosedBugs: i, showMenu: j, now: k, showTimeAgo: l};
+											};
 										};
 									};
 								};
@@ -16761,14 +16764,17 @@ var _user$project$Types$Bug = F8(
 	function (a, b, c, d, e, f, g, h) {
 		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
 	});
-var _user$project$Types$Occurrence = F4(
-	function (a, b, c, d) {
-		return {id: a, patchId: b, message: c, occurredAt: d};
+var _user$project$Types$Occurrence = F5(
+	function (a, b, c, d, e) {
+		return {id: a, patchId: b, message: c, occurredAt: d, data: e};
 	});
 var _user$project$Types$TimeTick = function (a) {
 	return {ctor: 'TimeTick', _0: a};
 };
 var _user$project$Types$ToggleTimeFormat = {ctor: 'ToggleTimeFormat'};
+var _user$project$Types$ToggleOccurrence = function (a) {
+	return {ctor: 'ToggleOccurrence', _0: a};
+};
 var _user$project$Types$ToggleFullStackTrace = {ctor: 'ToggleFullStackTrace'};
 var _user$project$Types$ToggleMenu = {ctor: 'ToggleMenu'};
 var _user$project$Types$ClearError = {ctor: 'ClearError'};
@@ -16802,6 +16808,189 @@ var _user$project$Types$LoadedBugs = function (a) {
 var _user$project$Types$LoadedPatches = function (a) {
 	return {ctor: 'LoadedPatches', _0: a};
 };
+
+var _user$project$FormatData$isSuccess = function (result) {
+	var _p0 = result;
+	if (_p0.ctor === 'Ok') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$FormatData$handleFormatError = F2(
+	function (result, view) {
+		var _p1 = result;
+		if (_p1.ctor === 'Ok') {
+			return view(_p1._0);
+		} else {
+			return {ctor: '[]'};
+		}
+	});
+var _user$project$FormatData$formatFallback = F2(
+	function (results, val) {
+		var anySuccess = A2(_elm_lang$core$List$any, _elm_lang$core$Basics$identity, results);
+		return anySuccess ? {ctor: '[]'} : {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$span,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('json-other'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						_elm_lang$core$Basics$toString(val)),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		};
+	});
+var _user$project$FormatData$formatString = function (result) {
+	return A2(
+		_user$project$FormatData$handleFormatError,
+		result,
+		function (str) {
+			return {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('json-string'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(str),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			};
+		});
+};
+var _user$project$FormatData$formatData = F2(
+	function (blacklist, val) {
+		var asPairs = A2(
+			_elm_lang$core$Json_Decode$decodeValue,
+			_elm_lang$core$Json_Decode$keyValuePairs(_elm_lang$core$Json_Decode$value),
+			val);
+		var asList = A2(
+			_elm_lang$core$Json_Decode$decodeValue,
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$value),
+			val);
+		var asString = A2(_elm_lang$core$Json_Decode$decodeValue, _elm_lang$core$Json_Decode$string, val);
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			_user$project$FormatData$formatString(asString),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(_user$project$FormatData$formatList, blacklist, asList),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(_user$project$FormatData$formatPairs, blacklist, asPairs),
+					A2(
+						_user$project$FormatData$formatFallback,
+						{
+							ctor: '::',
+							_0: _user$project$FormatData$isSuccess(asString),
+							_1: {
+								ctor: '::',
+								_0: _user$project$FormatData$isSuccess(asList),
+								_1: {
+									ctor: '::',
+									_0: _user$project$FormatData$isSuccess(asPairs),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						val))));
+	});
+var _user$project$FormatData$formatList = F2(
+	function (blacklist, result) {
+		return A2(
+			_user$project$FormatData$handleFormatError,
+			result,
+			function (values) {
+				return {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('json-array'),
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$List$concatMap,
+							_user$project$FormatData$formatData(blacklist),
+							values)),
+					_1: {ctor: '[]'}
+				};
+			});
+	});
+var _user$project$FormatData$formatPairs = F2(
+	function (blacklist, result) {
+		var formatPair = function (_p2) {
+			var _p3 = _p2;
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('json-object-entry'),
+					_1: {ctor: '[]'}
+				},
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$span,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('json-object-key'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(_p3._0),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					},
+					A2(_user$project$FormatData$formatData, blacklist, _p3._1)));
+		};
+		var filteredPairs = function (pairs) {
+			return A2(
+				_elm_lang$core$List$filter,
+				function (_p4) {
+					var _p5 = _p4;
+					return !A2(_elm_lang$core$List$member, _p5._0, blacklist);
+				},
+				pairs);
+		};
+		return A2(
+			_user$project$FormatData$handleFormatError,
+			result,
+			function (pairs) {
+				return {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('json-object'),
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$List$map,
+							formatPair,
+							filteredPairs(pairs))),
+					_1: {ctor: '[]'}
+				};
+			});
+	});
 
 var _user$project$TimeAgo$buildDatePeriods = F2(
 	function (date1, date2) {
@@ -16907,7 +17096,7 @@ var _user$project$View$errorClass = function (bug) {
 };
 var _user$project$View$bugGroups = function (model) {
 	var groupFor = function (diff) {
-		return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > 0) ? 'Earlier' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > 0) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > 0) ? 'Past Day' : 'Past Hour'));
+		return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > 0) ? 'Earlier' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > -1) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > 0) ? 'Earlier Today' : 'Past Hour'));
 	};
 	var groupNames = {
 		ctor: '::',
@@ -16990,7 +17179,12 @@ var _user$project$View$occurrenceDisplay = F2(
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$class('occurrence-toggle'),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(
+								_user$project$Types$ToggleOccurrence(occurrence.id)),
+							_1: {ctor: '[]'}
+						}
 					},
 					{
 						ctor: '::',
@@ -17007,7 +17201,38 @@ var _user$project$View$occurrenceDisplay = F2(
 							}
 						}
 					}),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('occurrence-data'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$classList(
+									{
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'is-hidden',
+											_1: !A2(_elm_lang$core$List$member, occurrence.id, model.expandedOccurrences)
+										},
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						},
+						A2(
+							_user$project$FormatData$formatData,
+							{
+								ctor: '::',
+								_0: 'backtrace',
+								_1: {ctor: '[]'}
+							},
+							occurrence.data)),
+					_1: {ctor: '[]'}
+				}
 			});
 	});
 var _user$project$View$occurrencesDisplay = function (model) {
@@ -17951,13 +18176,14 @@ var _user$project$Rest$closeBug = function (bugId) {
 			_elm_lang$http$Http$emptyBody,
 			_user$project$Rest$decodeBug));
 };
-var _user$project$Rest$decodeOccurrence = A5(
-	_elm_lang$core$Json_Decode$map4,
+var _user$project$Rest$decodeOccurrence = A6(
+	_elm_lang$core$Json_Decode$map5,
 	_user$project$Types$Occurrence,
 	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'patch_id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'occurred_at', _user$project$Rest$date));
+	A2(_elm_lang$core$Json_Decode$field, 'occurred_at', _user$project$Rest$date),
+	A2(_elm_lang$core$Json_Decode$field, 'data', _elm_lang$core$Json_Decode$value));
 var _user$project$Rest$decodeOccurrences = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeOccurrence);
 var _user$project$Rest$occurrencesUrl = function (bugId) {
 	return A2(
@@ -18141,7 +18367,11 @@ var _user$project$Main$update = F2(
 			case 'RequestDetails':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							expandedOccurrences: {ctor: '[]'}
+						}),
 					{
 						ctor: '::',
 						_0: _user$project$Rest$loadBugDetails(_p2._0),
@@ -18238,6 +18468,24 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{showFullStackTrace: !model.showFullStackTrace}));
+			case 'ToggleOccurrence':
+				var _p4 = _p2._0;
+				return A2(_elm_lang$core$List$member, _p4, model.expandedOccurrences) ? _user$project$Main$noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							expandedOccurrences: A2(
+								_elm_lang$core$List$filter,
+								function (oId) {
+									return !_elm_lang$core$Native_Utils.eq(oId, _p4);
+								},
+								model.expandedOccurrences)
+						})) : _user$project$Main$noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							expandedOccurrences: {ctor: '::', _0: _p4, _1: model.expandedOccurrences}
+						}));
 			case 'ToggleTimeFormat':
 				return _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
@@ -18279,7 +18527,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _user$project$Main$main !== 'undefined') {
-    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Date.Date":{"args":[],"tags":{"Date":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Types.Msg":{"args":[],"tags":{"ToggleTimeFormat":[],"LoadedBugs":["Result.Result Http.Error Types.Bugs"],"LoadedDetails":["Result.Result Http.Error Types.Bug"],"TimeTick":["Time.Time"],"ShowPatchBugs":["String"],"HideClosedBugs":[],"ToggleMenu":[],"LoadedPatches":["Result.Result Http.Error Types.Patches"],"ShowClosedBugs":[],"ClosedBug":["Result.Result Http.Error Types.Bug"],"HidePatchBugs":["String"],"HideBug":[],"LoadedOccurrences":["Result.Result Http.Error Types.Occurrences"],"RequestDetails":["String"],"CloseBug":["String"],"ToggleFullStackTrace":[],"ClearError":[]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}}},"aliases":{"Types.Occurrence":{"args":[],"type":"{ id : String , patchId : String , message : String , occurredAt : Date.Date }"},"Types.Bug":{"args":[],"type":"{ id : String , patchId : String , message : String , firstOccurredAt : Date.Date , lastOccurredAt : Date.Date , occurrenceCount : Int , closedAt : Maybe.Maybe Date.Date , stackTrace : Maybe.Maybe (List String) }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Types.Patch":{"args":[],"type":"{ id : String, name : String }"},"Types.Patches":{"args":[],"type":"List Types.Patch"},"Types.Bugs":{"args":[],"type":"List Types.Bug"},"Time.Time":{"args":[],"type":"Float"},"Types.Occurrences":{"args":[],"type":"List Types.Occurrence"}},"message":"Types.Msg"},"versions":{"elm":"0.18.0"}});
+    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Json.Encode.Value":{"args":[],"tags":{"Value":[]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Date.Date":{"args":[],"tags":{"Date":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Types.Msg":{"args":[],"tags":{"ToggleTimeFormat":[],"LoadedBugs":["Result.Result Http.Error Types.Bugs"],"LoadedDetails":["Result.Result Http.Error Types.Bug"],"ToggleOccurrence":["String"],"TimeTick":["Time.Time"],"ShowPatchBugs":["String"],"HideClosedBugs":[],"ToggleMenu":[],"LoadedPatches":["Result.Result Http.Error Types.Patches"],"ShowClosedBugs":[],"ClosedBug":["Result.Result Http.Error Types.Bug"],"HidePatchBugs":["String"],"HideBug":[],"LoadedOccurrences":["Result.Result Http.Error Types.Occurrences"],"RequestDetails":["String"],"CloseBug":["String"],"ToggleFullStackTrace":[],"ClearError":[]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}}},"aliases":{"Types.Occurrence":{"args":[],"type":"{ id : String , patchId : String , message : String , occurredAt : Date.Date , data : Json.Decode.Value }"},"Types.Bug":{"args":[],"type":"{ id : String , patchId : String , message : String , firstOccurredAt : Date.Date , lastOccurredAt : Date.Date , occurrenceCount : Int , closedAt : Maybe.Maybe Date.Date , stackTrace : Maybe.Maybe (List String) }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Types.Patch":{"args":[],"type":"{ id : String, name : String }"},"Json.Decode.Value":{"args":[],"type":"Json.Encode.Value"},"Types.Patches":{"args":[],"type":"List Types.Patch"},"Types.Bugs":{"args":[],"type":"List Types.Bug"},"Time.Time":{"args":[],"type":"Float"},"Types.Occurrences":{"args":[],"type":"List Types.Occurrence"}},"message":"Types.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])

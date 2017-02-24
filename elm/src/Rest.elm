@@ -89,11 +89,12 @@ decodeOccurrences =
 
 decodeOccurrence : Decoder Occurrence
 decodeOccurrence =
-    map4 Occurrence
+    map5 Occurrence
         (field "id" string)
         (field "patch_id" string)
         (field "message" string)
         (field "occurred_at" date)
+        (field "data" value)
 
 
 stacktrace : Decoder (Maybe (List String))

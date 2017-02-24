@@ -4,6 +4,7 @@ import Http
 import Date
 import Time
 import String
+import Json.Decode
 
 
 -- Messages
@@ -25,6 +26,7 @@ type Msg
     | ClearError
     | ToggleMenu
     | ToggleFullStackTrace
+    | ToggleOccurrence String
     | ToggleTimeFormat
     | TimeTick Time.Time
 
@@ -39,6 +41,7 @@ type alias Model =
     , bugs : Bugs
     , focusedBug : Maybe Bug
     , focusedBugOccurrences : Maybe Occurrences
+    , expandedOccurrences : List String
     , showFullStackTrace : Bool
     , error : Maybe String
     , showClosedBugs : Bool
@@ -85,6 +88,7 @@ type alias Occurrence =
     , patchId : String
     , message : String
     , occurredAt : Date.Date
+    , data : Json.Decode.Value
     }
 
 
@@ -95,6 +99,7 @@ initialModel =
     , bugs = []
     , focusedBug = Nothing
     , focusedBugOccurrences = Nothing
+    , expandedOccurrences = []
     , showFullStackTrace = False
     , error = Nothing
     , showClosedBugs = False

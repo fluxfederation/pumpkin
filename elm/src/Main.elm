@@ -9,6 +9,7 @@ import View
 import Rest
 import List.Extra as ListX
 
+
 init : ( Model, Cmd Msg )
 init =
     ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Rest.loadBugs False, Task.perform TimeTick Time.now ] )
@@ -31,6 +32,7 @@ main =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Time.every Time.minute TimeTick
+
 
 
 -- Updates
@@ -72,7 +74,7 @@ update msg model =
                 noCmd { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug }
 
         RequestDetails bugId ->
-            model ! [ Rest.loadBugDetails bugId ]
+            { model | expandedOccurrences = [] } ! [ Rest.loadBugDetails bugId ]
 
         LoadedDetails result ->
             handleResult
@@ -116,6 +118,12 @@ update msg model =
 
         ToggleFullStackTrace ->
             noCmd { model | showFullStackTrace = not model.showFullStackTrace }
+
+        ToggleOccurrence id ->
+            if List.member id model.expandedOccurrences then
+                noCmd { model | expandedOccurrences = (List.filter (\oId -> oId /= id) model.expandedOccurrences) }
+            else
+                noCmd { model | expandedOccurrences = id :: model.expandedOccurrences }
 
         ToggleTimeFormat ->
             noCmd { model | showTimeAgo = not model.showTimeAgo }

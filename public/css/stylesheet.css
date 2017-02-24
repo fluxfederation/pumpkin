@@ -180,6 +180,71 @@ main {
   background-color: transparent;
 }
 
-.occurrence-title {
-  background-color: transparent;
+.occurrence {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
+
+.occurrence-toggle {
+  display: block;
+  padding: 0.5em 0.75em;
+  color: #363636;
+  transition: background-color 0.2s;
+}
+
+.occurrence-toggle:hover {
+  background-color: #f5f5f5;
+}
+
+.occurrence-data {
+  padding: 0.25rem 0.75rem 0.5rem 0.75rem;
+}
+
+.json-object,
+.json-array {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1rem;
+}
+
+.json-object:empty,
+.json-array:empty {
+  /* This does weird things with the :before and :after ... */
+  flex-direction: row-reverse;
+  padding-left: 0.5rem;
+}
+
+.json-object:before {
+  content: "{";
+  margin-left: -1rem;
+}
+
+.json-object:after {
+  content: "}";
+  margin-left: -1rem;
+}
+
+.json-array:before {
+  content: "[";
+  margin-left: -1rem;
+}
+
+.json-array:after {
+  content: "]";
+  margin-left: -1rem;
+}
+
+.json-object-entry {
+  display: flex;
+}
+
+.json-object-key {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.json-object-key:after {
+  content: ":";
 }
