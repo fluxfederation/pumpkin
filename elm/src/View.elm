@@ -292,11 +292,11 @@ bugGroups model =
             [ "Past Hour", "Past Day", "Past Week", "Earlier" ]
 
         groupFor diff =
-            if diff.week > 1 then
+            if diff.week >= 1 then
                 "Earlier"
             else if diff.day >= 1 then
                 "Past Week"
-            else if diff.hour > 1 then
+            else if diff.hour >= 1 then
                 "Earlier Today"
             else
                 "Past Hour"
