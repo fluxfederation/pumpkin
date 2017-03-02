@@ -48,7 +48,7 @@ sidebarHeader : Model -> Html Msg
 sidebarHeader model =
     div [ class "sidebar-header" ]
         [ a [ class "menu-button button", classList [ ( "is-active", model.showMenu ) ], onClick ToggleMenu ]
-            [ img [ src "/logo.png", class "logo" ] []
+            [ img [ src "/images/logo.png", class "logo" ] []
             , currentPatchesAsTags model
             , icon "check"
                 (if model.showMenu then
@@ -102,7 +102,7 @@ patchMenuItem selectedPatchIds patch =
 
 sidebarBugs : Model -> Html Msg
 sidebarBugs model =
-    div [ class "menu", classList [ ( "is-hidden", model.showMenu ) ] ]
+    div [ class "sidebar-bugs menu", classList [ ( "is-hidden", model.showMenu ) ] ]
         (List.concatMap (sidebarBugGroup model) (bugGroups model))
 
 
@@ -160,7 +160,7 @@ selectedBug model =
                 ]
 
         Nothing ->
-            div [] []
+            div [ class "selected-bug" ] []
 
 
 selectedBugHeader : Model -> Bug -> Html Msg

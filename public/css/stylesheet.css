@@ -70,6 +70,14 @@ main {
   background-color: #eee;
 }
 
+.sidebar-bugs:empty {
+  background-image: url(/images/patches-this-way.svg);
+  background-position: center 7rem;
+  background-repeat: no-repeat;
+  background-size: 20rem;
+  opacity: 0.3;
+}
+
 .sidebar-bug-group {
   padding: 0;
 
@@ -135,6 +143,14 @@ main {
   margin: 0.75rem 0.75rem 0.75rem 0.25rem;
   padding: 1rem;
   overflow-y: auto;
+}
+
+.selected-bug:empty {
+  background-image: url(/images/pumpkins-this-way.svg);
+  background-position: center 13rem;
+  background-repeat: no-repeat;
+  background-size: 20rem;
+  opacity: 0.3;
 }
 
 .selected-bug-header {
