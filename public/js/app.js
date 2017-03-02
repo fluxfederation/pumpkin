@@ -14377,8 +14377,11 @@ var _user$project$Types$isClosed = function (bug) {
 };
 var _user$project$Types$initialModel = {
 	selectedPatchIds: {ctor: '[]'},
+	loadingPatches: true,
 	patches: {ctor: '[]'},
+	loadingBugs: false,
 	bugs: {ctor: '[]'},
+	loadingFocusedBug: false,
 	focusedBug: _elm_lang$core$Maybe$Nothing,
 	focusedBugOccurrences: _elm_lang$core$Maybe$Nothing,
 	expandedOccurrences: {ctor: '[]'},
@@ -14401,7 +14404,13 @@ var _user$project$Types$Model = function (a) {
 									return function (j) {
 										return function (k) {
 											return function (l) {
-												return {selectedPatchIds: a, patches: b, bugs: c, focusedBug: d, focusedBugOccurrences: e, expandedOccurrences: f, showFullStackTrace: g, error: h, showClosedBugs: i, showMenu: j, now: k, showTimeAgo: l};
+												return function (m) {
+													return function (n) {
+														return function (o) {
+															return {selectedPatchIds: a, loadingPatches: b, patches: c, loadingBugs: d, bugs: e, loadingFocusedBug: f, focusedBug: g, focusedBugOccurrences: h, expandedOccurrences: i, showFullStackTrace: j, error: k, showClosedBugs: l, showMenu: m, now: n, showTimeAgo: o};
+														};
+													};
+												};
 											};
 										};
 									};
@@ -15286,34 +15295,7 @@ var _user$project$View$selectedBugHeader = F2(
 			});
 	});
 var _user$project$View$selectedBug = function (model) {
-	var _p1 = model.focusedBug;
-	if (_p1.ctor === 'Just') {
-		var _p2 = _p1._0;
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('selected-bug box'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(_user$project$View$selectedBugHeader, model, _p2),
-				_1: {
-					ctor: '::',
-					_0: _user$project$View$linkedIssue(_p2),
-					_1: {
-						ctor: '::',
-						_0: A2(_user$project$View$stackTraceDisplay, model, _p2),
-						_1: {
-							ctor: '::',
-							_0: _user$project$View$occurrencesDisplay(model),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			});
-	} else {
+	if (model.loadingFocusedBug) {
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -15321,7 +15303,56 @@ var _user$project$View$selectedBug = function (model) {
 				_0: _elm_lang$html$Html_Attributes$class('selected-bug'),
 				_1: {ctor: '[]'}
 			},
-			{ctor: '[]'});
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('loading-spinner'),
+						_1: {ctor: '[]'}
+					},
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
+			});
+	} else {
+		var _p1 = model.focusedBug;
+		if (_p1.ctor === 'Just') {
+			var _p2 = _p1._0;
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('selected-bug box'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(_user$project$View$selectedBugHeader, model, _p2),
+					_1: {
+						ctor: '::',
+						_0: _user$project$View$linkedIssue(_p2),
+						_1: {
+							ctor: '::',
+							_0: A2(_user$project$View$stackTraceDisplay, model, _p2),
+							_1: {
+								ctor: '::',
+								_0: _user$project$View$occurrencesDisplay(model),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				});
+		} else {
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('selected-bug'),
+					_1: {ctor: '[]'}
+				},
+				{ctor: '[]'});
+		}
 	}
 };
 var _user$project$View$sidebarBug = F2(
@@ -15497,7 +15528,18 @@ var _user$project$View$sidebarBugs = function (model) {
 				_1: {ctor: '[]'}
 			}
 		},
-		A2(
+		model.loadingBugs ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$span,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('loading-spinner'),
+					_1: {ctor: '[]'}
+				},
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		} : A2(
 			_elm_lang$core$List$concatMap,
 			_user$project$View$sidebarBugGroup(model),
 			_user$project$View$bugGroups(model)));
@@ -15541,7 +15583,7 @@ var _user$project$View$sidebarMenu = function (model) {
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('menu'),
+			_0: _elm_lang$html$Html_Attributes$class('sidebar-menu menu'),
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Attributes$classList(
@@ -15553,7 +15595,18 @@ var _user$project$View$sidebarMenu = function (model) {
 				_1: {ctor: '[]'}
 			}
 		},
-		{
+		model.loadingPatches ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$span,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('loading-spinner'),
+					_1: {ctor: '[]'}
+				},
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		} : {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$ul,
@@ -15968,7 +16021,7 @@ var _user$project$Main$loadedBugs = F2(
 		return _user$project$Main$noCmd(
 			_elm_lang$core$Native_Utils.update(
 				model,
-				{bugs: bugs, focusedBug: newFocusedBug}));
+				{bugs: bugs, focusedBug: newFocusedBug, loadingBugs: false}));
 	});
 var _user$project$Main$closedBug = F2(
 	function (model, bugDetails) {
@@ -16011,7 +16064,7 @@ var _user$project$Main$update = F2(
 						return _user$project$Main$noCmd(
 							_elm_lang$core$Native_Utils.update(
 								model,
-								{patches: patches}));
+								{patches: patches, loadingPatches: false}));
 					},
 					model,
 					_p2._0);
@@ -16032,7 +16085,8 @@ var _user$project$Main$update = F2(
 								ctor: '::',
 								_0: _p2._0,
 								_1: {ctor: '[]'}
-							})
+							}),
+						loadingBugs: true
 					});
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
@@ -16058,7 +16112,7 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selectedPatchIds: newPatchIds, focusedBug: newFocusedBug}),
+						{selectedPatchIds: newPatchIds, focusedBug: newFocusedBug, loadingBugs: true}),
 					{
 						ctor: '::',
 						_0: A2(_user$project$Rest$loadBugs, newPatchIds, false),
@@ -16070,7 +16124,7 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selectedPatchIds: _p4}),
+						{selectedPatchIds: _p4, loadingBugs: true}),
 					{
 						ctor: '::',
 						_0: A2(_user$project$Rest$loadBugs, _p4, false),
@@ -16082,7 +16136,8 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							expandedOccurrences: {ctor: '[]'}
+							expandedOccurrences: {ctor: '[]'},
+							loadingFocusedBug: true
 						}),
 					{
 						ctor: '::',
@@ -16097,7 +16152,8 @@ var _user$project$Main$update = F2(
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									focusedBug: _elm_lang$core$Maybe$Just(bugDetails)
+									focusedBug: _elm_lang$core$Maybe$Just(bugDetails),
+									loadingFocusedBug: false
 								}));
 					},
 					model,
@@ -16145,7 +16201,7 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{showClosedBugs: true}),
+						{showClosedBugs: true, loadingBugs: true}),
 					{
 						ctor: '::',
 						_0: _user$project$Rest$loadPatches,
@@ -16160,7 +16216,7 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{showClosedBugs: false}),
+						{showClosedBugs: false, loadingBugs: true}),
 					{
 						ctor: '::',
 						_0: _user$project$Rest$loadPatches,

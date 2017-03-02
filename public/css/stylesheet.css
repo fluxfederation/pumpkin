@@ -13,6 +13,32 @@ main {
   padding: 0.75rem;
 }
 
+/* Misc */
+
+.loading-spinner {
+  position: absolute;
+  left: 50%;
+  display: block;
+  width: 10rem;
+  height: 10rem;
+  margin-left: -5rem;
+  background-image: url(/images/loading-spinner.svg);
+  background-size: contain;
+  opacity: 0.3;
+  animation: spin 0.8s cubic-bezier(.28,.66,.89,.75) infinite, fadein 0.5s ease-in-out;
+}
+
+@keyframes fadein {
+    0% { opacity: 0; }
+    25% { opacity: 0; }
+    100% { opacity: 0.3; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}
+
 /* Sidebar header */
 
 .sidebar-header {
@@ -68,6 +94,11 @@ main {
   bottom: 0;
   overflow-y: auto;
   background-color: #eee;
+}
+
+.sidebar-bugs .loading-spinner,
+.sidebar-menu .loading-spinner {
+  top: 12rem;
 }
 
 .sidebar-bugs:empty {
@@ -140,9 +171,14 @@ main {
 
 .selected-bug {
   flex: 1;
+  position: relative;
   margin: 0.75rem 0.75rem 0.75rem 0.25rem;
   padding: 1rem;
   overflow-y: auto;
+}
+
+.selected-bug .loading-spinner {
+  top: 18rem;
 }
 
 .selected-bug:empty {

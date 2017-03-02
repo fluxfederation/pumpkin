@@ -73,10 +73,13 @@ currentPatchesAsTags model =
 
 sidebarMenu : Model -> Html Msg
 sidebarMenu model =
-    div [ class "menu", classList [ ( "is-hidden", not model.showMenu ) ] ]
-        [ ul [ class "menu-list" ]
-            (List.map (patchMenuItem model.selectedPatchIds) model.patches)
-        ]
+    div [ class "sidebar-menu menu", classList [ ( "is-hidden", not model.showMenu ) ] ] <|
+        if model.loadingPatches then
+            [ span [ class "loading-spinner" ] [] ]
+        else
+            [ ul [ class "menu-list" ]
+                (List.map (patchMenuItem model.selectedPatchIds) model.patches)
+            ]
 
 
 patchMenuItem : List String -> Patch -> Html Msg
@@ -102,8 +105,11 @@ patchMenuItem selectedPatchIds patch =
 
 sidebarBugs : Model -> Html Msg
 sidebarBugs model =
-    div [ class "sidebar-bugs menu", classList [ ( "is-hidden", model.showMenu ) ] ]
-        (List.concatMap (sidebarBugGroup model) (bugGroups model))
+    div [ class "sidebar-bugs menu", classList [ ( "is-hidden", model.showMenu ) ] ] <|
+        if model.loadingBugs then
+            [ span [ class "loading-spinner" ] [] ]
+        else
+            (List.concatMap (sidebarBugGroup model) (bugGroups model))
 
 
 sidebarBugGroup : Model -> ( String, List Bug ) -> List (Html Msg)
@@ -150,17 +156,20 @@ sidebarBug model bug =
 
 selectedBug : Model -> Html Msg
 selectedBug model =
-    case model.focusedBug of
-        Just bug ->
-            div [ class "selected-bug box" ]
-                [ selectedBugHeader model bug
-                , linkedIssue bug
-                , stackTraceDisplay model bug
-                , occurrencesDisplay model
-                ]
+    if model.loadingFocusedBug then
+        div [ class "selected-bug" ] [ span [ class "loading-spinner" ] [] ]
+    else
+        case model.focusedBug of
+            Just bug ->
+                div [ class "selected-bug box" ]
+                    [ selectedBugHeader model bug
+                    , linkedIssue bug
+                    , stackTraceDisplay model bug
+                    , occurrencesDisplay model
+                    ]
 
-        Nothing ->
-            div [ class "selected-bug" ] []
+            Nothing ->
+                div [ class "selected-bug" ] []
 
 
 selectedBugHeader : Model -> Bug -> Html Msg

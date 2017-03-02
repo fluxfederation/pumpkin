@@ -38,8 +38,11 @@ type Msg
 
 type alias Model =
     { selectedPatchIds : List String
+    , loadingPatches : Bool
     , patches : Patches
+    , loadingBugs : Bool
     , bugs : Bugs
+    , loadingFocusedBug : Bool
     , focusedBug : Maybe Bug
     , focusedBugOccurrences : Maybe Occurrences
     , expandedOccurrences : List String
@@ -96,8 +99,11 @@ type alias Occurrence =
 initialModel : Model
 initialModel =
     { selectedPatchIds = []
+    , loadingPatches = True
     , patches = []
+    , loadingBugs = False
     , bugs = []
+    , loadingFocusedBug = False
     , focusedBug = Nothing
     , focusedBugOccurrences = Nothing
     , expandedOccurrences = []
