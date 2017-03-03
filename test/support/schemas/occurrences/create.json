@@ -1,7 +1,7 @@
 {
   "type": "object",
   "attributes": {
-    "$ref": "file://occurrences/show.json"
+    "$ref": "file://occurrences/_occurrence.json"
   },
-  "required": ["id", "message", "data", "patch"]
+  "required": ["id", "message", "data", "patch_id"]
 }

@@ -5,17 +5,11 @@
     "message":{"type":"string"},
     "first_occurred_at":{"type":"string"},
     "last_occurred_at":{"type":"string"},
+    "occurrence_count": {"type": "number"},
     "patch_id": { "type": "string" },
     "data": { "type": "object" },
     "closed_at": { "type": ["string", "null"] },
-    "issue_url": { "type": ["string", "null"] },
-    "occurrences": {
-      "type": "array",
-      "properties": {
-        "id":{"type":"string"}
-      },
-      "minItems": 1
-    }
+    "issue_url": { "type": ["string", "null"] }
   },
-  "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id", "data", "closed_at", "issue_url", "occurrences"]
+  "required":["id", "message", "first_occurred_at", "last_occurred_at", "occurrence_count", "patch_id", "data", "closed_at", "issue_url"]
 }
