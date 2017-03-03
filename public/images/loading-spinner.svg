@@ -1,0 +1,20 @@
+<svg width="256" height="256" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:figma="http://www.figma.com/figma/ns">
+<title>loading-spinner</title>
+<desc>Created using Figma</desc>
+<g id="Canvas" transform="translate(-668 142)" figma:type="canvas">
+<mask id="mask0_alpha" mask-type="alpha">
+<path d="M 668 -142L 924 -142L 924 114L 668 114L 668 -142Z" fill="#FFFFFF"/>
+</mask>
+<g id="loading-spinner" style="mix-blend-mode:normal;" mask="url(#mask0_alpha)" figma:type="frame">
+<g id="Vector 4" style="mix-blend-mode:normal;" figma:type="vector">
+<use xlink:href="#path0_fill" transform="matrix(1 1.22131e-16 -1.228e-16 1 707.169 13.2474)" fill="#302F2E" style="mix-blend-mode:normal;"/>
+</g>
+<g id="Vector 4" style="mix-blend-mode:normal;" figma:type="vector">
+<use xlink:href="#path0_fill" transform="matrix(-1 -1.22131e-16 1.228e-16 -1 884.831 -41.2474)" fill="#302F2E" style="mix-blend-mode:normal;"/>
+</g>
+</g>
+</g>
+<defs>
+<path id="path0_fill" d="M 92.2641 54.2823C 134.321 57.3108 165.557 10.5054 165.557 0.780647C 169.769 0.780647 177.662 -2.1136 177.662 3.24358C 177.662 13.2971 144.444 65.1245 92.2641 65.1245C 49.6622 65.1245 29.1622 45.6245 13.1048 29.8515C 9.16223 43.6245 10.3005 54.1245 4.1622 59.1245C -1.76352 63.9514 -1.37385 39.422 5.40773 16.1253C 5.8733 14.5259 7.01359 13.2112 8.52557 12.5122C 29.5644 2.78474 52.1421 -3.05591 48.6622 5.24359C 45.0515 13.8549 32.8968 13.5464 21.1622 20.1245C 36.6622 39.6245 56.335 51.6951 92.2641 54.2823Z"/>
+</defs>
+</svg>

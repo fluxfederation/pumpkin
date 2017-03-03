@@ -4,8 +4,19 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
   include ActiveJob::TestHelper
   include ActiveModelSerializers::Test::Schema
 
-  test "index" do
+  setup do
+    @default_patch_ids = [patches(:qa), patches(:prod)].map(&:to_param)
+  end
+
+  test "index with no patch ids" do
     get bugs_path
+    assert_response :success
+
+    assert_empty JSON.parse(@response.body)
+  end
+
+  test "index with patch ids" do
+    get bugs_path, params: {patch_ids: @default_patch_ids}
     assert_response :success
     assert_response_schema "bugs/index.json"
 
@@ -14,7 +25,7 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index with bug filtering" do
-    get bugs_path, params: {ids: [bugs(:prod_normal), bugs(:prod_twice)].map(&:to_param)}
+    get bugs_path, params: {patch_ids: @default_patch_ids, ids: [bugs(:prod_normal), bugs(:prod_twice)].map(&:to_param)}
     assert_response :success
     assert_response_schema "bugs/index.json"
   end
@@ -26,13 +37,13 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index with closed filtering" do
-    get bugs_path, params: {closed: "true"}
+    get bugs_path, params: {patch_ids: @default_patch_ids, closed: "true"}
     assert_response :success
     assert_response_schema "bugs/index.json"
   end
 
   test "index with not closed filtering" do
-    get bugs_path, params: {closed: "false"}
+    get bugs_path, params: {patch_ids: @default_patch_ids, closed: "false"}
     assert_response :success
     assert_response_schema "bugs/index.json"
   end

@@ -1,5 +1,5 @@
 {
-  "id": "file://occurrences/show.json",
+  "id": "file://occurrences/occurrence.json",
   "type": "object",
   "attributes": {
     "id": { "type": "string" },
@@ -14,5 +14,5 @@
       "required": ["id", "name"]
     }
   },
-  "required": ["id", "message", "data", "patch"]
+  "required": ["id", "message", "data", "patch_id"]
 }

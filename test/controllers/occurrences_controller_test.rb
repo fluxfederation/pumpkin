@@ -4,10 +4,12 @@ class OccurrencesControllerTest < ActionDispatch::IntegrationTest
   include ActiveJob::TestHelper
   include ActiveModelSerializers::Test::Schema
 
-  test "show" do
-    get occurrence_path(occurrences(:prod_normal))
+  test "index" do
+    get bug_occurrences_path(bug_id: bugs(:prod_normal))
     assert_response :success
-    assert_response_schema "occurrences/show.json"
+    assert_response_schema "occurrences/index.json"
+
+    occurrences(:prod_normal)
   end
 
   test "create no token" do

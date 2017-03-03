@@ -1,0 +1,11 @@
+{
+  "type":"array",
+  "items": {
+    "type": "object",
+    "attributes": {
+      "$ref": "file://occurrences/_occurrence.json"
+    },
+    "required": ["id", "message", "data", "patch_id"]
+  },
+  "minItems": 1
+}

@@ -103,7 +103,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         LoadedPatches result ->
-            handleResult (\patches -> noCmd { model | patches = patches }) model result
+            handleResult (\patches -> noCmd { model | patches = patches, loadingPatches = False }) model result
 
         LoadedBugs result ->
             handleResult (loadedBugs model) model result
@@ -111,7 +111,7 @@ update msg model =
         ShowPatchBugs projectName ->
             let
                 newModel =
-                    { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ] }
+                    { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ], loadingBugs = True }
             in
                 newModel ! [ Rest.loadBugs newModel.selectedPatchIds False ]
 
@@ -126,18 +126,18 @@ update msg model =
                 newPatchIds =
                     List.filter (\x -> x /= patchId) model.selectedPatchIds
             in
-                { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug } ! [ Rest.loadBugs newPatchIds False ]
+                { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug, loadingBugs = True } ! [ Rest.loadBugs newPatchIds False ]
 
         SetSelectedPatchIds ids ->
-            { model | selectedPatchIds = ids } ! [ Rest.loadBugs ids False ]
+            { model | selectedPatchIds = ids, loadingBugs = True } ! [ Rest.loadBugs ids False ]
 
         RequestDetails bugId ->
-            { model | expandedOccurrences = [] } ! [ Rest.loadBugDetails bugId ]
+            { model | expandedOccurrences = [], loadingFocusedBug = True } ! [ Rest.loadBugDetails bugId ]
 
         LoadedDetails result ->
             handleResult
                 (\bugDetails ->
-                    noCmd { model | focusedBug = Just bugDetails }
+                    noCmd { model | focusedBug = Just bugDetails, loadingFocusedBug = False }
                 )
                 model
                 result
@@ -166,10 +166,10 @@ update msg model =
             noCmd { model | error = Nothing }
 
         ShowClosedBugs ->
-            { model | showClosedBugs = True } ! [ Rest.loadPatches, Rest.loadBugs model.selectedPatchIds True ]
+            { model | showClosedBugs = True, loadingBugs = True } ! [ Rest.loadPatches, Rest.loadBugs model.selectedPatchIds True ]
 
         HideClosedBugs ->
-            { model | showClosedBugs = False } ! [ Rest.loadPatches, Rest.loadBugs model.selectedPatchIds False ]
+            { model | showClosedBugs = False, loadingBugs = True } ! [ Rest.loadPatches, Rest.loadBugs model.selectedPatchIds False ]
 
         ToggleMenu ->
             noCmd { model | showMenu = not model.showMenu }
@@ -204,7 +204,7 @@ loadedBugs model bugs =
             else
                 model.focusedBug
     in
-        noCmd { model | bugs = bugs, focusedBug = newFocusedBug }
+        noCmd { model | bugs = bugs, focusedBug = newFocusedBug, loadingBugs = False }
 
 
 closedBug : Model -> Bug -> ( Model, Cmd Msg )
