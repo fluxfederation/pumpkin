@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server 'com-test-pumpkin-ccp1', roles: %w{app db web}
+server 'com-test-pumpkin-ccp2', roles: %w{app db web}
 
 
 # role-based syntax
