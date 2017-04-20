@@ -13,21 +13,21 @@ import Json.Decode
 type Msg
     = LoadedEnvironments (Result Http.Error Environments)
     | LoadedBugs (Result Http.Error (List Bug))
-    | ShowEnvironmentBugs String
-    | HideEnvironmentBugs String
-    | SetSelectedEnvironmentIds (List String)
+    | ShowEnvironmentBugs EnvironmentID
+    | HideEnvironmentBugs EnvironmentID
+    | SetSelectedEnvironmentIds (List EnvironmentID)
     | ShowClosedBugs
     | HideClosedBugs
     | LoadedDetails (Result Http.Error Bug)
     | LoadedOccurrences (Result Http.Error (List Occurrence))
-    | RequestDetails String
+    | RequestDetails BugID
     | ClosedBug (Result Http.Error Bug)
-    | CloseBug String
+    | CloseBug BugID
     | HideBug
     | ClearError
     | ToggleMenu
     | ToggleFullStackTrace
-    | ToggleOccurrence String
+    | ToggleOccurrence OccurrenceID
     | ToggleTimeFormat
     | TimeTick Time.Time
 
@@ -37,7 +37,7 @@ type Msg
 
 
 type alias Model =
-    { selectedEnvironmentIds : List String
+    { selectedEnvironmentIds : List EnvironmentID
     , loadingEnvironments : Bool
     , environments : Environments
     , loadingBugs : Bool
@@ -45,7 +45,7 @@ type alias Model =
     , loadingFocusedBug : Bool
     , focusedBug : Maybe Bug
     , focusedBugOccurrences : Maybe (List Occurrence)
-    , expandedOccurrences : List String
+    , expandedOccurrences : List OccurrenceID
     , showFullStackTrace : Bool
     , error : Maybe String
     , showClosedBugs : Bool
@@ -63,13 +63,25 @@ type alias Environments =
     List Environment
 
 
+type alias UUID =
+    { toString : String }
+
+
+type EnvironmentID
+    = EnvironmentID UUID
+
+
 type alias Environment =
-    { id : String, name : String }
+    { id : EnvironmentID, name : String }
+
+
+type BugID
+    = BugID UUID
 
 
 type alias Bug =
-    { id : String
-    , environmentId : String
+    { id : BugID
+    , environmentId : EnvironmentID
     , message : String
     , firstOccurredAt : Date.Date
     , lastOccurredAt : Date.Date
@@ -79,9 +91,13 @@ type alias Bug =
     }
 
 
+type OccurrenceID
+    = OccurrenceID UUID
+
+
 type alias Occurrence =
-    { id : String
-    , environmentId : String
+    { id : OccurrenceID
+    , environmentId : EnvironmentID
     , message : String
     , occurredAt : Date.Date
     , data : Json.Decode.Value

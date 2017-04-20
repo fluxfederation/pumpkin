@@ -14497,6 +14497,9 @@ var _user$project$Types$Model = function (a) {
 var _user$project$Types$Event = function (a) {
 	return {name: a};
 };
+var _user$project$Types$UUID = function (a) {
+	return {toString: a};
+};
 var _user$project$Types$Environment = F2(
 	function (a, b) {
 		return {id: a, name: b};
@@ -14551,6 +14554,15 @@ var _user$project$Types$LoadedBugs = function (a) {
 };
 var _user$project$Types$LoadedEnvironments = function (a) {
 	return {ctor: 'LoadedEnvironments', _0: a};
+};
+var _user$project$Types$EnvironmentID = function (a) {
+	return {ctor: 'EnvironmentID', _0: a};
+};
+var _user$project$Types$BugID = function (a) {
+	return {ctor: 'BugID', _0: a};
+};
+var _user$project$Types$OccurrenceID = function (a) {
+	return {ctor: 'OccurrenceID', _0: a};
 };
 
 var _user$project$FormatData$isSuccess = function (result) {
@@ -14816,10 +14828,12 @@ var _user$project$View$environmentName = F2(
 					return _elm_lang$core$Native_Utils.eq(environment.id, id);
 				},
 				model.environments));
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			{name: '', id: ''},
-			environment).name;
+		var _p1 = environment;
+		if (_p1.ctor === 'Just') {
+			return _p1._0.name;
+		} else {
+			return '';
+		}
 	});
 var _user$project$View$errorMessage = function (bug) {
 	return A2(
@@ -15387,9 +15401,9 @@ var _user$project$View$selectedBug = function (model) {
 				_1: {ctor: '[]'}
 			});
 	} else {
-		var _p1 = model.focusedBug;
-		if (_p1.ctor === 'Just') {
-			var _p2 = _p1._0;
+		var _p2 = model.focusedBug;
+		if (_p2.ctor === 'Just') {
+			var _p3 = _p2._0;
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -15399,13 +15413,13 @@ var _user$project$View$selectedBug = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: A2(_user$project$View$selectedBugHeader, model, _p2),
+					_0: A2(_user$project$View$selectedBugHeader, model, _p3),
 					_1: {
 						ctor: '::',
-						_0: _user$project$View$linkedIssue(_p2),
+						_0: _user$project$View$linkedIssue(_p3),
 						_1: {
 							ctor: '::',
-							_0: A2(_user$project$View$stackTraceDisplay, model, _p2),
+							_0: A2(_user$project$View$stackTraceDisplay, model, _p3),
 							_1: {
 								ctor: '::',
 								_0: _user$project$View$occurrencesDisplay(model),
@@ -15429,9 +15443,9 @@ var _user$project$View$selectedBug = function (model) {
 var _user$project$View$sidebarBug = F2(
 	function (model, bug) {
 		var isSelected = function () {
-			var _p3 = model.focusedBug;
-			if (_p3.ctor === 'Just') {
-				return _elm_lang$core$Native_Utils.eq(_p3._0.id, bug.id);
+			var _p4 = model.focusedBug;
+			if (_p4.ctor === 'Just') {
+				return _elm_lang$core$Native_Utils.eq(_p4._0.id, bug.id);
 			} else {
 				return false;
 			}
@@ -15546,11 +15560,11 @@ var _user$project$View$sidebarBug = F2(
 			});
 	});
 var _user$project$View$sidebarBugGroup = F2(
-	function (model, _p4) {
-		var _p5 = _p4;
-		var _p6 = _p5._1;
+	function (model, _p5) {
+		var _p6 = _p5;
+		var _p7 = _p6._1;
 		return (_elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$List$length(_p6),
+			_elm_lang$core$List$length(_p7),
 			0) > 0) ? {
 			ctor: '::',
 			_0: A2(
@@ -15562,7 +15576,7 @@ var _user$project$View$sidebarBugGroup = F2(
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p5._0),
+					_0: _elm_lang$html$Html$text(_p6._0),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -15577,7 +15591,7 @@ var _user$project$View$sidebarBugGroup = F2(
 					A2(
 						_elm_lang$core$List$map,
 						_user$project$View$sidebarBug(model),
-						_p6)),
+						_p7)),
 				_1: {ctor: '[]'}
 			}
 		} : {ctor: '[]'};
@@ -15611,9 +15625,28 @@ var _user$project$View$sidebarBugs = function (model) {
 				{ctor: '[]'}),
 			_1: {ctor: '[]'}
 		} : A2(
-			_elm_lang$core$List$concatMap,
-			_user$project$View$sidebarBugGroup(model),
-			_user$project$View$bugGroups(model)));
+			_elm_lang$core$Basics_ops['++'],
+			A2(
+				_elm_lang$core$List$concatMap,
+				_user$project$View$sidebarBugGroup(model),
+				_user$project$View$bugGroups(model)),
+			_elm_lang$core$List$isEmpty(
+				_user$project$View$bugGroups(model)) ? {ctor: '[]'} : {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('button'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Load more'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}));
 };
 var _user$project$View$environmentMenuItem = F2(
 	function (selectedEnvironmentIds, environment) {
@@ -15847,8 +15880,8 @@ var _user$project$View$content = function (model) {
 		});
 };
 var _user$project$View$errorMessages = function (model) {
-	var _p7 = model.error;
-	if (_p7.ctor === 'Just') {
+	var _p8 = model.error;
+	if (_p8.ctor === 'Just') {
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -15872,7 +15905,7 @@ var _user$project$View$errorMessages = function (model) {
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p7._0),
+					_0: _elm_lang$html$Html$text(_p8._0),
 					_1: {ctor: '[]'}
 				}
 			});
@@ -15898,11 +15931,12 @@ var _user$project$View$view = function (model) {
 		});
 };
 
-var _user$project$Rest$closeBugUrl = function (bugId) {
+var _user$project$Rest$closeBugUrl = function (_p0) {
+	var _p1 = _p0;
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		'/bugs/',
-		A2(_elm_lang$core$Basics_ops['++'], bugId, '/close'));
+		A2(_elm_lang$core$Basics_ops['++'], _p1._0.toString, '/close'));
 };
 var _user$project$Rest$event = A2(
 	_elm_lang$core$Json_Decode$map,
@@ -15925,17 +15959,21 @@ var _user$project$Rest$stacktrace = _elm_lang$core$Json_Decode$maybe(
 			}
 		},
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
+var _user$project$Rest$decodeUUID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$UUID, _elm_lang$core$Json_Decode$string);
+var _user$project$Rest$decodeEnvironmentID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$EnvironmentID, _user$project$Rest$decodeUUID);
 var _user$project$Rest$decodeEnvironment = A3(
 	_elm_lang$core$Json_Decode$map2,
 	_user$project$Types$Environment,
-	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeEnvironmentID),
 	A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string));
+var _user$project$Rest$decodeBugID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$BugID, _user$project$Rest$decodeUUID);
+var _user$project$Rest$decodeOccurrenceID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$OccurrenceID, _user$project$Rest$decodeUUID);
 var _user$project$Rest$decodeEnvironments = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeEnvironment);
 var _user$project$Rest$date = function () {
 	var decodeDateFromString = function (s) {
-		var _p0 = _elm_lang$core$Date$fromString(s);
-		if (_p0.ctor === 'Ok') {
-			return _elm_lang$core$Json_Decode$succeed(_p0._0);
+		var _p2 = _elm_lang$core$Date$fromString(s);
+		if (_p2.ctor === 'Ok') {
+			return _elm_lang$core$Json_Decode$succeed(_p2._0);
 		} else {
 			return _elm_lang$core$Json_Decode$fail(
 				A2(_elm_lang$core$Basics_ops['++'], 'Invalid date: ', s));
@@ -15946,8 +15984,8 @@ var _user$project$Rest$date = function () {
 var _user$project$Rest$decodeBug = A9(
 	_elm_lang$core$Json_Decode$map8,
 	_user$project$Types$Bug,
-	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeBugID),
+	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _user$project$Rest$decodeEnvironmentID),
 	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'first_occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode$field, 'last_occurred_at', _user$project$Rest$date),
@@ -15971,20 +16009,22 @@ var _user$project$Rest$closeBug = function (bugId) {
 var _user$project$Rest$decodeOccurrence = A6(
 	_elm_lang$core$Json_Decode$map5,
 	_user$project$Types$Occurrence,
-	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeOccurrenceID),
+	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _user$project$Rest$decodeEnvironmentID),
 	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode$field, 'data', _elm_lang$core$Json_Decode$value));
 var _user$project$Rest$decodeOccurrences = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeOccurrence);
-var _user$project$Rest$occurrencesUrl = function (bugId) {
+var _user$project$Rest$occurrencesUrl = function (_p3) {
+	var _p4 = _p3;
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		'/bugs/',
-		A2(_elm_lang$core$Basics_ops['++'], bugId, '/occurrences'));
+		A2(_elm_lang$core$Basics_ops['++'], _p4._0.toString, '/occurrences'));
 };
-var _user$project$Rest$detailsUrl = function (bugId) {
-	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', bugId);
+var _user$project$Rest$detailsUrl = function (_p5) {
+	var _p6 = _p5;
+	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', _p6._0.toString);
 };
 var _user$project$Rest$loadBugDetails = function (bugId) {
 	return _elm_lang$core$Platform_Cmd$batch(
@@ -16010,9 +16050,7 @@ var _user$project$Rest$loadBugDetails = function (bugId) {
 			}
 		});
 };
-var _user$project$Rest$allBugsUrl = function (environmentIds) {
-	return '/bugs';
-};
+var _user$project$Rest$allBugsUrl = '/bugs';
 var _user$project$Rest$openBugsUrl = function (environmentIds) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -16025,14 +16063,15 @@ var _user$project$Rest$openBugsUrl = function (environmentIds) {
 				'&',
 				A2(
 					_elm_lang$core$List$map,
-					function (id) {
-						return A2(_elm_lang$core$Basics_ops['++'], 'environment_ids[]=', id);
+					function (_p7) {
+						var _p8 = _p7;
+						return A2(_elm_lang$core$Basics_ops['++'], 'environment_ids[]=', _p8._0.toString);
 					},
 					environmentIds))));
 };
 var _user$project$Rest$loadBugs = F2(
 	function (environmentIds, includeClosedBugs) {
-		var url = includeClosedBugs ? _user$project$Rest$allBugsUrl(environmentIds) : _user$project$Rest$openBugsUrl(environmentIds);
+		var url = includeClosedBugs ? _user$project$Rest$allBugsUrl : _user$project$Rest$openBugsUrl(environmentIds);
 		return A2(
 			_elm_lang$http$Http$send,
 			_user$project$Types$LoadedBugs,
@@ -16365,34 +16404,50 @@ var _user$project$Main$location2messages = function (location) {
 		0) > 0) ? {
 		ctor: '::',
 		_0: _user$project$Types$RequestDetails(
-			_rgrempel$elm_route_url$RouteUrl_Builder$hash(builder)),
+			_user$project$Types$BugID(
+				_user$project$Types$UUID(
+					_rgrempel$elm_route_url$RouteUrl_Builder$hash(builder)))),
 		_1: {ctor: '[]'}
 	} : {ctor: '[]'};
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		{
 			ctor: '::',
-			_0: _user$project$Types$SetSelectedEnvironmentIds(selectedEnvironmentIds),
+			_0: _user$project$Types$SetSelectedEnvironmentIds(
+				A2(
+					_elm_lang$core$List$map,
+					function (id) {
+						return _user$project$Types$EnvironmentID(
+							_user$project$Types$UUID(id));
+					},
+					selectedEnvironmentIds)),
 			_1: {ctor: '[]'}
 		},
 		focusBug);
 };
+var _user$project$Main$environmentIDToString = function (_p7) {
+	var _p8 = _p7;
+	return _p8._0.toString;
+};
 var _user$project$Main$delta2url = F2(
-	function (_p7, model) {
+	function (_p9, model) {
 		var selectedBug = function () {
-			var _p8 = model.focusedBug;
-			if (_p8.ctor === 'Just') {
-				return A2(_elm_lang$core$Basics_ops['++'], '#', _p8._0.id);
+			var _p10 = model.focusedBug;
+			if (_p10.ctor === 'Just') {
+				var _p11 = _p10._0.id;
+				var uuid = _p11._0;
+				return A2(_elm_lang$core$Basics_ops['++'], '#', uuid.toString);
 			} else {
 				return '#';
 			}
 		}();
-		var selectedEnvironments = (_elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$List$length(model.selectedEnvironmentIds),
-			0) > 0) ? A2(
+		var selectedEnvironments = A2(
 			_elm_lang$core$Basics_ops['++'],
 			'?environments=',
-			A2(_elm_lang$core$String$join, ',', model.selectedEnvironmentIds)) : '?environments=';
+			A2(
+				_elm_lang$core$String$join,
+				',',
+				A2(_elm_lang$core$List$map, _user$project$Main$environmentIDToString, model.selectedEnvironmentIds)));
 		return _elm_lang$core$Maybe$Just(
 			{
 				entry: _rgrempel$elm_route_url$RouteUrl$NewEntry,

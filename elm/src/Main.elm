@@ -37,20 +37,26 @@ delta2url : Model -> Model -> Maybe UrlChange
 delta2url _ model =
     let
         selectedEnvironments =
-            if List.length model.selectedEnvironmentIds > 0 then
-                "?environments=" ++ (String.join "," model.selectedEnvironmentIds)
-            else
-                "?environments="
+            "?environments=" ++ String.join "," (List.map environmentIDToString model.selectedEnvironmentIds)
 
         selectedBug =
             case model.focusedBug of
                 Just bug ->
-                    "#" ++ bug.id
+                    let
+                        (BugID uuid) =
+                            bug.id
+                    in
+                        "#" ++ uuid.toString
 
                 Nothing ->
                     "#"
     in
         Just { entry = NewEntry, url = selectedEnvironments ++ selectedBug }
+
+
+environmentIDToString : EnvironmentID -> String
+environmentIDToString (EnvironmentID uuid) =
+    uuid.toString
 
 
 location2messages : Location -> List Msg
@@ -69,11 +75,17 @@ location2messages location =
 
         focusBug =
             if String.length (BuildUrl.hash builder) > 0 then
-                [ RequestDetails (BuildUrl.hash builder) ]
+                [ RequestDetails (BugID (UUID (BuildUrl.hash builder))) ]
             else
                 []
     in
-        [ SetSelectedEnvironmentIds selectedEnvironmentIds ] ++ focusBug
+        [ SetSelectedEnvironmentIds
+            (List.map
+                (\id -> EnvironmentID (UUID id))
+                selectedEnvironmentIds
+            )
+        ]
+            ++ focusBug
 
 
 
@@ -234,7 +246,7 @@ bugInList bugs bug =
     not <| isJust <| (ListX.find (\x -> x.id == bug.id) bugs)
 
 
-bugInEnvironment : String -> Bug -> Bool
+bugInEnvironment : EnvironmentID -> Bug -> Bool
 bugInEnvironment environmentId bug =
     bug.environmentId == environmentId
 

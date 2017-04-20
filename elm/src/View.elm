@@ -82,7 +82,7 @@ sidebarMenu model =
             ]
 
 
-environmentMenuItem : List String -> Environment -> Html Msg
+environmentMenuItem : List EnvironmentID -> Environment -> Html Msg
 environmentMenuItem selectedEnvironmentIds environment =
     let
         isActive =
@@ -326,13 +326,18 @@ errorMessage bug =
     bug.message |> String.split " : " |> List.tail |> Maybe.withDefault [] |> String.join " : "
 
 
-environmentName : Model -> String -> String
+environmentName : Model -> EnvironmentID -> String
 environmentName model id =
     let
         environment =
             List.head (List.filter (\environment -> environment.id == id) model.environments)
     in
-        (Maybe.withDefault { name = "", id = "" } environment).name
+        case environment of
+            Just e ->
+                e.name
+
+            _ ->
+                ""
 
 
 filterStackTrace : Model -> Maybe (List String) -> List String

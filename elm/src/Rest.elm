@@ -14,29 +14,29 @@ environmentsUrl =
     "/environments"
 
 
-openBugsUrl : List String -> String
+openBugsUrl : List EnvironmentID -> String
 openBugsUrl environmentIds =
     "/bugs"
         ++ "?closed=false&"
         ++ (String.join
                 "&"
-                (List.map (\id -> "environment_ids[]=" ++ id) environmentIds)
+                (List.map (\(EnvironmentID uuid) -> "environment_ids[]=" ++ uuid.toString) environmentIds)
            )
 
 
-allBugsUrl : List String -> String
-allBugsUrl environmentIds =
+allBugsUrl : String
+allBugsUrl =
     "/bugs"
 
 
-detailsUrl : String -> String
-detailsUrl bugId =
-    "/bugs/" ++ bugId
+detailsUrl : BugID -> String
+detailsUrl (BugID uuid) =
+    "/bugs/" ++ uuid.toString
 
 
-occurrencesUrl : String -> String
-occurrencesUrl bugId =
-    "/bugs/" ++ bugId ++ "/occurrences"
+occurrencesUrl : BugID -> String
+occurrencesUrl (BugID uuid) =
+    "/bugs/" ++ uuid.toString ++ "/occurrences"
 
 
 
@@ -62,11 +62,26 @@ decodeEnvironments =
     list decodeEnvironment
 
 
+decodeUUID : Decoder UUID
+decodeUUID =
+    map UUID string
+
+
+decodeEnvironmentID : Decoder EnvironmentID
+decodeEnvironmentID =
+    map EnvironmentID decodeUUID
+
+
 decodeEnvironment : Decoder Environment
 decodeEnvironment =
     map2 Environment
-        (field "id" string)
+        (field "id" decodeEnvironmentID)
         (field "name" string)
+
+
+decodeBugID : Decoder BugID
+decodeBugID =
+    map BugID decodeUUID
 
 
 decodeBugs : Decoder (List Bug)
@@ -77,8 +92,8 @@ decodeBugs =
 decodeBug : Decoder Bug
 decodeBug =
     map8 Bug
-        (field "id" string)
-        (field "environment_id" string)
+        (field "id" decodeBugID)
+        (field "environment_id" decodeEnvironmentID)
         (field "message" string)
         (field "first_occurred_at" date)
         (field "last_occurred_at" date)
@@ -92,11 +107,16 @@ decodeOccurrences =
     list decodeOccurrence
 
 
+decodeOccurrenceID : Decoder OccurrenceID
+decodeOccurrenceID =
+    map OccurrenceID decodeUUID
+
+
 decodeOccurrence : Decoder Occurrence
 decodeOccurrence =
     map5 Occurrence
-        (field "id" string)
-        (field "environment_id" string)
+        (field "id" decodeOccurrenceID)
+        (field "environment_id" decodeEnvironmentID)
         (field "message" string)
         (field "occurred_at" date)
         (field "data" value)
@@ -112,16 +132,16 @@ event =
     map Event (field "name" string)
 
 
-closeBugUrl : String -> String
-closeBugUrl bugId =
-    "/bugs/" ++ bugId ++ "/close"
+closeBugUrl : BugID -> String
+closeBugUrl (BugID uuid) =
+    "/bugs/" ++ uuid.toString ++ "/close"
 
 
 
 -- Web Requests
 
 
-loadBugDetails : String -> Cmd Msg
+loadBugDetails : BugID -> Cmd Msg
 loadBugDetails bugId =
     Cmd.batch
         [ Http.send LoadedDetails <| Http.get (detailsUrl bugId) decodeBug
@@ -129,7 +149,7 @@ loadBugDetails bugId =
         ]
 
 
-closeBug : String -> Cmd Msg
+closeBug : BugID -> Cmd Msg
 closeBug bugId =
     Http.send ClosedBug <| Http.post (closeBugUrl bugId) Http.emptyBody decodeBug
 
@@ -139,12 +159,12 @@ loadEnvironments =
     Http.send LoadedEnvironments <| Http.get environmentsUrl decodeEnvironments
 
 
-loadBugs : List String -> Bool -> Cmd Msg
+loadBugs : List EnvironmentID -> Bool -> Cmd Msg
 loadBugs environmentIds includeClosedBugs =
     let
         url =
             if includeClosedBugs then
-                allBugsUrl environmentIds
+                allBugsUrl
             else
                 openBugsUrl environmentIds
     in
