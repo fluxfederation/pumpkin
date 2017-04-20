@@ -8,8 +8,13 @@ class OccurrencesControllerTest < ActionDispatch::IntegrationTest
     get bug_occurrences_path(bug_id: bugs(:prod_normal))
     assert_response :success
     assert_response_schema "occurrences/index.json"
+  end
 
-    occurrences(:prod_normal)
+  test "index with limit" do
+    get bug_occurrences_path(bug_id: bugs(:prod_normal), limit: 1)
+    assert_response :success
+    assert_response_schema "occurrences/index.json"
+    assert_equal 1, JSON::parse(@response.body).size
   end
 
   test "create no token" do
