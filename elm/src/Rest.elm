@@ -15,19 +15,48 @@ environmentsUrl =
     "/environments"
 
 
-openBugsUrl : List EnvironmentID -> String
-openBugsUrl environmentIds =
-    "/bugs"
-        ++ "?closed=false&"
-        ++ (String.join
-                "&"
-                (List.map (\(EnvironmentID uuid) -> "environment_ids[]=" ++ uuid.toString) environmentIds)
+pageParams : (a -> String) -> Int -> Maybe a -> List String
+pageParams idToString limit startFrom =
+    [ "limit=" ++ toString limit ]
+        ++ (case startFrom of
+                Just id ->
+                    [ "start=" ++ idToString id ]
+
+                Nothing ->
+                    []
            )
 
 
-allBugsUrl : String
-allBugsUrl =
-    "/bugs"
+bugIDToParam : BugID -> String
+bugIDToParam (BugID uuid) =
+    uuid.toString
+
+
+envIDToParam : EnvironmentID -> String
+envIDToParam (EnvironmentID uuid) =
+    uuid.toString
+
+
+occurrenceIDToParam : OccurrenceID -> String
+occurrenceIDToParam (OccurrenceID uuid) =
+    uuid.toString
+
+
+openBugsUrl : List EnvironmentID -> Int -> Maybe BugID -> String
+openBugsUrl environmentIds limit startFrom =
+    "/bugs?"
+        ++ (String.join
+                "&"
+                ([ "closed=false" ]
+                    ++ (pageParams bugIDToParam limit startFrom)
+                    ++ (List.map (\id -> "environment_ids[]=" ++ id) (List.map envIDToParam environmentIds))
+                )
+           )
+
+
+allBugsUrl : Int -> Maybe BugID -> String
+allBugsUrl limit startFrom =
+    "/bugs?" ++ String.join "&" (pageParams bugIDToParam limit startFrom)
 
 
 detailsUrl : BugID -> String
@@ -35,9 +64,19 @@ detailsUrl (BugID uuid) =
     "/bugs/" ++ uuid.toString
 
 
-occurrencesUrl : BugID -> String
-occurrencesUrl (BugID uuid) =
-    "/bugs/" ++ uuid.toString ++ "/occurrences"
+occurrencesUrl : BugID -> Int -> Maybe OccurrenceID -> String
+occurrencesUrl (BugID uuid) limit occurrenceID =
+    "/bugs/"
+        ++ uuid.toString
+        ++ "/occurrences?"
+        ++ (String.join
+                "&"
+                (pageParams
+                    occurrenceIDToParam
+                    limit
+                    occurrenceID
+                )
+           )
 
 
 
@@ -145,11 +184,19 @@ closeBugUrl (BugID uuid) =
 -- Web Requests
 
 
+defaultPageSize : Int
+defaultPageSize =
+    100
+
+
 loadBugDetails : BugID -> Cmd Msg
 loadBugDetails bugId =
     Cmd.batch
         [ Http.send LoadedDetails <| Http.get (detailsUrl bugId) decodeBug
-        , Http.send LoadedOccurrences <| Http.get (occurrencesUrl bugId) (decodeChunk 100 decodeOccurrence)
+        , Http.send LoadedOccurrences <|
+            Http.get
+                (occurrencesUrl bugId defaultPageSize Nothing)
+                (decodeChunk defaultPageSize decodeOccurrence)
         ]
 
 
@@ -163,13 +210,16 @@ loadEnvironments =
     Http.send LoadedEnvironments <| Http.get environmentsUrl decodeEnvironments
 
 
-loadBugs : List EnvironmentID -> Bool -> Cmd Msg
-loadBugs environmentIds includeClosedBugs =
+loadBugs : List EnvironmentID -> Bool -> Maybe BugID -> Cmd Msg
+loadBugs environmentIds includeClosedBugs startFrom =
     let
+        pageSize =
+            defaultPageSize
+
         url =
             if includeClosedBugs then
-                allBugsUrl
+                allBugsUrl (pageSize + 1) startFrom
             else
-                openBugsUrl environmentIds
+                openBugsUrl environmentIds (pageSize + 1) startFrom
     in
-        Http.send LoadedBugs <| Http.get url (decodeChunk 100 decodeBug)
+        Http.send LoadedBugs <| Http.get url (decodeChunk pageSize decodeBug)

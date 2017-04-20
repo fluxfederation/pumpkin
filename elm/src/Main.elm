@@ -126,7 +126,7 @@ update msg model =
                 newModel =
                     { model | selectedEnvironmentIds = model.selectedEnvironmentIds ++ [ projectName ], loadingBugs = True }
             in
-                newModel ! [ Rest.loadBugs newModel.selectedEnvironmentIds False ]
+                newModel ! [ Rest.loadBugs newModel.selectedEnvironmentIds False Nothing ]
 
         HideEnvironmentBugs environmentId ->
             let
@@ -139,10 +139,10 @@ update msg model =
                 newEnvironmentIds =
                     List.filter (\x -> x /= environmentId) model.selectedEnvironmentIds
             in
-                { model | selectedEnvironmentIds = newEnvironmentIds, focusedBug = newFocusedBug, loadingBugs = True } ! [ Rest.loadBugs newEnvironmentIds False ]
+                { model | selectedEnvironmentIds = newEnvironmentIds, focusedBug = newFocusedBug, loadingBugs = True } ! [ Rest.loadBugs newEnvironmentIds False Nothing ]
 
         SetSelectedEnvironmentIds ids ->
-            { model | selectedEnvironmentIds = ids, loadingBugs = True } ! [ Rest.loadBugs ids False ]
+            { model | selectedEnvironmentIds = ids, loadingBugs = True } ! [ Rest.loadBugs ids False Nothing ]
 
         RequestDetails bugId ->
             { model | expandedOccurrences = [], loadingFocusedBug = True } ! [ Rest.loadBugDetails bugId ]
@@ -179,10 +179,10 @@ update msg model =
             noCmd { model | error = Nothing }
 
         ShowClosedBugs ->
-            { model | showClosedBugs = True, loadingBugs = True } ! [ Rest.loadEnvironments, Rest.loadBugs model.selectedEnvironmentIds True ]
+            { model | showClosedBugs = True, loadingBugs = True } ! [ Rest.loadEnvironments, Rest.loadBugs model.selectedEnvironmentIds True Nothing ]
 
         HideClosedBugs ->
-            { model | showClosedBugs = False, loadingBugs = True } ! [ Rest.loadEnvironments, Rest.loadBugs model.selectedEnvironmentIds False ]
+            { model | showClosedBugs = False, loadingBugs = True } ! [ Rest.loadEnvironments, Rest.loadBugs model.selectedEnvironmentIds False Nothing ]
 
         ToggleMenu ->
             noCmd { model | showMenu = not model.showMenu }

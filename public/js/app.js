@@ -16147,6 +16147,7 @@ var _user$project$View$view = function (model) {
 		});
 };
 
+var _user$project$Rest$defaultPageSize = 100;
 var _user$project$Rest$closeBugUrl = function (_p0) {
 	var _p1 = _p0;
 	return A2(
@@ -16245,17 +16246,114 @@ var _user$project$Rest$decodeOccurrence = A6(
 	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode$field, 'data', _elm_lang$core$Json_Decode$value));
-var _user$project$Rest$occurrencesUrl = function (_p4) {
+var _user$project$Rest$detailsUrl = function (_p4) {
 	var _p5 = _p4;
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		'/bugs/',
-		A2(_elm_lang$core$Basics_ops['++'], _p5._0.toString, '/occurrences'));
+	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', _p5._0.toString);
 };
-var _user$project$Rest$detailsUrl = function (_p6) {
+var _user$project$Rest$occurrenceIDToParam = function (_p6) {
 	var _p7 = _p6;
-	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', _p7._0.toString);
+	return _p7._0.toString;
 };
+var _user$project$Rest$envIDToParam = function (_p8) {
+	var _p9 = _p8;
+	return _p9._0.toString;
+};
+var _user$project$Rest$bugIDToParam = function (_p10) {
+	var _p11 = _p10;
+	return _p11._0.toString;
+};
+var _user$project$Rest$pageParams = F3(
+	function (idToString, limit, startFrom) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$core$Basics_ops['++'],
+					'limit=',
+					_elm_lang$core$Basics$toString(limit)),
+				_1: {ctor: '[]'}
+			},
+			function () {
+				var _p12 = startFrom;
+				if (_p12.ctor === 'Just') {
+					return {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$core$Basics_ops['++'],
+							'start=',
+							idToString(_p12._0)),
+						_1: {ctor: '[]'}
+					};
+				} else {
+					return {ctor: '[]'};
+				}
+			}());
+	});
+var _user$project$Rest$openBugsUrl = F3(
+	function (environmentIds, limit, startFrom) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			'/bugs?',
+			A2(
+				_elm_lang$core$String$join,
+				'&',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					{
+						ctor: '::',
+						_0: 'closed=false',
+						_1: {ctor: '[]'}
+					},
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						A3(_user$project$Rest$pageParams, _user$project$Rest$bugIDToParam, limit, startFrom),
+						A2(
+							_elm_lang$core$List$map,
+							function (id) {
+								return A2(_elm_lang$core$Basics_ops['++'], 'environment_ids[]=', id);
+							},
+							A2(_elm_lang$core$List$map, _user$project$Rest$envIDToParam, environmentIds))))));
+	});
+var _user$project$Rest$allBugsUrl = F2(
+	function (limit, startFrom) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			'/bugs?',
+			A2(
+				_elm_lang$core$String$join,
+				'&',
+				A3(_user$project$Rest$pageParams, _user$project$Rest$bugIDToParam, limit, startFrom)));
+	});
+var _user$project$Rest$loadBugs = F3(
+	function (environmentIds, includeClosedBugs, startFrom) {
+		var pageSize = _user$project$Rest$defaultPageSize;
+		var url = includeClosedBugs ? A2(_user$project$Rest$allBugsUrl, pageSize + 1, startFrom) : A3(_user$project$Rest$openBugsUrl, environmentIds, pageSize + 1, startFrom);
+		return A2(
+			_elm_lang$http$Http$send,
+			_user$project$Types$LoadedBugs,
+			A2(
+				_elm_lang$http$Http$get,
+				url,
+				A2(_user$project$Rest$decodeChunk, pageSize, _user$project$Rest$decodeBug)));
+	});
+var _user$project$Rest$occurrencesUrl = F3(
+	function (_p13, limit, occurrenceID) {
+		var _p14 = _p13;
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			'/bugs/',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p14._0.toString,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'/occurrences?',
+					A2(
+						_elm_lang$core$String$join,
+						'&',
+						A3(_user$project$Rest$pageParams, _user$project$Rest$occurrenceIDToParam, limit, occurrenceID)))));
+	});
 var _user$project$Rest$loadBugDetails = function (bugId) {
 	return _elm_lang$core$Platform_Cmd$batch(
 		{
@@ -16274,42 +16372,12 @@ var _user$project$Rest$loadBugDetails = function (bugId) {
 					_user$project$Types$LoadedOccurrences,
 					A2(
 						_elm_lang$http$Http$get,
-						_user$project$Rest$occurrencesUrl(bugId),
-						A2(_user$project$Rest$decodeChunk, 100, _user$project$Rest$decodeOccurrence))),
+						A3(_user$project$Rest$occurrencesUrl, bugId, _user$project$Rest$defaultPageSize, _elm_lang$core$Maybe$Nothing),
+						A2(_user$project$Rest$decodeChunk, _user$project$Rest$defaultPageSize, _user$project$Rest$decodeOccurrence))),
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$Rest$allBugsUrl = '/bugs';
-var _user$project$Rest$openBugsUrl = function (environmentIds) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		'/bugs',
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'?closed=false&',
-			A2(
-				_elm_lang$core$String$join,
-				'&',
-				A2(
-					_elm_lang$core$List$map,
-					function (_p8) {
-						var _p9 = _p8;
-						return A2(_elm_lang$core$Basics_ops['++'], 'environment_ids[]=', _p9._0.toString);
-					},
-					environmentIds))));
-};
-var _user$project$Rest$loadBugs = F2(
-	function (environmentIds, includeClosedBugs) {
-		var url = includeClosedBugs ? _user$project$Rest$allBugsUrl : _user$project$Rest$openBugsUrl(environmentIds);
-		return A2(
-			_elm_lang$http$Http$send,
-			_user$project$Types$LoadedBugs,
-			A2(
-				_elm_lang$http$Http$get,
-				url,
-				A2(_user$project$Rest$decodeChunk, 100, _user$project$Rest$decodeBug)));
-	});
 var _user$project$Rest$environmentsUrl = '/environments';
 var _user$project$Rest$loadEnvironments = A2(
 	_elm_lang$http$Http$send,
@@ -16437,7 +16505,7 @@ var _user$project$Main$update = F2(
 					newModel,
 					{
 						ctor: '::',
-						_0: A2(_user$project$Rest$loadBugs, newModel.selectedEnvironmentIds, false),
+						_0: A3(_user$project$Rest$loadBugs, newModel.selectedEnvironmentIds, false, _elm_lang$core$Maybe$Nothing),
 						_1: {ctor: '[]'}
 					});
 			case 'HideEnvironmentBugs':
@@ -16459,7 +16527,7 @@ var _user$project$Main$update = F2(
 						{selectedEnvironmentIds: newEnvironmentIds, focusedBug: newFocusedBug, loadingBugs: true}),
 					{
 						ctor: '::',
-						_0: A2(_user$project$Rest$loadBugs, newEnvironmentIds, false),
+						_0: A3(_user$project$Rest$loadBugs, newEnvironmentIds, false, _elm_lang$core$Maybe$Nothing),
 						_1: {ctor: '[]'}
 					});
 			case 'SetSelectedEnvironmentIds':
@@ -16471,7 +16539,7 @@ var _user$project$Main$update = F2(
 						{selectedEnvironmentIds: _p3, loadingBugs: true}),
 					{
 						ctor: '::',
-						_0: A2(_user$project$Rest$loadBugs, _p3, false),
+						_0: A3(_user$project$Rest$loadBugs, _p3, false, _elm_lang$core$Maybe$Nothing),
 						_1: {ctor: '[]'}
 					});
 			case 'RequestDetails':
@@ -16551,7 +16619,7 @@ var _user$project$Main$update = F2(
 						_0: _user$project$Rest$loadEnvironments,
 						_1: {
 							ctor: '::',
-							_0: A2(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, true),
+							_0: A3(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, true, _elm_lang$core$Maybe$Nothing),
 							_1: {ctor: '[]'}
 						}
 					});
@@ -16566,7 +16634,7 @@ var _user$project$Main$update = F2(
 						_0: _user$project$Rest$loadEnvironments,
 						_1: {
 							ctor: '::',
-							_0: A2(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, false),
+							_0: A3(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, false, _elm_lang$core$Maybe$Nothing),
 							_1: {ctor: '[]'}
 						}
 					});
