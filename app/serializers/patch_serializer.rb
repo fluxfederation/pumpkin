@@ -1,4 +1,4 @@
-class PatchSerializer < ActiveModel::Serializer
+class EnvironmentSerializer < ActiveModel::Serializer
   attributes :id, :name
 
   has_many :bugs

@@ -6,10 +6,10 @@
     "first_occurred_at":{"type":"string"},
     "last_occurred_at":{"type":"string"},
     "occurrence_count": {"type": "number"},
-    "patch_id": { "type": "string" },
+    "environment_id": { "type": "string" },
     "data": { "type": "object" },
     "closed_at": { "type": ["string", "null"] },
     "issue_url": { "type": ["string", "null"] }
   },
-  "required":["id", "message", "first_occurred_at", "last_occurred_at", "occurrence_count", "patch_id", "data", "closed_at", "issue_url"]
+  "required":["id", "message", "first_occurred_at", "last_occurred_at", "occurrence_count", "environment_id", "data", "closed_at", "issue_url"]
 }

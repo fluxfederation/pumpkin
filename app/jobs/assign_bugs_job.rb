@@ -3,7 +3,7 @@ class AssignBugsJob < ApplicationJob
 
   def perform(occurrence)
     occurrence.with_lock do
-      occurrence.bug = Bug.joins(:primary_occurrence).merge(Occurrence.where(patch_id: occurrence.patch, message: occurrence.message)).first
+      occurrence.bug = Bug.joins(:primary_occurrence).merge(Occurrence.where(environment_id: occurrence.environment, message: occurrence.message)).first
       if occurrence.bug.nil?
         occurrence.build_bug(primary_occurrence: occurrence)
         occurrence.bug.events.build(name: 'created')

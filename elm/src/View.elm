@@ -49,7 +49,7 @@ sidebarHeader model =
     div [ class "sidebar-header" ]
         [ a [ class "menu-button button", classList [ ( "is-active", model.showMenu ) ], onClick ToggleMenu ]
             [ img [ src "/images/logo.png", class "logo" ] []
-            , currentPatchesAsTags model
+            , currentEnvironmentsAsTags model
             , icon "check"
                 (if model.showMenu then
                     ""
@@ -62,44 +62,44 @@ sidebarHeader model =
         ]
 
 
-currentPatchesAsTags : Model -> Html Msg
-currentPatchesAsTags model =
+currentEnvironmentsAsTags : Model -> Html Msg
+currentEnvironmentsAsTags model =
     let
         tag id =
-            span [ class "tag is-medium" ] [ text (patchName model id) ]
+            span [ class "tag is-medium" ] [ text (environmentName model id) ]
     in
-        span [ class "menu-button-tags" ] (List.map tag model.selectedPatchIds)
+        span [ class "menu-button-tags" ] (List.map tag model.selectedEnvironmentIds)
 
 
 sidebarMenu : Model -> Html Msg
 sidebarMenu model =
     div [ class "sidebar-menu menu", classList [ ( "is-hidden", not model.showMenu ) ] ] <|
-        if model.loadingPatches then
+        if model.loadingEnvironments then
             [ span [ class "loading-spinner" ] [] ]
         else
             [ ul [ class "menu-list" ]
-                (List.map (patchMenuItem model.selectedPatchIds) model.patches)
+                (List.map (environmentMenuItem model.selectedEnvironmentIds) model.environments)
             ]
 
 
-patchMenuItem : List String -> Patch -> Html Msg
-patchMenuItem selectedPatchIds patch =
+environmentMenuItem : List String -> Environment -> Html Msg
+environmentMenuItem selectedEnvironmentIds environment =
     let
         isActive =
-            (List.member patch.id selectedPatchIds)
+            (List.member environment.id selectedEnvironmentIds)
 
         toggleMsg =
             if isActive then
-                HidePatchBugs
+                HideEnvironmentBugs
             else
-                ShowPatchBugs
+                ShowEnvironmentBugs
     in
         li []
             [ a
                 [ classList [ ( "is-active", isActive ) ]
-                , onClick (toggleMsg patch.id)
+                , onClick (toggleMsg environment.id)
                 ]
-                [ text patch.name ]
+                [ text environment.name ]
             ]
 
 
@@ -264,7 +264,7 @@ occurrenceDisplay : Model -> Occurrence -> Html Msg
 occurrenceDisplay model occurrence =
     li [ class "occurrence panel-block" ]
         [ a [ class "occurrence-toggle", onClick (ToggleOccurrence occurrence.id) ]
-            [ text (patchName model occurrence.patchId)
+            [ text (environmentName model occurrence.environmentId)
             , text " • "
             , text (formatDate model occurrence.occurredAt)
             ]
@@ -326,13 +326,13 @@ errorMessage bug =
     bug.message |> String.split " : " |> List.tail |> Maybe.withDefault [] |> String.join " : "
 
 
-patchName : Model -> String -> String
-patchName model id =
+environmentName : Model -> String -> String
+environmentName model id =
     let
-        patch =
-            List.head (List.filter (\patch -> patch.id == id) model.patches)
+        environment =
+            List.head (List.filter (\environment -> environment.id == id) model.environments)
     in
-        (Maybe.withDefault { name = "", id = "" } patch).name
+        (Maybe.withDefault { name = "", id = "" } environment).name
 
 
 filterStackTrace : Model -> Maybe (List String) -> List String

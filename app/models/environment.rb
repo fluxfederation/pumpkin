@@ -1,4 +1,4 @@
-class Patch < ApplicationRecord
+class Environment < ApplicationRecord
   validates :name, presence: true
 
   has_many :occurrences

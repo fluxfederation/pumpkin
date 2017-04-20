@@ -9,23 +9,23 @@ import Date
 -- URLs
 
 
-patchesUrl : String
-patchesUrl =
-    "/patches"
+environmentsUrl : String
+environmentsUrl =
+    "/environments"
 
 
 openBugsUrl : List String -> String
-openBugsUrl patchIds =
+openBugsUrl environmentIds =
     "/bugs"
         ++ "?closed=false&"
         ++ (String.join
                 "&"
-                (List.map (\id -> "patch_ids[]=" ++ id) patchIds)
+                (List.map (\id -> "environment_ids[]=" ++ id) environmentIds)
            )
 
 
 allBugsUrl : List String -> String
-allBugsUrl patchIds =
+allBugsUrl environmentIds =
     "/bugs"
 
 
@@ -57,14 +57,14 @@ date =
         andThen decodeDateFromString string
 
 
-decodePatches : Decoder Patches
-decodePatches =
-    list decodePatch
+decodeEnvironments : Decoder Environments
+decodeEnvironments =
+    list decodeEnvironment
 
 
-decodePatch : Decoder Patch
-decodePatch =
-    map2 Patch
+decodeEnvironment : Decoder Environment
+decodeEnvironment =
+    map2 Environment
         (field "id" string)
         (field "name" string)
 
@@ -78,7 +78,7 @@ decodeBug : Decoder Bug
 decodeBug =
     map8 Bug
         (field "id" string)
-        (field "patch_id" string)
+        (field "environment_id" string)
         (field "message" string)
         (field "first_occurred_at" date)
         (field "last_occurred_at" date)
@@ -96,7 +96,7 @@ decodeOccurrence : Decoder Occurrence
 decodeOccurrence =
     map5 Occurrence
         (field "id" string)
-        (field "patch_id" string)
+        (field "environment_id" string)
         (field "message" string)
         (field "occurred_at" date)
         (field "data" value)
@@ -134,18 +134,18 @@ closeBug bugId =
     Http.send ClosedBug <| Http.post (closeBugUrl bugId) Http.emptyBody decodeBug
 
 
-loadPatches : Cmd Msg
-loadPatches =
-    Http.send LoadedPatches <| Http.get patchesUrl decodePatches
+loadEnvironments : Cmd Msg
+loadEnvironments =
+    Http.send LoadedEnvironments <| Http.get environmentsUrl decodeEnvironments
 
 
 loadBugs : List String -> Bool -> Cmd Msg
-loadBugs patchIds includeClosedBugs =
+loadBugs environmentIds includeClosedBugs =
     let
         url =
             if includeClosedBugs then
-                allBugsUrl patchIds
+                allBugsUrl environmentIds
             else
-                openBugsUrl patchIds
+                openBugsUrl environmentIds
     in
         Http.send LoadedBugs <| Http.get url decodeBugs

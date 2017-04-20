@@ -11,11 +11,11 @@ import Json.Decode
 
 
 type Msg
-    = LoadedPatches (Result Http.Error Patches)
+    = LoadedEnvironments (Result Http.Error Environments)
     | LoadedBugs (Result Http.Error Bugs)
-    | ShowPatchBugs String
-    | HidePatchBugs String
-    | SetSelectedPatchIds (List String)
+    | ShowEnvironmentBugs String
+    | HideEnvironmentBugs String
+    | SetSelectedEnvironmentIds (List String)
     | ShowClosedBugs
     | HideClosedBugs
     | LoadedDetails (Result Http.Error Bug)
@@ -37,9 +37,9 @@ type Msg
 
 
 type alias Model =
-    { selectedPatchIds : List String
-    , loadingPatches : Bool
-    , patches : Patches
+    { selectedEnvironmentIds : List String
+    , loadingEnvironments : Bool
+    , environments : Environments
     , loadingBugs : Bool
     , bugs : Bugs
     , loadingFocusedBug : Bool
@@ -59,11 +59,11 @@ type alias Event =
     { name : String }
 
 
-type alias Patches =
-    List Patch
+type alias Environments =
+    List Environment
 
 
-type alias Patch =
+type alias Environment =
     { id : String, name : String }
 
 
@@ -73,7 +73,7 @@ type alias Bugs =
 
 type alias Bug =
     { id : String
-    , patchId : String
+    , environmentId : String
     , message : String
     , firstOccurredAt : Date.Date
     , lastOccurredAt : Date.Date
@@ -89,7 +89,7 @@ type alias Occurrences =
 
 type alias Occurrence =
     { id : String
-    , patchId : String
+    , environmentId : String
     , message : String
     , occurredAt : Date.Date
     , data : Json.Decode.Value
@@ -98,9 +98,9 @@ type alias Occurrence =
 
 initialModel : Model
 initialModel =
-    { selectedPatchIds = []
-    , loadingPatches = True
-    , patches = []
+    { selectedEnvironmentIds = []
+    , loadingEnvironments = True
+    , environments = []
     , loadingBugs = False
     , bugs = []
     , loadingFocusedBug = False

@@ -14,7 +14,7 @@ import RouteUrl.Builder as BuildUrl
 
 init : ( Model, Cmd Msg )
 init =
-    ( Types.initialModel, Cmd.batch [ Rest.loadPatches, Task.perform TimeTick Time.now ] )
+    ( Types.initialModel, Cmd.batch [ Rest.loadEnvironments, Task.perform TimeTick Time.now ] )
 
 
 main : RouteUrlProgram Never Model Msg
@@ -36,11 +36,11 @@ main =
 delta2url : Model -> Model -> Maybe UrlChange
 delta2url _ model =
     let
-        selectedPatches =
-            if List.length model.selectedPatchIds > 0 then
-                "?patches=" ++ (String.join "," model.selectedPatchIds)
+        selectedEnvironments =
+            if List.length model.selectedEnvironmentIds > 0 then
+                "?environments=" ++ (String.join "," model.selectedEnvironmentIds)
             else
-                "?patches="
+                "?environments="
 
         selectedBug =
             case model.focusedBug of
@@ -50,7 +50,7 @@ delta2url _ model =
                 Nothing ->
                     "#"
     in
-        Just { entry = NewEntry, url = selectedPatches ++ selectedBug }
+        Just { entry = NewEntry, url = selectedEnvironments ++ selectedBug }
 
 
 location2messages : Location -> List Msg
@@ -59,10 +59,10 @@ location2messages location =
         builder =
             BuildUrl.fromUrl location.href
 
-        selectedPatchIds =
-            case BuildUrl.getQuery "patches" builder of
-                Just patches ->
-                    List.filter (\s -> String.length s > 0) (String.split "," patches)
+        selectedEnvironmentIds =
+            case BuildUrl.getQuery "environments" builder of
+                Just environments ->
+                    List.filter (\s -> String.length s > 0) (String.split "," environments)
 
                 Nothing ->
                     []
@@ -73,7 +73,7 @@ location2messages location =
             else
                 []
     in
-        [ SetSelectedPatchIds selectedPatchIds ] ++ focusBug
+        [ SetSelectedEnvironmentIds selectedEnvironmentIds ] ++ focusBug
 
 
 
@@ -102,34 +102,34 @@ handleResult handler model result =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadedPatches result ->
-            handleResult (\patches -> noCmd { model | patches = patches, loadingPatches = False }) model result
+        LoadedEnvironments result ->
+            handleResult (\environments -> noCmd { model | environments = environments, loadingEnvironments = False }) model result
 
         LoadedBugs result ->
             handleResult (loadedBugs model) model result
 
-        ShowPatchBugs projectName ->
+        ShowEnvironmentBugs projectName ->
             let
                 newModel =
-                    { model | selectedPatchIds = model.selectedPatchIds ++ [ projectName ], loadingBugs = True }
+                    { model | selectedEnvironmentIds = model.selectedEnvironmentIds ++ [ projectName ], loadingBugs = True }
             in
-                newModel ! [ Rest.loadBugs newModel.selectedPatchIds False ]
+                newModel ! [ Rest.loadBugs newModel.selectedEnvironmentIds False ]
 
-        HidePatchBugs patchId ->
+        HideEnvironmentBugs environmentId ->
             let
                 newFocusedBug =
-                    if shouldHideFocusedBug model (bugInPatch patchId) then
+                    if shouldHideFocusedBug model (bugInEnvironment environmentId) then
                         Nothing
                     else
                         model.focusedBug
 
-                newPatchIds =
-                    List.filter (\x -> x /= patchId) model.selectedPatchIds
+                newEnvironmentIds =
+                    List.filter (\x -> x /= environmentId) model.selectedEnvironmentIds
             in
-                { model | selectedPatchIds = newPatchIds, focusedBug = newFocusedBug, loadingBugs = True } ! [ Rest.loadBugs newPatchIds False ]
+                { model | selectedEnvironmentIds = newEnvironmentIds, focusedBug = newFocusedBug, loadingBugs = True } ! [ Rest.loadBugs newEnvironmentIds False ]
 
-        SetSelectedPatchIds ids ->
-            { model | selectedPatchIds = ids, loadingBugs = True } ! [ Rest.loadBugs ids False ]
+        SetSelectedEnvironmentIds ids ->
+            { model | selectedEnvironmentIds = ids, loadingBugs = True } ! [ Rest.loadBugs ids False ]
 
         RequestDetails bugId ->
             { model | expandedOccurrences = [], loadingFocusedBug = True } ! [ Rest.loadBugDetails bugId ]
@@ -166,10 +166,10 @@ update msg model =
             noCmd { model | error = Nothing }
 
         ShowClosedBugs ->
-            { model | showClosedBugs = True, loadingBugs = True } ! [ Rest.loadPatches, Rest.loadBugs model.selectedPatchIds True ]
+            { model | showClosedBugs = True, loadingBugs = True } ! [ Rest.loadEnvironments, Rest.loadBugs model.selectedEnvironmentIds True ]
 
         HideClosedBugs ->
-            { model | showClosedBugs = False, loadingBugs = True } ! [ Rest.loadPatches, Rest.loadBugs model.selectedPatchIds False ]
+            { model | showClosedBugs = False, loadingBugs = True } ! [ Rest.loadEnvironments, Rest.loadBugs model.selectedEnvironmentIds False ]
 
         ToggleMenu ->
             noCmd { model | showMenu = not model.showMenu }
@@ -234,9 +234,9 @@ bugInList bugs bug =
     not <| isJust <| (ListX.find (\x -> x.id == bug.id) bugs)
 
 
-bugInPatch : String -> Bug -> Bool
-bugInPatch patchId bug =
-    bug.patchId == patchId
+bugInEnvironment : String -> Bug -> Bool
+bugInEnvironment environmentId bug =
+    bug.environmentId == environmentId
 
 
 shouldHideFocusedBug : Model -> (Bug -> Bool) -> Bool

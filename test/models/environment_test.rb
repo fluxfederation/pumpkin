@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class PatchTest < ActiveSupport::TestCase
+class EnvironmentTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

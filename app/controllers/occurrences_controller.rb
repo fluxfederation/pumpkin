@@ -8,15 +8,15 @@ class OccurrencesController < ApplicationController
   end
 
   def create
-    patch = Patch.find_or_create_by!(name: params[:occurrence][:pumpkin_patch])
+    environment = Environment.find_or_create_by!(name: params[:occurrence][:pumpkin_environment])
 
-    occurrence = patch.occurrences.new(occurrence_params)
+    occurrence = environment.occurrences.new(occurrence_params)
     occurrence.data = params[:occurrence][:data]
     occurrence.save!
 
     AssignBugsJob.perform_later(occurrence)
 
-    render json: occurrence, include: [:patch]
+    render json: occurrence, include: [:environment]
   end
 
   private

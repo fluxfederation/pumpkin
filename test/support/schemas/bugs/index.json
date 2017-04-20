@@ -7,12 +7,12 @@
       "message":{"type":"string"},
       "first_occurred_at":{"type":"string"},
       "last_occurred_at":{"type":"string"},
-      "patch_id": { "type": "string" },
+      "environment_id": { "type": "string" },
       "closed_at": { "type": ["string", "null"] },
       "issue_url": { "type": ["string", "null"] },
       "occurrence_count": { "type": "number" }
     },
-    "required":["id", "message", "first_occurred_at", "last_occurred_at", "patch_id", "closed_at", "issue_url", "occurrence_count"]
+    "required":["id", "message", "first_occurred_at", "last_occurred_at", "environment_id", "closed_at", "issue_url", "occurrence_count"]
   },
   "minItems": 1
 }

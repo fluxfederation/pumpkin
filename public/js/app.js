@@ -13207,7 +13207,7 @@ var _rgrempel$elm_route_url$RouteUrl_Builder$fromHash = function (url) {
 		{entry: _rgrempel$elm_route_url$RouteUrl$NewEntry, path: unwrapped.path, query: unwrapped.query, hash: unwrapped.hash});
 };
 
-var _rluiten$elm_date_extra$Date_Extra_Core$prevMonth = function (month) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$prevMonth = function (month) {
 	var _p0 = month;
 	switch (_p0.ctor) {
 		case 'Jan':
@@ -13236,7 +13236,7 @@ var _rluiten$elm_date_extra$Date_Extra_Core$prevMonth = function (month) {
 			return _elm_lang$core$Date$Nov;
 	}
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$nextMonth = function (month) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$nextMonth = function (month) {
 	var _p1 = month;
 	switch (_p1.ctor) {
 		case 'Jan':
@@ -13265,10 +13265,10 @@ var _rluiten$elm_date_extra$Date_Extra_Core$nextMonth = function (month) {
 			return _elm_lang$core$Date$Jan;
 	}
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$intToMonth = function (month) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$intToMonth = function (month) {
 	return (_elm_lang$core$Native_Utils.cmp(month, 1) < 1) ? _elm_lang$core$Date$Jan : (_elm_lang$core$Native_Utils.eq(month, 2) ? _elm_lang$core$Date$Feb : (_elm_lang$core$Native_Utils.eq(month, 3) ? _elm_lang$core$Date$Mar : (_elm_lang$core$Native_Utils.eq(month, 4) ? _elm_lang$core$Date$Apr : (_elm_lang$core$Native_Utils.eq(month, 5) ? _elm_lang$core$Date$May : (_elm_lang$core$Native_Utils.eq(month, 6) ? _elm_lang$core$Date$Jun : (_elm_lang$core$Native_Utils.eq(month, 7) ? _elm_lang$core$Date$Jul : (_elm_lang$core$Native_Utils.eq(month, 8) ? _elm_lang$core$Date$Aug : (_elm_lang$core$Native_Utils.eq(month, 9) ? _elm_lang$core$Date$Sep : (_elm_lang$core$Native_Utils.eq(month, 10) ? _elm_lang$core$Date$Oct : (_elm_lang$core$Native_Utils.eq(month, 11) ? _elm_lang$core$Date$Nov : _elm_lang$core$Date$Dec))))))))));
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$monthToInt = function (month) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$monthToInt = function (month) {
 	var _p2 = month;
 	switch (_p2.ctor) {
 		case 'Jan':
@@ -13297,7 +13297,7 @@ var _rluiten$elm_date_extra$Date_Extra_Core$monthToInt = function (month) {
 			return 12;
 	}
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$isLeapYear = function (year) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$isLeapYear = function (year) {
 	return (_elm_lang$core$Native_Utils.eq(
 		A2(_elm_lang$core$Basics_ops['%'], year, 4),
 		0) && (!_elm_lang$core$Native_Utils.eq(
@@ -13306,21 +13306,21 @@ var _rluiten$elm_date_extra$Date_Extra_Core$isLeapYear = function (year) {
 		A2(_elm_lang$core$Basics_ops['%'], year, 400),
 		0);
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$isLeapYearDate = function (date) {
-	return _rluiten$elm_date_extra$Date_Extra_Core$isLeapYear(
+var _rluiten$elm_date_extra$Date_Extra_Internal2$isLeapYearDate = function (date) {
+	return _rluiten$elm_date_extra$Date_Extra_Internal2$isLeapYear(
 		_elm_lang$core$Date$year(date));
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$yearToDayLength = function (year) {
-	return _rluiten$elm_date_extra$Date_Extra_Core$isLeapYear(year) ? 366 : 365;
+var _rluiten$elm_date_extra$Date_Extra_Internal2$yearToDayLength = function (year) {
+	return _rluiten$elm_date_extra$Date_Extra_Internal2$isLeapYear(year) ? 366 : 365;
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$daysInMonth = F2(
+var _rluiten$elm_date_extra$Date_Extra_Internal2$daysInMonth = F2(
 	function (year, month) {
 		var _p3 = month;
 		switch (_p3.ctor) {
 			case 'Jan':
 				return 31;
 			case 'Feb':
-				return _rluiten$elm_date_extra$Date_Extra_Core$isLeapYear(year) ? 29 : 28;
+				return _rluiten$elm_date_extra$Date_Extra_Internal2$isLeapYear(year) ? 29 : 28;
 			case 'Mar':
 				return 31;
 			case 'Apr':
@@ -13343,13 +13343,13 @@ var _rluiten$elm_date_extra$Date_Extra_Core$daysInMonth = F2(
 				return 31;
 		}
 	});
-var _rluiten$elm_date_extra$Date_Extra_Core$daysInMonthDate = function (date) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$daysInMonthDate = function (date) {
 	return A2(
-		_rluiten$elm_date_extra$Date_Extra_Core$daysInMonth,
+		_rluiten$elm_date_extra$Date_Extra_Internal2$daysInMonth,
 		_elm_lang$core$Date$year(date),
 		_elm_lang$core$Date$month(date));
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$monthList = {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$monthList = {
 	ctor: '::',
 	_0: _elm_lang$core$Date$Jan,
 	_1: {
@@ -13398,15 +13398,15 @@ var _rluiten$elm_date_extra$Date_Extra_Core$monthList = {
 		}
 	}
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$toTime = function (_p4) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$toTime = function (_p4) {
 	return _elm_lang$core$Basics$floor(
 		_elm_lang$core$Date$toTime(_p4));
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$fromTime = function (_p5) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$fromTime = function (_p5) {
 	return _elm_lang$core$Date$fromTime(
 		_elm_lang$core$Basics$toFloat(_p5));
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$prevDay = function (day) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$prevDay = function (day) {
 	var _p6 = day;
 	switch (_p6.ctor) {
 		case 'Mon':
@@ -13425,7 +13425,7 @@ var _rluiten$elm_date_extra$Date_Extra_Core$prevDay = function (day) {
 			return _elm_lang$core$Date$Sat;
 	}
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$nextDay = function (day) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$nextDay = function (day) {
 	var _p7 = day;
 	switch (_p7.ctor) {
 		case 'Mon':
@@ -13444,7 +13444,7 @@ var _rluiten$elm_date_extra$Date_Extra_Core$nextDay = function (day) {
 			return _elm_lang$core$Date$Mon;
 	}
 };
-var _rluiten$elm_date_extra$Date_Extra_Core$isoDayOfWeek = function (day) {
+var _rluiten$elm_date_extra$Date_Extra_Internal2$isoDayOfWeek = function (day) {
 	var _p8 = day;
 	switch (_p8.ctor) {
 		case 'Mon':
@@ -13463,57 +13463,253 @@ var _rluiten$elm_date_extra$Date_Extra_Core$isoDayOfWeek = function (day) {
 			return 7;
 	}
 };
+var _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMillisecond = _elm_lang$core$Basics$floor(_elm_lang$core$Time$millisecond);
+var _rluiten$elm_date_extra$Date_Extra_Internal2$ticksASecond = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMillisecond * 1000;
+var _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMinute = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksASecond * 60;
+var _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAnHour = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMinute * 60;
+var _rluiten$elm_date_extra$Date_Extra_Internal2$ticksADay = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAnHour * 24;
+var _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAWeek = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksADay * 7;
+var _rluiten$elm_date_extra$Date_Extra_Internal2$lastOfMonthTicks = function (date) {
+	var dateTicks = _rluiten$elm_date_extra$Date_Extra_Internal2$toTime(date);
+	var day = _elm_lang$core$Date$day(date);
+	var month = _elm_lang$core$Date$month(date);
+	var year = _elm_lang$core$Date$year(date);
+	var daysInMonthVal = A2(_rluiten$elm_date_extra$Date_Extra_Internal2$daysInMonth, year, month);
+	var addDays = daysInMonthVal - day;
+	return dateTicks + (addDays * _rluiten$elm_date_extra$Date_Extra_Internal2$ticksADay);
+};
+var _rluiten$elm_date_extra$Date_Extra_Internal2$firstOfNextMonthDate = function (date) {
+	return _rluiten$elm_date_extra$Date_Extra_Internal2$fromTime(
+		_rluiten$elm_date_extra$Date_Extra_Internal2$lastOfMonthTicks(date) + _rluiten$elm_date_extra$Date_Extra_Internal2$ticksADay);
+};
+var _rluiten$elm_date_extra$Date_Extra_Internal2$daysInNextMonth = function (date) {
+	return _rluiten$elm_date_extra$Date_Extra_Internal2$daysInMonthDate(
+		_rluiten$elm_date_extra$Date_Extra_Internal2$firstOfNextMonthDate(date));
+};
+var _rluiten$elm_date_extra$Date_Extra_Internal2$firstOfMonthTicks = function (date) {
+	var dateTicks = _rluiten$elm_date_extra$Date_Extra_Internal2$toTime(date);
+	var day = _elm_lang$core$Date$day(date);
+	return dateTicks + ((1 - day) * _rluiten$elm_date_extra$Date_Extra_Internal2$ticksADay);
+};
+var _rluiten$elm_date_extra$Date_Extra_Internal2$lastOfPrevMonthDate = function (date) {
+	return _rluiten$elm_date_extra$Date_Extra_Internal2$fromTime(
+		_rluiten$elm_date_extra$Date_Extra_Internal2$firstOfMonthTicks(date) - _rluiten$elm_date_extra$Date_Extra_Internal2$ticksADay);
+};
+var _rluiten$elm_date_extra$Date_Extra_Internal2$daysInPrevMonth = function (date) {
+	return _rluiten$elm_date_extra$Date_Extra_Internal2$daysInMonthDate(
+		_rluiten$elm_date_extra$Date_Extra_Internal2$lastOfPrevMonthDate(date));
+};
+var _rluiten$elm_date_extra$Date_Extra_Internal2$epochDateStr = '1970-01-01T00:00:00Z';
+
+var _rluiten$elm_date_extra$Date_Extra_Period$diff = F2(
+	function (date1, date2) {
+		var millisecondDiff = _elm_lang$core$Date$millisecond(date1) - _elm_lang$core$Date$millisecond(date2);
+		var secondDiff = _elm_lang$core$Date$second(date1) - _elm_lang$core$Date$second(date2);
+		var minuteDiff = _elm_lang$core$Date$minute(date1) - _elm_lang$core$Date$minute(date2);
+		var hourDiff = _elm_lang$core$Date$hour(date1) - _elm_lang$core$Date$hour(date2);
+		var ticksDiff = _rluiten$elm_date_extra$Date_Extra_Internal2$toTime(date1) - _rluiten$elm_date_extra$Date_Extra_Internal2$toTime(date2);
+		var ticksDayDiff = (((ticksDiff - (hourDiff * _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAnHour)) - (minuteDiff * _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMinute)) - (secondDiff * _rluiten$elm_date_extra$Date_Extra_Internal2$ticksASecond)) - (millisecondDiff * _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMillisecond);
+		var onlyDaysDiff = (ticksDayDiff / _rluiten$elm_date_extra$Date_Extra_Internal2$ticksADay) | 0;
+		var _p0 = function () {
+			if (_elm_lang$core$Native_Utils.cmp(onlyDaysDiff, 0) < 0) {
+				var absDayDiff = _elm_lang$core$Basics$abs(onlyDaysDiff);
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Basics$negate((absDayDiff / 7) | 0),
+					_1: _elm_lang$core$Basics$negate(
+						A2(_elm_lang$core$Basics_ops['%'], absDayDiff, 7))
+				};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: (onlyDaysDiff / 7) | 0,
+					_1: A2(_elm_lang$core$Basics_ops['%'], onlyDaysDiff, 7)
+				};
+			}
+		}();
+		var weekDiff = _p0._0;
+		var dayDiff = _p0._1;
+		return {week: weekDiff, day: dayDiff, hour: hourDiff, minute: minuteDiff, second: secondDiff, millisecond: millisecondDiff};
+	});
+var _rluiten$elm_date_extra$Date_Extra_Period$addTimeUnit = F3(
+	function (unit, addend, date) {
+		return _rluiten$elm_date_extra$Date_Extra_Internal2$fromTime(
+			A2(
+				F2(
+					function (x, y) {
+						return x + y;
+					}),
+				addend * unit,
+				_rluiten$elm_date_extra$Date_Extra_Internal2$toTime(date)));
+	});
+var _rluiten$elm_date_extra$Date_Extra_Period$toTicks = function (period) {
+	var _p1 = period;
+	switch (_p1.ctor) {
+		case 'Millisecond':
+			return _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMillisecond;
+		case 'Second':
+			return _rluiten$elm_date_extra$Date_Extra_Internal2$ticksASecond;
+		case 'Minute':
+			return _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMinute;
+		case 'Hour':
+			return _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAnHour;
+		case 'Day':
+			return _rluiten$elm_date_extra$Date_Extra_Internal2$ticksADay;
+		case 'Week':
+			return _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAWeek;
+		default:
+			var _p2 = _p1._0;
+			return (((((_rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMillisecond * _p2.millisecond) + (_rluiten$elm_date_extra$Date_Extra_Internal2$ticksASecond * _p2.second)) + (_rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMinute * _p2.minute)) + (_rluiten$elm_date_extra$Date_Extra_Internal2$ticksAnHour * _p2.hour)) + (_rluiten$elm_date_extra$Date_Extra_Internal2$ticksADay * _p2.day)) + (_rluiten$elm_date_extra$Date_Extra_Internal2$ticksAWeek * _p2.week);
+	}
+};
+var _rluiten$elm_date_extra$Date_Extra_Period$add = function (period) {
+	return _rluiten$elm_date_extra$Date_Extra_Period$addTimeUnit(
+		_rluiten$elm_date_extra$Date_Extra_Period$toTicks(period));
+};
+var _rluiten$elm_date_extra$Date_Extra_Period$zeroDelta = {week: 0, day: 0, hour: 0, minute: 0, second: 0, millisecond: 0};
+var _rluiten$elm_date_extra$Date_Extra_Period$DeltaRecord = F6(
+	function (a, b, c, d, e, f) {
+		return {week: a, day: b, hour: c, minute: d, second: e, millisecond: f};
+	});
+var _rluiten$elm_date_extra$Date_Extra_Period$Delta = function (a) {
+	return {ctor: 'Delta', _0: a};
+};
+var _rluiten$elm_date_extra$Date_Extra_Period$Week = {ctor: 'Week'};
+var _rluiten$elm_date_extra$Date_Extra_Period$Day = {ctor: 'Day'};
+var _rluiten$elm_date_extra$Date_Extra_Period$Hour = {ctor: 'Hour'};
+var _rluiten$elm_date_extra$Date_Extra_Period$Minute = {ctor: 'Minute'};
+var _rluiten$elm_date_extra$Date_Extra_Period$Second = {ctor: 'Second'};
+var _rluiten$elm_date_extra$Date_Extra_Period$Millisecond = {ctor: 'Millisecond'};
+
+var _rluiten$elm_date_extra$Date_Extra_Internal$daysFromCivil = F3(
+	function (year, month, day) {
+		var doy = (((((153 * (month + ((_elm_lang$core$Native_Utils.cmp(month, 2) > 0) ? -3 : 9))) + 2) / 5) | 0) + day) - 1;
+		var y = year - ((_elm_lang$core$Native_Utils.cmp(month, 2) < 1) ? 1 : 0);
+		var era = (((_elm_lang$core$Native_Utils.cmp(y, 0) > -1) ? y : (y - 399)) / 400) | 0;
+		var yoe = y - (era * 400);
+		var doe = (((yoe * 365) + ((yoe / 4) | 0)) - ((yoe / 100) | 0)) + doy;
+		return ((era * 146097) + doe) - 719468;
+	});
+var _rluiten$elm_date_extra$Date_Extra_Internal$ticksFromFields = F7(
+	function (year, month, day, hour, minute, second, millisecond) {
+		var monthInt = _rluiten$elm_date_extra$Date_Extra_Internal2$monthToInt(month);
+		var clampYear = (_elm_lang$core$Native_Utils.cmp(year, 0) < 0) ? 0 : year;
+		var clampDay = A3(
+			_elm_lang$core$Basics$clamp,
+			1,
+			A2(_rluiten$elm_date_extra$Date_Extra_Internal2$daysInMonth, clampYear, month),
+			day);
+		var dayCount = A3(_rluiten$elm_date_extra$Date_Extra_Internal$daysFromCivil, clampYear, monthInt, clampDay);
+		return _rluiten$elm_date_extra$Date_Extra_Period$toTicks(
+			_rluiten$elm_date_extra$Date_Extra_Period$Delta(
+				{
+					millisecond: A3(_elm_lang$core$Basics$clamp, 0, 999, millisecond),
+					second: A3(_elm_lang$core$Basics$clamp, 0, 59, second),
+					minute: A3(_elm_lang$core$Basics$clamp, 0, 59, minute),
+					hour: A3(_elm_lang$core$Basics$clamp, 0, 23, hour),
+					day: dayCount,
+					week: 0
+				}));
+	});
+var _rluiten$elm_date_extra$Date_Extra_Internal$ticksFromDateFields = function (date) {
+	return A7(
+		_rluiten$elm_date_extra$Date_Extra_Internal$ticksFromFields,
+		_elm_lang$core$Date$year(date),
+		_elm_lang$core$Date$month(date),
+		_elm_lang$core$Date$day(date),
+		_elm_lang$core$Date$hour(date),
+		_elm_lang$core$Date$minute(date),
+		_elm_lang$core$Date$second(date),
+		_elm_lang$core$Date$millisecond(date));
+};
+var _rluiten$elm_date_extra$Date_Extra_Internal$getTimezoneOffset = function (date) {
+	var v1Ticks = _rluiten$elm_date_extra$Date_Extra_Internal$ticksFromDateFields(date);
+	var dateTicks = _elm_lang$core$Basics$floor(
+		_elm_lang$core$Date$toTime(date));
+	return ((dateTicks - v1Ticks) / _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMinute) | 0;
+};
+var _rluiten$elm_date_extra$Date_Extra_Internal$hackDateAsOffset = F2(
+	function (offsetMinutes, date) {
+		return _rluiten$elm_date_extra$Date_Extra_Internal2$fromTime(
+			A2(
+				F2(
+					function (x, y) {
+						return x + y;
+					}),
+				offsetMinutes * _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMinute,
+				_rluiten$elm_date_extra$Date_Extra_Internal2$toTime(date)));
+	});
+var _rluiten$elm_date_extra$Date_Extra_Internal$hackDateAsUtc = function (date) {
+	var offset = _rluiten$elm_date_extra$Date_Extra_Internal$getTimezoneOffset(date);
+	var oHours = (offset / _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAnHour) | 0;
+	var oMinutes = ((offset - (oHours * _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAnHour)) / _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMinute) | 0;
+	return A2(_rluiten$elm_date_extra$Date_Extra_Internal$hackDateAsOffset, offset, date);
+};
+
+var _rluiten$elm_date_extra$Date_Extra_Core$compensateZoneOffset = F2(
+	function (date1, date2) {
+		return A3(
+			_rluiten$elm_date_extra$Date_Extra_Period$add,
+			_rluiten$elm_date_extra$Date_Extra_Period$Minute,
+			_rluiten$elm_date_extra$Date_Extra_Internal$getTimezoneOffset(date2) - _rluiten$elm_date_extra$Date_Extra_Internal$getTimezoneOffset(date1),
+			date2);
+	});
+var _rluiten$elm_date_extra$Date_Extra_Core$lastOfMonthDate = function (date) {
+	return A2(
+		_rluiten$elm_date_extra$Date_Extra_Core$compensateZoneOffset,
+		date,
+		_rluiten$elm_date_extra$Date_Extra_Internal2$fromTime(
+			_rluiten$elm_date_extra$Date_Extra_Internal2$lastOfMonthTicks(date)));
+};
+var _rluiten$elm_date_extra$Date_Extra_Core$toFirstOfMonth = function (date) {
+	return A2(
+		_rluiten$elm_date_extra$Date_Extra_Core$compensateZoneOffset,
+		date,
+		_rluiten$elm_date_extra$Date_Extra_Internal2$fromTime(
+			_rluiten$elm_date_extra$Date_Extra_Internal2$firstOfMonthTicks(date)));
+};
+var _rluiten$elm_date_extra$Date_Extra_Core$lastOfPrevMonthDate = function (date) {
+	return A2(
+		_rluiten$elm_date_extra$Date_Extra_Core$compensateZoneOffset,
+		date,
+		_rluiten$elm_date_extra$Date_Extra_Internal2$lastOfPrevMonthDate(date));
+};
+var _rluiten$elm_date_extra$Date_Extra_Core$firstOfNextMonthDate = function (date) {
+	return A2(
+		_rluiten$elm_date_extra$Date_Extra_Core$compensateZoneOffset,
+		date,
+		_rluiten$elm_date_extra$Date_Extra_Internal2$firstOfNextMonthDate(date));
+};
+var _rluiten$elm_date_extra$Date_Extra_Core$yearToDayLength = _rluiten$elm_date_extra$Date_Extra_Internal2$yearToDayLength;
+var _rluiten$elm_date_extra$Date_Extra_Core$toTime = _rluiten$elm_date_extra$Date_Extra_Internal2$toTime;
+var _rluiten$elm_date_extra$Date_Extra_Core$ticksAWeek = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAWeek;
+var _rluiten$elm_date_extra$Date_Extra_Core$ticksASecond = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksASecond;
+var _rluiten$elm_date_extra$Date_Extra_Core$ticksAMinute = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMinute;
+var _rluiten$elm_date_extra$Date_Extra_Core$ticksAMillisecond = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAMillisecond;
+var _rluiten$elm_date_extra$Date_Extra_Core$ticksADay = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksADay;
+var _rluiten$elm_date_extra$Date_Extra_Core$ticksAnHour = _rluiten$elm_date_extra$Date_Extra_Internal2$ticksAnHour;
+var _rluiten$elm_date_extra$Date_Extra_Core$prevMonth = _rluiten$elm_date_extra$Date_Extra_Internal2$prevMonth;
+var _rluiten$elm_date_extra$Date_Extra_Core$prevDay = _rluiten$elm_date_extra$Date_Extra_Internal2$prevDay;
+var _rluiten$elm_date_extra$Date_Extra_Core$nextMonth = _rluiten$elm_date_extra$Date_Extra_Internal2$nextMonth;
+var _rluiten$elm_date_extra$Date_Extra_Core$nextDay = _rluiten$elm_date_extra$Date_Extra_Internal2$nextDay;
+var _rluiten$elm_date_extra$Date_Extra_Core$monthToInt = _rluiten$elm_date_extra$Date_Extra_Internal2$monthToInt;
+var _rluiten$elm_date_extra$Date_Extra_Core$monthList = _rluiten$elm_date_extra$Date_Extra_Internal2$monthList;
+var _rluiten$elm_date_extra$Date_Extra_Core$isoDayOfWeek = _rluiten$elm_date_extra$Date_Extra_Internal2$isoDayOfWeek;
 var _rluiten$elm_date_extra$Date_Extra_Core$daysBackToStartOfWeek = F2(
 	function (dateDay, startOfWeekDay) {
 		var startOfWeekDayIndex = _rluiten$elm_date_extra$Date_Extra_Core$isoDayOfWeek(startOfWeekDay);
 		var dateDayIndex = _rluiten$elm_date_extra$Date_Extra_Core$isoDayOfWeek(dateDay);
 		return (_elm_lang$core$Native_Utils.cmp(dateDayIndex, startOfWeekDayIndex) < 0) ? ((7 + dateDayIndex) - startOfWeekDayIndex) : (dateDayIndex - startOfWeekDayIndex);
 	});
-var _rluiten$elm_date_extra$Date_Extra_Core$ticksAMillisecond = _elm_lang$core$Basics$floor(_elm_lang$core$Time$millisecond);
-var _rluiten$elm_date_extra$Date_Extra_Core$ticksASecond = _rluiten$elm_date_extra$Date_Extra_Core$ticksAMillisecond * 1000;
-var _rluiten$elm_date_extra$Date_Extra_Core$ticksAMinute = _rluiten$elm_date_extra$Date_Extra_Core$ticksASecond * 60;
-var _rluiten$elm_date_extra$Date_Extra_Core$ticksAnHour = _rluiten$elm_date_extra$Date_Extra_Core$ticksAMinute * 60;
-var _rluiten$elm_date_extra$Date_Extra_Core$ticksADay = _rluiten$elm_date_extra$Date_Extra_Core$ticksAnHour * 24;
-var _rluiten$elm_date_extra$Date_Extra_Core$ticksAWeek = _rluiten$elm_date_extra$Date_Extra_Core$ticksADay * 7;
-var _rluiten$elm_date_extra$Date_Extra_Core$firstOfMonthTicks = function (date) {
-	var dateTicks = _rluiten$elm_date_extra$Date_Extra_Core$toTime(date);
-	var day = _elm_lang$core$Date$day(date);
-	return dateTicks + ((1 - day) * _rluiten$elm_date_extra$Date_Extra_Core$ticksADay);
-};
-var _rluiten$elm_date_extra$Date_Extra_Core$lastOfPrevMonthDate = function (date) {
-	return _rluiten$elm_date_extra$Date_Extra_Core$fromTime(
-		_rluiten$elm_date_extra$Date_Extra_Core$firstOfMonthTicks(date) - _rluiten$elm_date_extra$Date_Extra_Core$ticksADay);
-};
-var _rluiten$elm_date_extra$Date_Extra_Core$daysInPrevMonth = function (date) {
-	return _rluiten$elm_date_extra$Date_Extra_Core$daysInMonthDate(
-		_rluiten$elm_date_extra$Date_Extra_Core$lastOfPrevMonthDate(date));
-};
-var _rluiten$elm_date_extra$Date_Extra_Core$toFirstOfMonth = function (date) {
-	return _rluiten$elm_date_extra$Date_Extra_Core$fromTime(
-		_rluiten$elm_date_extra$Date_Extra_Core$firstOfMonthTicks(date));
-};
-var _rluiten$elm_date_extra$Date_Extra_Core$lastOfMonthTicks = function (date) {
-	var dateTicks = _rluiten$elm_date_extra$Date_Extra_Core$toTime(date);
-	var day = _elm_lang$core$Date$day(date);
-	var month = _elm_lang$core$Date$month(date);
-	var year = _elm_lang$core$Date$year(date);
-	var daysInMonthVal = A2(_rluiten$elm_date_extra$Date_Extra_Core$daysInMonth, year, month);
-	var addDays = daysInMonthVal - day;
-	return dateTicks + (addDays * _rluiten$elm_date_extra$Date_Extra_Core$ticksADay);
-};
-var _rluiten$elm_date_extra$Date_Extra_Core$firstOfNextMonthDate = function (date) {
-	return _rluiten$elm_date_extra$Date_Extra_Core$fromTime(
-		_rluiten$elm_date_extra$Date_Extra_Core$lastOfMonthTicks(date) + _rluiten$elm_date_extra$Date_Extra_Core$ticksADay);
-};
-var _rluiten$elm_date_extra$Date_Extra_Core$daysInNextMonth = function (date) {
-	return _rluiten$elm_date_extra$Date_Extra_Core$daysInMonthDate(
-		_rluiten$elm_date_extra$Date_Extra_Core$firstOfNextMonthDate(date));
-};
-var _rluiten$elm_date_extra$Date_Extra_Core$lastOfMonthDate = function (date) {
-	return _rluiten$elm_date_extra$Date_Extra_Core$fromTime(
-		_rluiten$elm_date_extra$Date_Extra_Core$lastOfMonthTicks(date));
-};
-var _rluiten$elm_date_extra$Date_Extra_Core$epochDateStr = '1970-01-01T00:00:00Z';
+var _rluiten$elm_date_extra$Date_Extra_Core$isLeapYearDate = _rluiten$elm_date_extra$Date_Extra_Internal2$isLeapYearDate;
+var _rluiten$elm_date_extra$Date_Extra_Core$isLeapYear = _rluiten$elm_date_extra$Date_Extra_Internal2$isLeapYear;
+var _rluiten$elm_date_extra$Date_Extra_Core$intToMonth = _rluiten$elm_date_extra$Date_Extra_Internal2$intToMonth;
+var _rluiten$elm_date_extra$Date_Extra_Core$fromTime = _rluiten$elm_date_extra$Date_Extra_Internal2$fromTime;
+var _rluiten$elm_date_extra$Date_Extra_Core$epochDateStr = _rluiten$elm_date_extra$Date_Extra_Internal2$epochDateStr;
+var _rluiten$elm_date_extra$Date_Extra_Core$daysInMonthDate = _rluiten$elm_date_extra$Date_Extra_Internal2$daysInMonthDate;
+var _rluiten$elm_date_extra$Date_Extra_Core$daysInPrevMonth = _rluiten$elm_date_extra$Date_Extra_Internal2$daysInPrevMonth;
+var _rluiten$elm_date_extra$Date_Extra_Core$daysInNextMonth = _rluiten$elm_date_extra$Date_Extra_Internal2$daysInNextMonth;
+var _rluiten$elm_date_extra$Date_Extra_Core$daysInMonth = _rluiten$elm_date_extra$Date_Extra_Internal2$daysInMonth;
 
 var _rluiten$elm_date_extra$Date_Extra_Compare$is3 = F4(
 	function (comp, date1, date2, date3) {
@@ -13699,151 +13895,6 @@ var _rluiten$elm_date_extra$Date_Extra_I18n_I_en_us$dayShort = function (day) {
 var _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config = {
 	i18n: {dayShort: _rluiten$elm_date_extra$Date_Extra_I18n_I_en_us$dayShort, dayName: _rluiten$elm_date_extra$Date_Extra_I18n_I_en_us$dayName, monthShort: _rluiten$elm_date_extra$Date_Extra_I18n_I_en_us$monthShort, monthName: _rluiten$elm_date_extra$Date_Extra_I18n_I_en_us$monthName, dayOfMonthWithSuffix: _rluiten$elm_date_extra$Date_Extra_I18n_I_en_us$dayOfMonthWithSuffix},
 	format: {date: '%-m/%-d/%Y', longDate: '%A, %B %d, %Y', time: '%-H:%M %p', longTime: '%-H:%M:%S %p', dateTime: '%-m/%-d/%Y %-I:%M %p', firstDayOfWeek: _elm_lang$core$Date$Sun}
-};
-
-var _rluiten$elm_date_extra$Date_Extra_Period$diff = F2(
-	function (date1, date2) {
-		var millisecondDiff = _elm_lang$core$Date$millisecond(date1) - _elm_lang$core$Date$millisecond(date2);
-		var secondDiff = _elm_lang$core$Date$second(date1) - _elm_lang$core$Date$second(date2);
-		var minuteDiff = _elm_lang$core$Date$minute(date1) - _elm_lang$core$Date$minute(date2);
-		var hourDiff = _elm_lang$core$Date$hour(date1) - _elm_lang$core$Date$hour(date2);
-		var ticksDiff = _rluiten$elm_date_extra$Date_Extra_Core$toTime(date1) - _rluiten$elm_date_extra$Date_Extra_Core$toTime(date2);
-		var ticksDayDiff = (((ticksDiff - (hourDiff * _rluiten$elm_date_extra$Date_Extra_Core$ticksAnHour)) - (minuteDiff * _rluiten$elm_date_extra$Date_Extra_Core$ticksAMinute)) - (secondDiff * _rluiten$elm_date_extra$Date_Extra_Core$ticksASecond)) - (millisecondDiff * _rluiten$elm_date_extra$Date_Extra_Core$ticksAMillisecond);
-		var onlyDaysDiff = (ticksDayDiff / _rluiten$elm_date_extra$Date_Extra_Core$ticksADay) | 0;
-		var _p0 = function () {
-			if (_elm_lang$core$Native_Utils.cmp(onlyDaysDiff, 0) < 0) {
-				var absDayDiff = _elm_lang$core$Basics$abs(onlyDaysDiff);
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Basics$negate((absDayDiff / 7) | 0),
-					_1: _elm_lang$core$Basics$negate(
-						A2(_elm_lang$core$Basics_ops['%'], absDayDiff, 7))
-				};
-			} else {
-				return {
-					ctor: '_Tuple2',
-					_0: (onlyDaysDiff / 7) | 0,
-					_1: A2(_elm_lang$core$Basics_ops['%'], onlyDaysDiff, 7)
-				};
-			}
-		}();
-		var weekDiff = _p0._0;
-		var dayDiff = _p0._1;
-		return {week: weekDiff, day: dayDiff, hour: hourDiff, minute: minuteDiff, second: secondDiff, millisecond: millisecondDiff};
-	});
-var _rluiten$elm_date_extra$Date_Extra_Period$addTimeUnit = F3(
-	function (unit, addend, date) {
-		return _rluiten$elm_date_extra$Date_Extra_Core$fromTime(
-			A2(
-				F2(
-					function (x, y) {
-						return x + y;
-					}),
-				addend * unit,
-				_rluiten$elm_date_extra$Date_Extra_Core$toTime(date)));
-	});
-var _rluiten$elm_date_extra$Date_Extra_Period$toTicks = function (period) {
-	var _p1 = period;
-	switch (_p1.ctor) {
-		case 'Millisecond':
-			return _rluiten$elm_date_extra$Date_Extra_Core$ticksAMillisecond;
-		case 'Second':
-			return _rluiten$elm_date_extra$Date_Extra_Core$ticksASecond;
-		case 'Minute':
-			return _rluiten$elm_date_extra$Date_Extra_Core$ticksAMinute;
-		case 'Hour':
-			return _rluiten$elm_date_extra$Date_Extra_Core$ticksAnHour;
-		case 'Day':
-			return _rluiten$elm_date_extra$Date_Extra_Core$ticksADay;
-		case 'Week':
-			return _rluiten$elm_date_extra$Date_Extra_Core$ticksAWeek;
-		default:
-			var _p2 = _p1._0;
-			return (((((_rluiten$elm_date_extra$Date_Extra_Core$ticksAMillisecond * _p2.millisecond) + (_rluiten$elm_date_extra$Date_Extra_Core$ticksASecond * _p2.second)) + (_rluiten$elm_date_extra$Date_Extra_Core$ticksAMinute * _p2.minute)) + (_rluiten$elm_date_extra$Date_Extra_Core$ticksAnHour * _p2.hour)) + (_rluiten$elm_date_extra$Date_Extra_Core$ticksADay * _p2.day)) + (_rluiten$elm_date_extra$Date_Extra_Core$ticksAWeek * _p2.week);
-	}
-};
-var _rluiten$elm_date_extra$Date_Extra_Period$add = function (period) {
-	return _rluiten$elm_date_extra$Date_Extra_Period$addTimeUnit(
-		_rluiten$elm_date_extra$Date_Extra_Period$toTicks(period));
-};
-var _rluiten$elm_date_extra$Date_Extra_Period$zeroDelta = {week: 0, day: 0, hour: 0, minute: 0, second: 0, millisecond: 0};
-var _rluiten$elm_date_extra$Date_Extra_Period$DeltaRecord = F6(
-	function (a, b, c, d, e, f) {
-		return {week: a, day: b, hour: c, minute: d, second: e, millisecond: f};
-	});
-var _rluiten$elm_date_extra$Date_Extra_Period$Delta = function (a) {
-	return {ctor: 'Delta', _0: a};
-};
-var _rluiten$elm_date_extra$Date_Extra_Period$Week = {ctor: 'Week'};
-var _rluiten$elm_date_extra$Date_Extra_Period$Day = {ctor: 'Day'};
-var _rluiten$elm_date_extra$Date_Extra_Period$Hour = {ctor: 'Hour'};
-var _rluiten$elm_date_extra$Date_Extra_Period$Minute = {ctor: 'Minute'};
-var _rluiten$elm_date_extra$Date_Extra_Period$Second = {ctor: 'Second'};
-var _rluiten$elm_date_extra$Date_Extra_Period$Millisecond = {ctor: 'Millisecond'};
-
-var _rluiten$elm_date_extra$Date_Extra_Internal$daysFromCivil = F3(
-	function (year, month, day) {
-		var doy = (((((153 * (month + ((_elm_lang$core$Native_Utils.cmp(month, 2) > 0) ? -3 : 9))) + 2) / 5) | 0) + day) - 1;
-		var y = year - ((_elm_lang$core$Native_Utils.cmp(month, 2) < 1) ? 1 : 0);
-		var era = (((_elm_lang$core$Native_Utils.cmp(y, 0) > -1) ? y : (y - 399)) / 400) | 0;
-		var yoe = y - (era * 400);
-		var doe = (((yoe * 365) + ((yoe / 4) | 0)) - ((yoe / 100) | 0)) + doy;
-		return ((era * 146097) + doe) - 719468;
-	});
-var _rluiten$elm_date_extra$Date_Extra_Internal$ticksFromFields = F7(
-	function (year, month, day, hour, minute, second, millisecond) {
-		var monthInt = _rluiten$elm_date_extra$Date_Extra_Core$monthToInt(month);
-		var c_year = (_elm_lang$core$Native_Utils.cmp(year, 0) < 0) ? 0 : year;
-		var c_day = A3(
-			_elm_lang$core$Basics$clamp,
-			1,
-			A2(_rluiten$elm_date_extra$Date_Extra_Core$daysInMonth, c_year, month),
-			day);
-		var dayCount = A3(_rluiten$elm_date_extra$Date_Extra_Internal$daysFromCivil, c_year, monthInt, c_day);
-		return _rluiten$elm_date_extra$Date_Extra_Period$toTicks(
-			_rluiten$elm_date_extra$Date_Extra_Period$Delta(
-				{
-					millisecond: A3(_elm_lang$core$Basics$clamp, 0, 999, millisecond),
-					second: A3(_elm_lang$core$Basics$clamp, 0, 59, second),
-					minute: A3(_elm_lang$core$Basics$clamp, 0, 59, minute),
-					hour: A3(_elm_lang$core$Basics$clamp, 0, 23, hour),
-					day: dayCount,
-					week: 0
-				}));
-	});
-var _rluiten$elm_date_extra$Date_Extra_Internal$ticksFromDateFields = function (date) {
-	return A7(
-		_rluiten$elm_date_extra$Date_Extra_Internal$ticksFromFields,
-		_elm_lang$core$Date$year(date),
-		_elm_lang$core$Date$month(date),
-		_elm_lang$core$Date$day(date),
-		_elm_lang$core$Date$hour(date),
-		_elm_lang$core$Date$minute(date),
-		_elm_lang$core$Date$second(date),
-		_elm_lang$core$Date$millisecond(date));
-};
-var _rluiten$elm_date_extra$Date_Extra_Internal$getTimezoneOffset = function (date) {
-	var v1Ticks = _rluiten$elm_date_extra$Date_Extra_Internal$ticksFromDateFields(date);
-	var dateTicks = _elm_lang$core$Basics$floor(
-		_elm_lang$core$Date$toTime(date));
-	return ((dateTicks - v1Ticks) / _rluiten$elm_date_extra$Date_Extra_Core$ticksAMinute) | 0;
-};
-var _rluiten$elm_date_extra$Date_Extra_Internal$hackDateAsOffset = F2(
-	function (offsetMinutes, date) {
-		return _rluiten$elm_date_extra$Date_Extra_Core$fromTime(
-			A2(
-				F2(
-					function (x, y) {
-						return x + y;
-					}),
-				offsetMinutes * _rluiten$elm_date_extra$Date_Extra_Core$ticksAMinute,
-				_rluiten$elm_date_extra$Date_Extra_Core$toTime(date)));
-	});
-var _rluiten$elm_date_extra$Date_Extra_Internal$hackDateAsUtc = function (date) {
-	var offset = _rluiten$elm_date_extra$Date_Extra_Internal$getTimezoneOffset(date);
-	var oHours = (offset / _rluiten$elm_date_extra$Date_Extra_Core$ticksAnHour) | 0;
-	var oMinutes = ((offset - (oHours * _rluiten$elm_date_extra$Date_Extra_Core$ticksAnHour)) / _rluiten$elm_date_extra$Date_Extra_Core$ticksAMinute) | 0;
-	return A2(_rluiten$elm_date_extra$Date_Extra_Internal$hackDateAsOffset, offset, date);
 };
 
 var _rluiten$elm_date_extra$Date_Extra_Create$epochDate = _elm_lang$core$Date$fromTime(0);
@@ -14188,8 +14239,28 @@ var _rluiten$elm_date_extra$Date_Extra_Format$utcIsoString = function (date) {
 };
 var _rluiten$elm_date_extra$Date_Extra_Format$isoFormat = '%Y-%m-%dT%H:%M:%S';
 
+var _rluiten$elm_date_extra$Date_Extra_Duration$positiveDiffDays = F3(
+	function (date1, date2, multiplier) {
+		var date2DaysFromCivil = A3(
+			_rluiten$elm_date_extra$Date_Extra_Internal$daysFromCivil,
+			_elm_lang$core$Date$year(date2),
+			_rluiten$elm_date_extra$Date_Extra_Core$monthToInt(
+				_elm_lang$core$Date$month(date2)),
+			_elm_lang$core$Date$day(date2));
+		var date1DaysFromCivil = A3(
+			_rluiten$elm_date_extra$Date_Extra_Internal$daysFromCivil,
+			_elm_lang$core$Date$year(date1),
+			_rluiten$elm_date_extra$Date_Extra_Core$monthToInt(
+				_elm_lang$core$Date$month(date1)),
+			_elm_lang$core$Date$day(date1));
+		return (date1DaysFromCivil - date2DaysFromCivil) * multiplier;
+	});
+var _rluiten$elm_date_extra$Date_Extra_Duration$diffDays = F2(
+	function (date1, date2) {
+		return A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$After, date1, date2) ? A3(_rluiten$elm_date_extra$Date_Extra_Duration$positiveDiffDays, date1, date2, 1) : A3(_rluiten$elm_date_extra$Date_Extra_Duration$positiveDiffDays, date2, date1, -1);
+	});
 var _rluiten$elm_date_extra$Date_Extra_Duration$positiveDiff = F3(
-	function (date1, date2, mult) {
+	function (date1, date2, multiplier) {
 		var accDiff = F4(
 			function (acc, v1, v2, maxV2) {
 				return (_elm_lang$core$Native_Utils.cmp(v1, v2) < 0) ? {ctor: '_Tuple2', _0: acc - 1, _1: (maxV2 + v1) - v2} : {ctor: '_Tuple2', _0: acc, _1: v1 - v2};
@@ -14229,7 +14300,7 @@ var _rluiten$elm_date_extra$Date_Extra_Duration$positiveDiff = F3(
 		var _p5 = A4(accDiff, secondDiffA, msec1, msec2, 1000);
 		var secondDiff = _p5._0;
 		var msecDiff = _p5._1;
-		return {year: yearDiff * mult, month: monthDiff * mult, day: dayDiff * mult, hour: hourDiff * mult, minute: minuteDiff * mult, second: secondDiff * mult, millisecond: msecDiff * mult};
+		return {year: yearDiff * multiplier, month: monthDiff * multiplier, day: dayDiff * multiplier, hour: hourDiff * multiplier, minute: minuteDiff * multiplier, second: secondDiff * multiplier, millisecond: msecDiff * multiplier};
 	});
 var _rluiten$elm_date_extra$Date_Extra_Duration$diff = F2(
 	function (date1, date2) {
@@ -14376,9 +14447,9 @@ var _user$project$Types$isClosed = function (bug) {
 			bug.closedAt));
 };
 var _user$project$Types$initialModel = {
-	selectedPatchIds: {ctor: '[]'},
-	loadingPatches: true,
-	patches: {ctor: '[]'},
+	selectedEnvironmentIds: {ctor: '[]'},
+	loadingEnvironments: true,
+	environments: {ctor: '[]'},
 	loadingBugs: false,
 	bugs: {ctor: '[]'},
 	loadingFocusedBug: false,
@@ -14407,7 +14478,7 @@ var _user$project$Types$Model = function (a) {
 												return function (m) {
 													return function (n) {
 														return function (o) {
-															return {selectedPatchIds: a, loadingPatches: b, patches: c, loadingBugs: d, bugs: e, loadingFocusedBug: f, focusedBug: g, focusedBugOccurrences: h, expandedOccurrences: i, showFullStackTrace: j, error: k, showClosedBugs: l, showMenu: m, now: n, showTimeAgo: o};
+															return {selectedEnvironmentIds: a, loadingEnvironments: b, environments: c, loadingBugs: d, bugs: e, loadingFocusedBug: f, focusedBug: g, focusedBugOccurrences: h, expandedOccurrences: i, showFullStackTrace: j, error: k, showClosedBugs: l, showMenu: m, now: n, showTimeAgo: o};
 														};
 													};
 												};
@@ -14426,17 +14497,17 @@ var _user$project$Types$Model = function (a) {
 var _user$project$Types$Event = function (a) {
 	return {name: a};
 };
-var _user$project$Types$Patch = F2(
+var _user$project$Types$Environment = F2(
 	function (a, b) {
 		return {id: a, name: b};
 	});
 var _user$project$Types$Bug = F8(
 	function (a, b, c, d, e, f, g, h) {
-		return {id: a, patchId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
+		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
 	});
 var _user$project$Types$Occurrence = F5(
 	function (a, b, c, d, e) {
-		return {id: a, patchId: b, message: c, occurredAt: d, data: e};
+		return {id: a, environmentId: b, message: c, occurredAt: d, data: e};
 	});
 var _user$project$Types$TimeTick = function (a) {
 	return {ctor: 'TimeTick', _0: a};
@@ -14466,20 +14537,20 @@ var _user$project$Types$LoadedDetails = function (a) {
 };
 var _user$project$Types$HideClosedBugs = {ctor: 'HideClosedBugs'};
 var _user$project$Types$ShowClosedBugs = {ctor: 'ShowClosedBugs'};
-var _user$project$Types$SetSelectedPatchIds = function (a) {
-	return {ctor: 'SetSelectedPatchIds', _0: a};
+var _user$project$Types$SetSelectedEnvironmentIds = function (a) {
+	return {ctor: 'SetSelectedEnvironmentIds', _0: a};
 };
-var _user$project$Types$HidePatchBugs = function (a) {
-	return {ctor: 'HidePatchBugs', _0: a};
+var _user$project$Types$HideEnvironmentBugs = function (a) {
+	return {ctor: 'HideEnvironmentBugs', _0: a};
 };
-var _user$project$Types$ShowPatchBugs = function (a) {
-	return {ctor: 'ShowPatchBugs', _0: a};
+var _user$project$Types$ShowEnvironmentBugs = function (a) {
+	return {ctor: 'ShowEnvironmentBugs', _0: a};
 };
 var _user$project$Types$LoadedBugs = function (a) {
 	return {ctor: 'LoadedBugs', _0: a};
 };
-var _user$project$Types$LoadedPatches = function (a) {
-	return {ctor: 'LoadedPatches', _0: a};
+var _user$project$Types$LoadedEnvironments = function (a) {
+	return {ctor: 'LoadedEnvironments', _0: a};
 };
 
 var _user$project$FormatData$isSuccess = function (result) {
@@ -14736,19 +14807,19 @@ var _user$project$View$filterStackTrace = F2(
 			return {ctor: '[]'};
 		}
 	});
-var _user$project$View$patchName = F2(
+var _user$project$View$environmentName = F2(
 	function (model, id) {
-		var patch = _elm_lang$core$List$head(
+		var environment = _elm_lang$core$List$head(
 			A2(
 				_elm_lang$core$List$filter,
-				function (patch) {
-					return _elm_lang$core$Native_Utils.eq(patch.id, id);
+				function (environment) {
+					return _elm_lang$core$Native_Utils.eq(environment.id, id);
 				},
-				model.patches));
+				model.environments));
 		return A2(
 			_elm_lang$core$Maybe$withDefault,
 			{name: '', id: ''},
-			patch).name;
+			environment).name;
 	});
 var _user$project$View$errorMessage = function (bug) {
 	return A2(
@@ -14862,7 +14933,7 @@ var _user$project$View$occurrenceDisplay = F2(
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
-							A2(_user$project$View$patchName, model, occurrence.patchId)),
+							A2(_user$project$View$environmentName, model, occurrence.environmentId)),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(' • '),
@@ -15544,10 +15615,10 @@ var _user$project$View$sidebarBugs = function (model) {
 			_user$project$View$sidebarBugGroup(model),
 			_user$project$View$bugGroups(model)));
 };
-var _user$project$View$patchMenuItem = F2(
-	function (selectedPatchIds, patch) {
-		var isActive = A2(_elm_lang$core$List$member, patch.id, selectedPatchIds);
-		var toggleMsg = isActive ? _user$project$Types$HidePatchBugs : _user$project$Types$ShowPatchBugs;
+var _user$project$View$environmentMenuItem = F2(
+	function (selectedEnvironmentIds, environment) {
+		var isActive = A2(_elm_lang$core$List$member, environment.id, selectedEnvironmentIds);
+		var toggleMsg = isActive ? _user$project$Types$HideEnvironmentBugs : _user$project$Types$ShowEnvironmentBugs;
 		return A2(
 			_elm_lang$html$Html$li,
 			{ctor: '[]'},
@@ -15566,13 +15637,13 @@ var _user$project$View$patchMenuItem = F2(
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onClick(
-								toggleMsg(patch.id)),
+								toggleMsg(environment.id)),
 							_1: {ctor: '[]'}
 						}
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(patch.name),
+						_0: _elm_lang$html$Html$text(environment.name),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -15595,7 +15666,7 @@ var _user$project$View$sidebarMenu = function (model) {
 				_1: {ctor: '[]'}
 			}
 		},
-		model.loadingPatches ? {
+		model.loadingEnvironments ? {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$span,
@@ -15617,12 +15688,12 @@ var _user$project$View$sidebarMenu = function (model) {
 				},
 				A2(
 					_elm_lang$core$List$map,
-					_user$project$View$patchMenuItem(model.selectedPatchIds),
-					model.patches)),
+					_user$project$View$environmentMenuItem(model.selectedEnvironmentIds),
+					model.environments)),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$View$currentPatchesAsTags = function (model) {
+var _user$project$View$currentEnvironmentsAsTags = function (model) {
 	var tag = function (id) {
 		return A2(
 			_elm_lang$html$Html$span,
@@ -15634,7 +15705,7 @@ var _user$project$View$currentPatchesAsTags = function (model) {
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html$text(
-					A2(_user$project$View$patchName, model, id)),
+					A2(_user$project$View$environmentName, model, id)),
 				_1: {ctor: '[]'}
 			});
 	};
@@ -15645,7 +15716,7 @@ var _user$project$View$currentPatchesAsTags = function (model) {
 			_0: _elm_lang$html$Html_Attributes$class('menu-button-tags'),
 			_1: {ctor: '[]'}
 		},
-		A2(_elm_lang$core$List$map, tag, model.selectedPatchIds));
+		A2(_elm_lang$core$List$map, tag, model.selectedEnvironmentIds));
 };
 var _user$project$View$sidebarHeader = function (model) {
 	return A2(
@@ -15693,7 +15764,7 @@ var _user$project$View$sidebarHeader = function (model) {
 						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
-						_0: _user$project$View$currentPatchesAsTags(model),
+						_0: _user$project$View$currentEnvironmentsAsTags(model),
 						_1: {
 							ctor: '::',
 							_0: A2(
@@ -15854,12 +15925,12 @@ var _user$project$Rest$stacktrace = _elm_lang$core$Json_Decode$maybe(
 			}
 		},
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
-var _user$project$Rest$decodePatch = A3(
+var _user$project$Rest$decodeEnvironment = A3(
 	_elm_lang$core$Json_Decode$map2,
-	_user$project$Types$Patch,
+	_user$project$Types$Environment,
 	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string));
-var _user$project$Rest$decodePatches = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodePatch);
+var _user$project$Rest$decodeEnvironments = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeEnvironment);
 var _user$project$Rest$date = function () {
 	var decodeDateFromString = function (s) {
 		var _p0 = _elm_lang$core$Date$fromString(s);
@@ -15876,7 +15947,7 @@ var _user$project$Rest$decodeBug = A9(
 	_elm_lang$core$Json_Decode$map8,
 	_user$project$Types$Bug,
 	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'patch_id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'first_occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode$field, 'last_occurred_at', _user$project$Rest$date),
@@ -15901,7 +15972,7 @@ var _user$project$Rest$decodeOccurrence = A6(
 	_elm_lang$core$Json_Decode$map5,
 	_user$project$Types$Occurrence,
 	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'patch_id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode$field, 'data', _elm_lang$core$Json_Decode$value));
@@ -15939,10 +16010,10 @@ var _user$project$Rest$loadBugDetails = function (bugId) {
 			}
 		});
 };
-var _user$project$Rest$allBugsUrl = function (patchIds) {
+var _user$project$Rest$allBugsUrl = function (environmentIds) {
 	return '/bugs';
 };
-var _user$project$Rest$openBugsUrl = function (patchIds) {
+var _user$project$Rest$openBugsUrl = function (environmentIds) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		'/bugs',
@@ -15955,23 +16026,23 @@ var _user$project$Rest$openBugsUrl = function (patchIds) {
 				A2(
 					_elm_lang$core$List$map,
 					function (id) {
-						return A2(_elm_lang$core$Basics_ops['++'], 'patch_ids[]=', id);
+						return A2(_elm_lang$core$Basics_ops['++'], 'environment_ids[]=', id);
 					},
-					patchIds))));
+					environmentIds))));
 };
 var _user$project$Rest$loadBugs = F2(
-	function (patchIds, includeClosedBugs) {
-		var url = includeClosedBugs ? _user$project$Rest$allBugsUrl(patchIds) : _user$project$Rest$openBugsUrl(patchIds);
+	function (environmentIds, includeClosedBugs) {
+		var url = includeClosedBugs ? _user$project$Rest$allBugsUrl(environmentIds) : _user$project$Rest$openBugsUrl(environmentIds);
 		return A2(
 			_elm_lang$http$Http$send,
 			_user$project$Types$LoadedBugs,
 			A2(_elm_lang$http$Http$get, url, _user$project$Rest$decodeBugs));
 	});
-var _user$project$Rest$patchesUrl = '/patches';
-var _user$project$Rest$loadPatches = A2(
+var _user$project$Rest$environmentsUrl = '/environments';
+var _user$project$Rest$loadEnvironments = A2(
 	_elm_lang$http$Http$send,
-	_user$project$Types$LoadedPatches,
-	A2(_elm_lang$http$Http$get, _user$project$Rest$patchesUrl, _user$project$Rest$decodePatches));
+	_user$project$Types$LoadedEnvironments,
+	A2(_elm_lang$http$Http$get, _user$project$Rest$environmentsUrl, _user$project$Rest$decodeEnvironments));
 
 var _user$project$Main$shouldHideFocusedBug = F2(
 	function (model, f) {
@@ -15980,9 +16051,9 @@ var _user$project$Main$shouldHideFocusedBug = F2(
 			false,
 			A2(_elm_lang$core$Maybe$map, f, model.focusedBug));
 	});
-var _user$project$Main$bugInPatch = F2(
-	function (patchId, bug) {
-		return _elm_lang$core$Native_Utils.eq(bug.patchId, patchId);
+var _user$project$Main$bugInEnvironment = F2(
+	function (environmentId, bug) {
+		return _elm_lang$core$Native_Utils.eq(bug.environmentId, environmentId);
 	});
 var _user$project$Main$isJust = function (x) {
 	var _p0 = x;
@@ -16057,14 +16128,14 @@ var _user$project$Main$update = F2(
 	function (msg, model) {
 		var _p2 = msg;
 		switch (_p2.ctor) {
-			case 'LoadedPatches':
+			case 'LoadedEnvironments':
 				return A3(
 					_user$project$Main$handleResult,
-					function (patches) {
+					function (environments) {
 						return _user$project$Main$noCmd(
 							_elm_lang$core$Native_Utils.update(
 								model,
-								{patches: patches, loadingPatches: false}));
+								{environments: environments, loadingEnvironments: false}));
 					},
 					model,
 					_p2._0);
@@ -16074,13 +16145,13 @@ var _user$project$Main$update = F2(
 					_user$project$Main$loadedBugs(model),
 					model,
 					_p2._0);
-			case 'ShowPatchBugs':
+			case 'ShowEnvironmentBugs':
 				var newModel = _elm_lang$core$Native_Utils.update(
 					model,
 					{
-						selectedPatchIds: A2(
+						selectedEnvironmentIds: A2(
 							_elm_lang$core$Basics_ops['++'],
-							model.selectedPatchIds,
+							model.selectedEnvironmentIds,
 							{
 								ctor: '::',
 								_0: _p2._0,
@@ -16093,38 +16164,38 @@ var _user$project$Main$update = F2(
 					newModel,
 					{
 						ctor: '::',
-						_0: A2(_user$project$Rest$loadBugs, newModel.selectedPatchIds, false),
+						_0: A2(_user$project$Rest$loadBugs, newModel.selectedEnvironmentIds, false),
 						_1: {ctor: '[]'}
 					});
-			case 'HidePatchBugs':
+			case 'HideEnvironmentBugs':
 				var _p3 = _p2._0;
-				var newPatchIds = A2(
+				var newEnvironmentIds = A2(
 					_elm_lang$core$List$filter,
 					function (x) {
 						return !_elm_lang$core$Native_Utils.eq(x, _p3);
 					},
-					model.selectedPatchIds);
+					model.selectedEnvironmentIds);
 				var newFocusedBug = A2(
 					_user$project$Main$shouldHideFocusedBug,
 					model,
-					_user$project$Main$bugInPatch(_p3)) ? _elm_lang$core$Maybe$Nothing : model.focusedBug;
+					_user$project$Main$bugInEnvironment(_p3)) ? _elm_lang$core$Maybe$Nothing : model.focusedBug;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selectedPatchIds: newPatchIds, focusedBug: newFocusedBug, loadingBugs: true}),
+						{selectedEnvironmentIds: newEnvironmentIds, focusedBug: newFocusedBug, loadingBugs: true}),
 					{
 						ctor: '::',
-						_0: A2(_user$project$Rest$loadBugs, newPatchIds, false),
+						_0: A2(_user$project$Rest$loadBugs, newEnvironmentIds, false),
 						_1: {ctor: '[]'}
 					});
-			case 'SetSelectedPatchIds':
+			case 'SetSelectedEnvironmentIds':
 				var _p4 = _p2._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selectedPatchIds: _p4, loadingBugs: true}),
+						{selectedEnvironmentIds: _p4, loadingBugs: true}),
 					{
 						ctor: '::',
 						_0: A2(_user$project$Rest$loadBugs, _p4, false),
@@ -16204,10 +16275,10 @@ var _user$project$Main$update = F2(
 						{showClosedBugs: true, loadingBugs: true}),
 					{
 						ctor: '::',
-						_0: _user$project$Rest$loadPatches,
+						_0: _user$project$Rest$loadEnvironments,
 						_1: {
 							ctor: '::',
-							_0: A2(_user$project$Rest$loadBugs, model.selectedPatchIds, true),
+							_0: A2(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, true),
 							_1: {ctor: '[]'}
 						}
 					});
@@ -16219,10 +16290,10 @@ var _user$project$Main$update = F2(
 						{showClosedBugs: false, loadingBugs: true}),
 					{
 						ctor: '::',
-						_0: _user$project$Rest$loadPatches,
+						_0: _user$project$Rest$loadEnvironments,
 						_1: {
 							ctor: '::',
-							_0: A2(_user$project$Rest$loadBugs, model.selectedPatchIds, false),
+							_0: A2(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, false),
 							_1: {ctor: '[]'}
 						}
 					});
@@ -16273,8 +16344,8 @@ var _user$project$Main$subscriptions = function (model) {
 };
 var _user$project$Main$location2messages = function (location) {
 	var builder = _rgrempel$elm_route_url$RouteUrl_Builder$fromUrl(location.href);
-	var selectedPatchIds = function () {
-		var _p6 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'patches', builder);
+	var selectedEnvironmentIds = function () {
+		var _p6 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
 		if (_p6.ctor === 'Just') {
 			return A2(
 				_elm_lang$core$List$filter,
@@ -16301,7 +16372,7 @@ var _user$project$Main$location2messages = function (location) {
 		_elm_lang$core$Basics_ops['++'],
 		{
 			ctor: '::',
-			_0: _user$project$Types$SetSelectedPatchIds(selectedPatchIds),
+			_0: _user$project$Types$SetSelectedEnvironmentIds(selectedEnvironmentIds),
 			_1: {ctor: '[]'}
 		},
 		focusBug);
@@ -16316,16 +16387,16 @@ var _user$project$Main$delta2url = F2(
 				return '#';
 			}
 		}();
-		var selectedPatches = (_elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$List$length(model.selectedPatchIds),
+		var selectedEnvironments = (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$List$length(model.selectedEnvironmentIds),
 			0) > 0) ? A2(
 			_elm_lang$core$Basics_ops['++'],
-			'?patches=',
-			A2(_elm_lang$core$String$join, ',', model.selectedPatchIds)) : '?patches=';
+			'?environments=',
+			A2(_elm_lang$core$String$join, ',', model.selectedEnvironmentIds)) : '?environments=';
 		return _elm_lang$core$Maybe$Just(
 			{
 				entry: _rgrempel$elm_route_url$RouteUrl$NewEntry,
-				url: A2(_elm_lang$core$Basics_ops['++'], selectedPatches, selectedBug)
+				url: A2(_elm_lang$core$Basics_ops['++'], selectedEnvironments, selectedBug)
 			});
 	});
 var _user$project$Main$init = {
@@ -16334,7 +16405,7 @@ var _user$project$Main$init = {
 	_1: _elm_lang$core$Platform_Cmd$batch(
 		{
 			ctor: '::',
-			_0: _user$project$Rest$loadPatches,
+			_0: _user$project$Rest$loadEnvironments,
 			_1: {
 				ctor: '::',
 				_0: A2(_elm_lang$core$Task$perform, _user$project$Types$TimeTick, _elm_lang$core$Time$now),

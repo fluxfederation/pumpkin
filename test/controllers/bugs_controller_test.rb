@@ -5,18 +5,18 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
   include ActiveModelSerializers::Test::Schema
 
   setup do
-    @default_patch_ids = [patches(:qa), patches(:prod)].map(&:to_param)
+    @default_environment_ids = [environments(:qa), environments(:prod)].map(&:to_param)
   end
 
-  test "index with no patch ids" do
+  test "index with no environment ids" do
     get bugs_path
     assert_response :success
 
     assert_empty JSON.parse(@response.body)
   end
 
-  test "index with patch ids" do
-    get bugs_path, params: {patch_ids: @default_patch_ids}
+  test "index with environment ids" do
+    get bugs_path, params: {environment_ids: @default_environment_ids}
     assert_response :success
     assert_response_schema "bugs/index.json"
 
@@ -25,25 +25,25 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index with bug filtering" do
-    get bugs_path, params: {patch_ids: @default_patch_ids, ids: [bugs(:prod_normal), bugs(:prod_twice)].map(&:to_param)}
+    get bugs_path, params: {environment_ids: @default_environment_ids, ids: [bugs(:prod_normal), bugs(:prod_twice)].map(&:to_param)}
     assert_response :success
     assert_response_schema "bugs/index.json"
   end
 
-  test "index with patch filtering" do
-    get bugs_path, params: {patch_ids: [patches(:qa)].map(&:to_param)}
+  test "index with environment filtering" do
+    get bugs_path, params: {environment_ids: [environments(:qa)].map(&:to_param)}
     assert_response :success
     assert_response_schema "bugs/index.json"
   end
 
   test "index with closed filtering" do
-    get bugs_path, params: {patch_ids: @default_patch_ids, closed: "true"}
+    get bugs_path, params: {environment_ids: @default_environment_ids, closed: "true"}
     assert_response :success
     assert_response_schema "bugs/index.json"
   end
 
   test "index with not closed filtering" do
-    get bugs_path, params: {patch_ids: @default_patch_ids, closed: "false"}
+    get bugs_path, params: {environment_ids: @default_environment_ids, closed: "false"}
     assert_response :success
     assert_response_schema "bugs/index.json"
   end
