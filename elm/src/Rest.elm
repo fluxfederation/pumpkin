@@ -69,7 +69,7 @@ decodeEnvironment =
         (field "name" string)
 
 
-decodeBugs : Decoder Bugs
+decodeBugs : Decoder (List Bug)
 decodeBugs =
     list decodeBug
 

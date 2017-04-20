@@ -12,7 +12,7 @@ import Json.Decode
 
 type Msg
     = LoadedEnvironments (Result Http.Error Environments)
-    | LoadedBugs (Result Http.Error Bugs)
+    | LoadedBugs (Result Http.Error (List Bug))
     | ShowEnvironmentBugs String
     | HideEnvironmentBugs String
     | SetSelectedEnvironmentIds (List String)
@@ -41,7 +41,7 @@ type alias Model =
     , loadingEnvironments : Bool
     , environments : Environments
     , loadingBugs : Bool
-    , bugs : Bugs
+    , bugs : List Bug
     , loadingFocusedBug : Bool
     , focusedBug : Maybe Bug
     , focusedBugOccurrences : Maybe Occurrences
@@ -65,10 +65,6 @@ type alias Environments =
 
 type alias Environment =
     { id : String, name : String }
-
-
-type alias Bugs =
-    List Bug
 
 
 type alias Bug =
