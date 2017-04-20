@@ -19,7 +19,7 @@ type Msg
     | ShowClosedBugs
     | HideClosedBugs
     | LoadedDetails (Result Http.Error Bug)
-    | LoadedOccurrences (Result Http.Error Occurrences)
+    | LoadedOccurrences (Result Http.Error (List Occurrence))
     | RequestDetails String
     | ClosedBug (Result Http.Error Bug)
     | CloseBug String
@@ -44,7 +44,7 @@ type alias Model =
     , bugs : List Bug
     , loadingFocusedBug : Bool
     , focusedBug : Maybe Bug
-    , focusedBugOccurrences : Maybe Occurrences
+    , focusedBugOccurrences : Maybe (List Occurrence)
     , expandedOccurrences : List String
     , showFullStackTrace : Bool
     , error : Maybe String
