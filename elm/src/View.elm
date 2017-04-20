@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Format as DF
 import Date.Extra.Period as Period
+import List.Extra as ListX
 import String.Extra exposing (pluralize)
 import Types exposing (..)
 import TimeAgo exposing (timeAgo)
@@ -105,11 +106,17 @@ environmentMenuItem selectedEnvironmentIds environment =
 
 sidebarBugs : Model -> Html Msg
 sidebarBugs model =
-    div [ class "sidebar-bugs menu", classList [ ( "is-hidden", model.showMenu ) ] ] <|
-        if model.loadingBugs then
-            [ span [ class "loading-spinner" ] [] ]
-        else
-            (List.concatMap (sidebarBugGroup model) (bugGroups model))
+    div [ class "sidebar-bugs menu", classList [ ( "is-hidden", model.showMenu ) ] ]
+        [ if model.loadingBugs then
+            span [ class "loading-spinner" ] []
+          else
+            paginatedList (sidebarBugGroups model) model.bugs
+        ]
+
+
+sidebarBugGroups : Model -> List Bug -> List (Html Msg)
+sidebarBugGroups model bugs =
+    List.concatMap (sidebarBugGroup model) (bugGroups model.now bugs)
 
 
 sidebarBugGroup : Model -> ( String, List Bug ) -> List (Html Msg)
@@ -255,9 +262,28 @@ occurrencesDisplay model =
             , button [ class "button is-small is-primary is-inverted" ] [ text "Map" ]
             , button [ class "button is-small is-primary is-inverted" ] [ text "Export JSON" ]
             ]
-        , ul [ class "panel" ] <|
-            List.map (occurrenceDisplay model) (Maybe.withDefault [] model.focusedBugOccurrences)
+        , ul [ class "panel" ]
+            [ case model.focusedBugOccurrences of
+                Just page ->
+                    paginatedList (List.map (occurrenceDisplay model)) page
+
+                Nothing ->
+                    text "Loading..."
+            ]
         ]
+
+
+paginatedList : (List a -> List (Html Msg)) -> Chunk a -> Html Msg
+paginatedList displayItems page =
+    div []
+        ((displayItems page.items)
+            ++ case page.nextItem of
+                Just _ ->
+                    [ button [ class "button" ] [ text "Show more" ] ]
+
+                Nothing ->
+                    []
+        )
 
 
 occurrenceDisplay : Model -> Occurrence -> Html Msg
@@ -291,11 +317,11 @@ formatDate model date =
         DF.format "%e %b %Y %k:%M:%S" date
 
 
-bugGroups : Model -> List ( String, List Bug )
-bugGroups model =
+bugGroups : Date.Date -> List Bug -> List ( String, List Bug )
+bugGroups now bugs =
     let
         periodDiff bug =
-            Period.diff model.now bug.lastOccurredAt
+            Period.diff now bug.lastOccurredAt
 
         groupNames =
             [ "Past Hour", "Past Day", "Past Week", "Earlier" ]
@@ -311,7 +337,7 @@ bugGroups model =
                 "Past Hour"
 
         group name =
-            ( name, List.filter (\bug -> groupFor (periodDiff bug) == name) model.bugs )
+            ( name, List.filter (\bug -> groupFor (periodDiff bug) == name) bugs )
     in
         List.map group groupNames
 

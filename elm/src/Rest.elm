@@ -4,6 +4,7 @@ import Http
 import Json.Decode exposing (..)
 import Types exposing (..)
 import Date
+import List.Extra exposing (splitAt)
 
 
 -- URLs
@@ -57,7 +58,7 @@ date =
         andThen decodeDateFromString string
 
 
-decodeEnvironments : Decoder Environments
+decodeEnvironments : Decoder (List Environment)
 decodeEnvironments =
     list decodeEnvironment
 
@@ -84,11 +85,6 @@ decodeBugID =
     map BugID decodeUUID
 
 
-decodeBugs : Decoder (List Bug)
-decodeBugs =
-    list decodeBug
-
-
 decodeBug : Decoder Bug
 decodeBug =
     map8 Bug
@@ -102,9 +98,17 @@ decodeBug =
         (stacktrace)
 
 
-decodeOccurrences : Decoder (List Occurrence)
-decodeOccurrences =
-    list decodeOccurrence
+decodeChunk : Int -> Decoder a -> Decoder (Chunk a)
+decodeChunk pageSize decodeItem =
+    let
+        toPage items =
+            let
+                ( wanted, rest ) =
+                    splitAt pageSize items
+            in
+                Chunk wanted (List.head rest)
+    in
+        map toPage (list decodeItem)
 
 
 decodeOccurrenceID : Decoder OccurrenceID
@@ -145,7 +149,7 @@ loadBugDetails : BugID -> Cmd Msg
 loadBugDetails bugId =
     Cmd.batch
         [ Http.send LoadedDetails <| Http.get (detailsUrl bugId) decodeBug
-        , Http.send LoadedOccurrences <| Http.get (occurrencesUrl bugId) decodeOccurrences
+        , Http.send LoadedOccurrences <| Http.get (occurrencesUrl bugId) (decodeChunk 100 decodeOccurrence)
         ]
 
 
@@ -168,4 +172,4 @@ loadBugs environmentIds includeClosedBugs =
             else
                 openBugsUrl environmentIds
     in
-        Http.send LoadedBugs <| Http.get url decodeBugs
+        Http.send LoadedBugs <| Http.get url (decodeChunk 100 decodeBug)

@@ -11,15 +11,15 @@ import Json.Decode
 
 
 type Msg
-    = LoadedEnvironments (Result Http.Error Environments)
-    | LoadedBugs (Result Http.Error (List Bug))
+    = LoadedEnvironments (Result Http.Error (List Environment))
+    | LoadedBugs (Result Http.Error (Chunk Bug))
     | ShowEnvironmentBugs EnvironmentID
     | HideEnvironmentBugs EnvironmentID
     | SetSelectedEnvironmentIds (List EnvironmentID)
     | ShowClosedBugs
     | HideClosedBugs
     | LoadedDetails (Result Http.Error Bug)
-    | LoadedOccurrences (Result Http.Error (List Occurrence))
+    | LoadedOccurrences (Result Http.Error (Chunk Occurrence))
     | RequestDetails BugID
     | ClosedBug (Result Http.Error Bug)
     | CloseBug BugID
@@ -32,6 +32,12 @@ type Msg
     | TimeTick Time.Time
 
 
+type alias Chunk a =
+    { items : List a
+    , nextItem : Maybe a
+    }
+
+
 
 -- Model
 
@@ -39,12 +45,12 @@ type Msg
 type alias Model =
     { selectedEnvironmentIds : List EnvironmentID
     , loadingEnvironments : Bool
-    , environments : Environments
+    , environments : List Environment
     , loadingBugs : Bool
-    , bugs : List Bug
+    , bugs : Chunk Bug
     , loadingFocusedBug : Bool
     , focusedBug : Maybe Bug
-    , focusedBugOccurrences : Maybe (List Occurrence)
+    , focusedBugOccurrences : Maybe (Chunk Occurrence)
     , expandedOccurrences : List OccurrenceID
     , showFullStackTrace : Bool
     , error : Maybe String
@@ -57,10 +63,6 @@ type alias Model =
 
 type alias Event =
     { name : String }
-
-
-type alias Environments =
-    List Environment
 
 
 type alias UUID =
@@ -110,7 +112,7 @@ initialModel =
     , loadingEnvironments = True
     , environments = []
     , loadingBugs = False
-    , bugs = []
+    , bugs = { items = [], nextItem = Nothing }
     , loadingFocusedBug = False
     , focusedBug = Nothing
     , focusedBugOccurrences = Nothing

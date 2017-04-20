@@ -5489,900 +5489,6 @@ var _elm_community$list_extra$List_Extra$init = function () {
 var _elm_community$list_extra$List_Extra$last = _elm_community$list_extra$List_Extra$foldl1(
 	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
 
-//import Maybe, Native.List //
-
-var _elm_lang$core$Native_Regex = function() {
-
-function escape(str)
-{
-	return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-}
-function caseInsensitive(re)
-{
-	return new RegExp(re.source, 'gi');
-}
-function regex(raw)
-{
-	return new RegExp(raw, 'g');
-}
-
-function contains(re, string)
-{
-	return string.match(re) !== null;
-}
-
-function find(n, re, str)
-{
-	n = n.ctor === 'All' ? Infinity : n._0;
-	var out = [];
-	var number = 0;
-	var string = str;
-	var lastIndex = re.lastIndex;
-	var prevLastIndex = -1;
-	var result;
-	while (number++ < n && (result = re.exec(string)))
-	{
-		if (prevLastIndex === re.lastIndex) break;
-		var i = result.length - 1;
-		var subs = new Array(i);
-		while (i > 0)
-		{
-			var submatch = result[i];
-			subs[--i] = submatch === undefined
-				? _elm_lang$core$Maybe$Nothing
-				: _elm_lang$core$Maybe$Just(submatch);
-		}
-		out.push({
-			match: result[0],
-			submatches: _elm_lang$core$Native_List.fromArray(subs),
-			index: result.index,
-			number: number
-		});
-		prevLastIndex = re.lastIndex;
-	}
-	re.lastIndex = lastIndex;
-	return _elm_lang$core$Native_List.fromArray(out);
-}
-
-function replace(n, re, replacer, string)
-{
-	n = n.ctor === 'All' ? Infinity : n._0;
-	var count = 0;
-	function jsReplacer(match)
-	{
-		if (count++ >= n)
-		{
-			return match;
-		}
-		var i = arguments.length - 3;
-		var submatches = new Array(i);
-		while (i > 0)
-		{
-			var submatch = arguments[i];
-			submatches[--i] = submatch === undefined
-				? _elm_lang$core$Maybe$Nothing
-				: _elm_lang$core$Maybe$Just(submatch);
-		}
-		return replacer({
-			match: match,
-			submatches: _elm_lang$core$Native_List.fromArray(submatches),
-			index: arguments[arguments.length - 2],
-			number: count
-		});
-	}
-	return string.replace(re, jsReplacer);
-}
-
-function split(n, re, str)
-{
-	n = n.ctor === 'All' ? Infinity : n._0;
-	if (n === Infinity)
-	{
-		return _elm_lang$core$Native_List.fromArray(str.split(re));
-	}
-	var string = str;
-	var result;
-	var out = [];
-	var start = re.lastIndex;
-	var restoreLastIndex = re.lastIndex;
-	while (n--)
-	{
-		if (!(result = re.exec(string))) break;
-		out.push(string.slice(start, result.index));
-		start = re.lastIndex;
-	}
-	out.push(string.slice(start));
-	re.lastIndex = restoreLastIndex;
-	return _elm_lang$core$Native_List.fromArray(out);
-}
-
-return {
-	regex: regex,
-	caseInsensitive: caseInsensitive,
-	escape: escape,
-
-	contains: F2(contains),
-	find: F3(find),
-	replace: F4(replace),
-	split: F3(split)
-};
-
-}();
-
-var _elm_lang$core$Regex$split = _elm_lang$core$Native_Regex.split;
-var _elm_lang$core$Regex$replace = _elm_lang$core$Native_Regex.replace;
-var _elm_lang$core$Regex$find = _elm_lang$core$Native_Regex.find;
-var _elm_lang$core$Regex$contains = _elm_lang$core$Native_Regex.contains;
-var _elm_lang$core$Regex$caseInsensitive = _elm_lang$core$Native_Regex.caseInsensitive;
-var _elm_lang$core$Regex$regex = _elm_lang$core$Native_Regex.regex;
-var _elm_lang$core$Regex$escape = _elm_lang$core$Native_Regex.escape;
-var _elm_lang$core$Regex$Match = F4(
-	function (a, b, c, d) {
-		return {match: a, submatches: b, index: c, number: d};
-	});
-var _elm_lang$core$Regex$Regex = {ctor: 'Regex'};
-var _elm_lang$core$Regex$AtMost = function (a) {
-	return {ctor: 'AtMost', _0: a};
-};
-var _elm_lang$core$Regex$All = {ctor: 'All'};
-
-var _elm_lang$core$Native_Bitwise = function() {
-
-return {
-	and: F2(function and(a, b) { return a & b; }),
-	or: F2(function or(a, b) { return a | b; }),
-	xor: F2(function xor(a, b) { return a ^ b; }),
-	complement: function complement(a) { return ~a; },
-	shiftLeftBy: F2(function(offset, a) { return a << offset; }),
-	shiftRightBy: F2(function(offset, a) { return a >> offset; }),
-	shiftRightZfBy: F2(function(offset, a) { return a >>> offset; })
-};
-
-}();
-
-var _elm_lang$core$Bitwise$shiftRightZfBy = _elm_lang$core$Native_Bitwise.shiftRightZfBy;
-var _elm_lang$core$Bitwise$shiftRightBy = _elm_lang$core$Native_Bitwise.shiftRightBy;
-var _elm_lang$core$Bitwise$shiftLeftBy = _elm_lang$core$Native_Bitwise.shiftLeftBy;
-var _elm_lang$core$Bitwise$complement = _elm_lang$core$Native_Bitwise.complement;
-var _elm_lang$core$Bitwise$xor = _elm_lang$core$Native_Bitwise.xor;
-var _elm_lang$core$Bitwise$or = _elm_lang$core$Native_Bitwise.or;
-var _elm_lang$core$Bitwise$and = _elm_lang$core$Native_Bitwise.and;
-
-var _elm_community$string_extra$String_Extra$nonEmpty = function (string) {
-	return _elm_lang$core$String$isEmpty(string) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(string);
-};
-var _elm_community$string_extra$String_Extra$replacementCodePoint = 65533;
-var _elm_community$string_extra$String_Extra$toCodePoints = function (string) {
-	var allCodeUnits = A2(
-		_elm_lang$core$List$map,
-		_elm_lang$core$Char$toCode,
-		_elm_lang$core$String$toList(string));
-	var combineAndReverse = F2(
-		function (codeUnits, accumulated) {
-			combineAndReverse:
-			while (true) {
-				var _p0 = codeUnits;
-				if (_p0.ctor === '[]') {
-					return accumulated;
-				} else {
-					var _p4 = _p0._0;
-					var _p3 = _p0._1;
-					if ((_elm_lang$core$Native_Utils.cmp(_p4, 0) > -1) && (_elm_lang$core$Native_Utils.cmp(_p4, 55295) < 1)) {
-						var _v1 = _p3,
-							_v2 = {ctor: '::', _0: _p4, _1: accumulated};
-						codeUnits = _v1;
-						accumulated = _v2;
-						continue combineAndReverse;
-					} else {
-						if ((_elm_lang$core$Native_Utils.cmp(_p4, 55296) > -1) && (_elm_lang$core$Native_Utils.cmp(_p4, 56319) < 1)) {
-							var _p1 = _p3;
-							if (_p1.ctor === '[]') {
-								return {ctor: '::', _0: _elm_community$string_extra$String_Extra$replacementCodePoint, _1: accumulated};
-							} else {
-								var _p2 = _p1._0;
-								if ((_elm_lang$core$Native_Utils.cmp(_p2, 56320) > -1) && (_elm_lang$core$Native_Utils.cmp(_p2, 57343) < 1)) {
-									var codePoint = (65536 + ((_p4 - 55296) * 1024)) + (_p2 - 56320);
-									var _v4 = _p1._1,
-										_v5 = {ctor: '::', _0: codePoint, _1: accumulated};
-									codeUnits = _v4;
-									accumulated = _v5;
-									continue combineAndReverse;
-								} else {
-									var _v6 = _p3,
-										_v7 = {ctor: '::', _0: _elm_community$string_extra$String_Extra$replacementCodePoint, _1: accumulated};
-									codeUnits = _v6;
-									accumulated = _v7;
-									continue combineAndReverse;
-								}
-							}
-						} else {
-							if ((_elm_lang$core$Native_Utils.cmp(_p4, 57344) > -1) && (_elm_lang$core$Native_Utils.cmp(_p4, 65535) < 1)) {
-								var _v8 = _p3,
-									_v9 = {ctor: '::', _0: _p4, _1: accumulated};
-								codeUnits = _v8;
-								accumulated = _v9;
-								continue combineAndReverse;
-							} else {
-								var _v10 = _p3,
-									_v11 = {ctor: '::', _0: _elm_community$string_extra$String_Extra$replacementCodePoint, _1: accumulated};
-								codeUnits = _v10;
-								accumulated = _v11;
-								continue combineAndReverse;
-							}
-						}
-					}
-				}
-			}
-		});
-	return _elm_lang$core$List$reverse(
-		A2(
-			combineAndReverse,
-			allCodeUnits,
-			{ctor: '[]'}));
-};
-var _elm_community$string_extra$String_Extra$fromCodePoints = function (allCodePoints) {
-	var splitAndReverse = F2(
-		function (codePoints, accumulated) {
-			splitAndReverse:
-			while (true) {
-				var _p5 = codePoints;
-				if (_p5.ctor === '[]') {
-					return accumulated;
-				} else {
-					var _p7 = _p5._1;
-					var _p6 = _p5._0;
-					if ((_elm_lang$core$Native_Utils.cmp(_p6, 0) > -1) && (_elm_lang$core$Native_Utils.cmp(_p6, 55295) < 1)) {
-						var _v13 = _p7,
-							_v14 = {ctor: '::', _0: _p6, _1: accumulated};
-						codePoints = _v13;
-						accumulated = _v14;
-						continue splitAndReverse;
-					} else {
-						if ((_elm_lang$core$Native_Utils.cmp(_p6, 65536) > -1) && (_elm_lang$core$Native_Utils.cmp(_p6, 1114111) < 1)) {
-							var subtracted = _p6 - 65536;
-							var leading = (subtracted >> 10) + 55296;
-							var trailing = (subtracted & 1023) + 56320;
-							var _v15 = _p7,
-								_v16 = {
-								ctor: '::',
-								_0: trailing,
-								_1: {ctor: '::', _0: leading, _1: accumulated}
-							};
-							codePoints = _v15;
-							accumulated = _v16;
-							continue splitAndReverse;
-						} else {
-							if ((_elm_lang$core$Native_Utils.cmp(_p6, 57344) > -1) && (_elm_lang$core$Native_Utils.cmp(_p6, 65535) < 1)) {
-								var _v17 = _p7,
-									_v18 = {ctor: '::', _0: _p6, _1: accumulated};
-								codePoints = _v17;
-								accumulated = _v18;
-								continue splitAndReverse;
-							} else {
-								var _v19 = _p7,
-									_v20 = {ctor: '::', _0: _elm_community$string_extra$String_Extra$replacementCodePoint, _1: accumulated};
-								codePoints = _v19;
-								accumulated = _v20;
-								continue splitAndReverse;
-							}
-						}
-					}
-				}
-			}
-		});
-	var allCodeUnits = _elm_lang$core$List$reverse(
-		A2(
-			splitAndReverse,
-			allCodePoints,
-			{ctor: '[]'}));
-	return _elm_lang$core$String$fromList(
-		A2(_elm_lang$core$List$map, _elm_lang$core$Char$fromCode, allCodeUnits));
-};
-var _elm_community$string_extra$String_Extra$fromFloat = _elm_lang$core$Basics$toString;
-var _elm_community$string_extra$String_Extra$fromInt = _elm_lang$core$Basics$toString;
-var _elm_community$string_extra$String_Extra$leftOfBack = F2(
-	function (pattern, string) {
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			'',
-			A2(
-				_elm_lang$core$Maybe$map,
-				A2(_elm_lang$core$Basics$flip, _elm_lang$core$String$left, string),
-				_elm_lang$core$List$head(
-					_elm_lang$core$List$reverse(
-						A2(_elm_lang$core$String$indexes, pattern, string)))));
-	});
-var _elm_community$string_extra$String_Extra$rightOfBack = F2(
-	function (pattern, string) {
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			'',
-			A2(
-				_elm_lang$core$Maybe$map,
-				function (_p8) {
-					return A3(
-						_elm_lang$core$Basics$flip,
-						_elm_lang$core$String$dropLeft,
-						string,
-						A2(
-							F2(
-								function (x, y) {
-									return x + y;
-								}),
-							_elm_lang$core$String$length(pattern),
-							_p8));
-				},
-				_elm_lang$core$List$head(
-					_elm_lang$core$List$reverse(
-						A2(_elm_lang$core$String$indexes, pattern, string)))));
-	});
-var _elm_community$string_extra$String_Extra$firstResultHelp = F2(
-	function ($default, list) {
-		firstResultHelp:
-		while (true) {
-			var _p9 = list;
-			if (_p9.ctor === '[]') {
-				return $default;
-			} else {
-				if (_p9._0.ctor === 'Just') {
-					return _p9._0._0;
-				} else {
-					var _v22 = $default,
-						_v23 = _p9._1;
-					$default = _v22;
-					list = _v23;
-					continue firstResultHelp;
-				}
-			}
-		}
-	});
-var _elm_community$string_extra$String_Extra$firstResult = function (list) {
-	return A2(_elm_community$string_extra$String_Extra$firstResultHelp, '', list);
-};
-var _elm_community$string_extra$String_Extra$leftOf = F2(
-	function (pattern, string) {
-		return A2(
-			_elm_lang$core$String$join,
-			'',
-			A2(
-				_elm_lang$core$List$map,
-				function (_p10) {
-					return _elm_community$string_extra$String_Extra$firstResult(
-						function (_) {
-							return _.submatches;
-						}(_p10));
-				},
-				A3(
-					_elm_lang$core$Regex$find,
-					_elm_lang$core$Regex$AtMost(1),
-					_elm_lang$core$Regex$regex(
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							'^(.*?)',
-							_elm_lang$core$Regex$escape(pattern))),
-					string)));
-	});
-var _elm_community$string_extra$String_Extra$rightOf = F2(
-	function (pattern, string) {
-		return A2(
-			_elm_lang$core$String$join,
-			'',
-			A2(
-				_elm_lang$core$List$map,
-				function (_p11) {
-					return _elm_community$string_extra$String_Extra$firstResult(
-						function (_) {
-							return _.submatches;
-						}(_p11));
-				},
-				A3(
-					_elm_lang$core$Regex$find,
-					_elm_lang$core$Regex$AtMost(1),
-					_elm_lang$core$Regex$regex(
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Regex$escape(pattern),
-							'(.*)$')),
-					string)));
-	});
-var _elm_community$string_extra$String_Extra$pluralize = F3(
-	function (singular, plural, count) {
-		return _elm_lang$core$Native_Utils.eq(count, 1) ? A2(_elm_lang$core$Basics_ops['++'], '1 ', singular) : A2(
-			_elm_lang$core$Basics_ops['++'],
-			_elm_lang$core$Basics$toString(count),
-			A2(_elm_lang$core$Basics_ops['++'], ' ', plural));
-	});
-var _elm_community$string_extra$String_Extra$stripTags = function (string) {
-	return A4(
-		_elm_lang$core$Regex$replace,
-		_elm_lang$core$Regex$All,
-		_elm_lang$core$Regex$regex('<\\/?[^>]+>'),
-		_elm_lang$core$Basics$always(''),
-		string);
-};
-var _elm_community$string_extra$String_Extra$toSentenceHelper = F3(
-	function (lastPart, sentence, list) {
-		toSentenceHelper:
-		while (true) {
-			var _p12 = list;
-			if (_p12.ctor === '[]') {
-				return sentence;
-			} else {
-				if (_p12._1.ctor === '[]') {
-					return A2(
-						_elm_lang$core$Basics_ops['++'],
-						sentence,
-						A2(_elm_lang$core$Basics_ops['++'], lastPart, _p12._0));
-				} else {
-					var _v25 = lastPart,
-						_v26 = A2(
-						_elm_lang$core$Basics_ops['++'],
-						sentence,
-						A2(_elm_lang$core$Basics_ops['++'], ', ', _p12._0)),
-						_v27 = _p12._1;
-					lastPart = _v25;
-					sentence = _v26;
-					list = _v27;
-					continue toSentenceHelper;
-				}
-			}
-		}
-	});
-var _elm_community$string_extra$String_Extra$toSentenceBaseCase = function (list) {
-	var _p13 = list;
-	_v28_2:
-	do {
-		if (_p13.ctor === '::') {
-			if (_p13._1.ctor === '[]') {
-				return _p13._0;
-			} else {
-				if (_p13._1._1.ctor === '[]') {
-					return A2(
-						_elm_lang$core$Basics_ops['++'],
-						_p13._0,
-						A2(_elm_lang$core$Basics_ops['++'], ' and ', _p13._1._0));
-				} else {
-					break _v28_2;
-				}
-			}
-		} else {
-			break _v28_2;
-		}
-	} while(false);
-	return '';
-};
-var _elm_community$string_extra$String_Extra$toSentenceOxford = function (list) {
-	var _p14 = list;
-	if (((_p14.ctor === '::') && (_p14._1.ctor === '::')) && (_p14._1._1.ctor === '::')) {
-		return A3(
-			_elm_community$string_extra$String_Extra$toSentenceHelper,
-			', and ',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p14._0,
-				A2(_elm_lang$core$Basics_ops['++'], ', ', _p14._1._0)),
-			{ctor: '::', _0: _p14._1._1._0, _1: _p14._1._1._1});
-	} else {
-		return _elm_community$string_extra$String_Extra$toSentenceBaseCase(list);
-	}
-};
-var _elm_community$string_extra$String_Extra$toSentence = function (list) {
-	var _p15 = list;
-	if (((_p15.ctor === '::') && (_p15._1.ctor === '::')) && (_p15._1._1.ctor === '::')) {
-		return A3(
-			_elm_community$string_extra$String_Extra$toSentenceHelper,
-			' and ',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p15._0,
-				A2(_elm_lang$core$Basics_ops['++'], ', ', _p15._1._0)),
-			{ctor: '::', _0: _p15._1._1._0, _1: _p15._1._1._1});
-	} else {
-		return _elm_community$string_extra$String_Extra$toSentenceBaseCase(list);
-	}
-};
-var _elm_community$string_extra$String_Extra$ellipsisWith = F3(
-	function (howLong, append, string) {
-		return (_elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$String$length(string),
-			howLong) < 1) ? string : A2(
-			_elm_lang$core$Basics_ops['++'],
-			A2(
-				_elm_lang$core$String$left,
-				howLong - _elm_lang$core$String$length(append),
-				string),
-			append);
-	});
-var _elm_community$string_extra$String_Extra$ellipsis = F2(
-	function (howLong, string) {
-		return A3(_elm_community$string_extra$String_Extra$ellipsisWith, howLong, '...', string);
-	});
-var _elm_community$string_extra$String_Extra$countOccurrences = F2(
-	function (needle, haystack) {
-		return (_elm_lang$core$Native_Utils.eq(
-			_elm_lang$core$String$length(needle),
-			0) || _elm_lang$core$Native_Utils.eq(
-			_elm_lang$core$String$length(haystack),
-			0)) ? 0 : _elm_lang$core$List$length(
-			A2(_elm_lang$core$String$indexes, needle, haystack));
-	});
-var _elm_community$string_extra$String_Extra$unindent = function (multilineSting) {
-	var isNotWhitespace = function ($char) {
-		return (!_elm_lang$core$Native_Utils.eq(
-			$char,
-			_elm_lang$core$Native_Utils.chr(' '))) && (!_elm_lang$core$Native_Utils.eq(
-			$char,
-			_elm_lang$core$Native_Utils.chr('\t')));
-	};
-	var countLeadingWhitespace = F2(
-		function (count, line) {
-			countLeadingWhitespace:
-			while (true) {
-				var _p16 = _elm_lang$core$String$uncons(line);
-				if (_p16.ctor === 'Nothing') {
-					return count;
-				} else {
-					var _p18 = _p16._0._1;
-					var _p17 = _p16._0._0;
-					switch (_p17.valueOf()) {
-						case ' ':
-							var _v33 = count + 1,
-								_v34 = _p18;
-							count = _v33;
-							line = _v34;
-							continue countLeadingWhitespace;
-						case '\t':
-							var _v35 = count + 1,
-								_v36 = _p18;
-							count = _v35;
-							line = _v36;
-							continue countLeadingWhitespace;
-						default:
-							return count;
-					}
-				}
-			}
-		});
-	var lines = _elm_lang$core$String$lines(multilineSting);
-	var minLead = A2(
-		_elm_lang$core$Maybe$withDefault,
-		0,
-		_elm_lang$core$List$minimum(
-			A2(
-				_elm_lang$core$List$map,
-				countLeadingWhitespace(0),
-				A2(
-					_elm_lang$core$List$filter,
-					_elm_lang$core$String$any(isNotWhitespace),
-					lines))));
-	return A2(
-		_elm_lang$core$String$join,
-		'\n',
-		A2(
-			_elm_lang$core$List$map,
-			_elm_lang$core$String$dropLeft(minLead),
-			lines));
-};
-var _elm_community$string_extra$String_Extra$dasherize = function (string) {
-	return _elm_lang$core$String$toLower(
-		A4(
-			_elm_lang$core$Regex$replace,
-			_elm_lang$core$Regex$All,
-			_elm_lang$core$Regex$regex('[_-\\s]+'),
-			_elm_lang$core$Basics$always('-'),
-			A4(
-				_elm_lang$core$Regex$replace,
-				_elm_lang$core$Regex$All,
-				_elm_lang$core$Regex$regex('([A-Z])'),
-				function (_p19) {
-					return A2(
-						_elm_lang$core$String$append,
-						'-',
-						function (_) {
-							return _.match;
-						}(_p19));
-				},
-				_elm_lang$core$String$trim(string))));
-};
-var _elm_community$string_extra$String_Extra$underscored = function (string) {
-	return _elm_lang$core$String$toLower(
-		A4(
-			_elm_lang$core$Regex$replace,
-			_elm_lang$core$Regex$All,
-			_elm_lang$core$Regex$regex('[_-\\s]+'),
-			_elm_lang$core$Basics$always('_'),
-			A4(
-				_elm_lang$core$Regex$replace,
-				_elm_lang$core$Regex$All,
-				_elm_lang$core$Regex$regex('([a-z\\d])([A-Z]+)'),
-				function (_p20) {
-					return A2(
-						_elm_lang$core$String$join,
-						'_',
-						A2(
-							_elm_lang$core$List$filterMap,
-							_elm_lang$core$Basics$identity,
-							function (_) {
-								return _.submatches;
-							}(_p20)));
-				},
-				_elm_lang$core$String$trim(string))));
-};
-var _elm_community$string_extra$String_Extra$unsurround = F2(
-	function (wrap, string) {
-		if (A2(_elm_lang$core$String$startsWith, wrap, string) && A2(_elm_lang$core$String$endsWith, wrap, string)) {
-			var length = _elm_lang$core$String$length(wrap);
-			return A2(
-				_elm_lang$core$String$dropRight,
-				length,
-				A2(_elm_lang$core$String$dropLeft, length, string));
-		} else {
-			return string;
-		}
-	});
-var _elm_community$string_extra$String_Extra$unquote = function (string) {
-	return A2(_elm_community$string_extra$String_Extra$unsurround, '\"', string);
-};
-var _elm_community$string_extra$String_Extra$surround = F2(
-	function (wrap, string) {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			wrap,
-			A2(_elm_lang$core$Basics_ops['++'], string, wrap));
-	});
-var _elm_community$string_extra$String_Extra$quote = function (string) {
-	return A2(_elm_community$string_extra$String_Extra$surround, '\"', string);
-};
-var _elm_community$string_extra$String_Extra$camelize = function (string) {
-	return A4(
-		_elm_lang$core$Regex$replace,
-		_elm_lang$core$Regex$All,
-		_elm_lang$core$Regex$regex('[-_\\s]+(.)?'),
-		function (_p21) {
-			var _p22 = _p21;
-			var _p23 = _p22.submatches;
-			if ((_p23.ctor === '::') && (_p23._0.ctor === 'Just')) {
-				return _elm_lang$core$String$toUpper(_p23._0._0);
-			} else {
-				return '';
-			}
-		},
-		_elm_lang$core$String$trim(string));
-};
-var _elm_community$string_extra$String_Extra$isBlank = function (string) {
-	return A2(
-		_elm_lang$core$Regex$contains,
-		_elm_lang$core$Regex$regex('^\\s*$'),
-		string);
-};
-var _elm_community$string_extra$String_Extra$clean = function (string) {
-	return _elm_lang$core$String$trim(
-		A4(
-			_elm_lang$core$Regex$replace,
-			_elm_lang$core$Regex$All,
-			_elm_lang$core$Regex$regex('\\s\\s+'),
-			_elm_lang$core$Basics$always(' '),
-			string));
-};
-var _elm_community$string_extra$String_Extra$softBreakRegexp = function (width) {
-	return _elm_lang$core$Regex$regex(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'.{1,',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_elm_lang$core$Basics$toString(width),
-				'}(\\s+|$)|\\S+?(\\s+|$)')));
-};
-var _elm_community$string_extra$String_Extra$softEllipsis = F2(
-	function (howLong, string) {
-		return (_elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$String$length(string),
-			howLong) < 1) ? string : A3(
-			_elm_lang$core$Basics$flip,
-			_elm_lang$core$String$append,
-			'...',
-			A4(
-				_elm_lang$core$Regex$replace,
-				_elm_lang$core$Regex$All,
-				_elm_lang$core$Regex$regex('([\\.,;:\\s])+$'),
-				_elm_lang$core$Basics$always(''),
-				A2(
-					_elm_lang$core$String$join,
-					'',
-					A2(
-						_elm_lang$core$List$map,
-						function (_) {
-							return _.match;
-						},
-						A3(
-							_elm_lang$core$Regex$find,
-							_elm_lang$core$Regex$AtMost(1),
-							_elm_community$string_extra$String_Extra$softBreakRegexp(howLong),
-							string)))));
-	});
-var _elm_community$string_extra$String_Extra$softBreak = F2(
-	function (width, string) {
-		return (_elm_lang$core$Native_Utils.cmp(width, 0) < 1) ? {ctor: '[]'} : A2(
-			_elm_lang$core$List$map,
-			function (_) {
-				return _.match;
-			},
-			A3(
-				_elm_lang$core$Regex$find,
-				_elm_lang$core$Regex$All,
-				_elm_community$string_extra$String_Extra$softBreakRegexp(width),
-				string));
-	});
-var _elm_community$string_extra$String_Extra$softWrapWith = F3(
-	function (width, separator, string) {
-		return A2(
-			_elm_lang$core$String$join,
-			separator,
-			A2(_elm_community$string_extra$String_Extra$softBreak, width, string));
-	});
-var _elm_community$string_extra$String_Extra$softWrap = F2(
-	function (width, string) {
-		return A3(_elm_community$string_extra$String_Extra$softWrapWith, width, '\n', string);
-	});
-var _elm_community$string_extra$String_Extra$breaker = F3(
-	function (width, string, acc) {
-		breaker:
-		while (true) {
-			var _p24 = string;
-			if (_p24 === '') {
-				return _elm_lang$core$List$reverse(acc);
-			} else {
-				var _v40 = width,
-					_v41 = A2(_elm_lang$core$String$dropLeft, width, string),
-					_v42 = {
-					ctor: '::',
-					_0: A3(_elm_lang$core$String$slice, 0, width, string),
-					_1: acc
-				};
-				width = _v40;
-				string = _v41;
-				acc = _v42;
-				continue breaker;
-			}
-		}
-	});
-var _elm_community$string_extra$String_Extra$break = F2(
-	function (width, string) {
-		return (_elm_lang$core$Native_Utils.eq(width, 0) || _elm_lang$core$Native_Utils.eq(string, '')) ? {
-			ctor: '::',
-			_0: string,
-			_1: {ctor: '[]'}
-		} : A3(
-			_elm_community$string_extra$String_Extra$breaker,
-			width,
-			string,
-			{ctor: '[]'});
-	});
-var _elm_community$string_extra$String_Extra$wrapWith = F3(
-	function (width, separator, string) {
-		return A2(
-			_elm_lang$core$String$join,
-			separator,
-			A2(_elm_community$string_extra$String_Extra$break, width, string));
-	});
-var _elm_community$string_extra$String_Extra$wrap = F2(
-	function (width, string) {
-		return A3(_elm_community$string_extra$String_Extra$wrapWith, width, '\n', string);
-	});
-var _elm_community$string_extra$String_Extra$replaceSlice = F4(
-	function (substitution, start, end, string) {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			A3(_elm_lang$core$String$slice, 0, start, string),
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				substitution,
-				A3(
-					_elm_lang$core$String$slice,
-					end,
-					_elm_lang$core$String$length(string),
-					string)));
-	});
-var _elm_community$string_extra$String_Extra$insertAt = F3(
-	function (insert, pos, string) {
-		return A4(_elm_community$string_extra$String_Extra$replaceSlice, insert, pos, pos, string);
-	});
-var _elm_community$string_extra$String_Extra$replace = F3(
-	function (search, substitution, string) {
-		return A4(
-			_elm_lang$core$Regex$replace,
-			_elm_lang$core$Regex$All,
-			_elm_lang$core$Regex$regex(
-				_elm_lang$core$Regex$escape(search)),
-			function (_p25) {
-				return substitution;
-			},
-			string);
-	});
-var _elm_community$string_extra$String_Extra$changeCase = F2(
-	function (mutator, word) {
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			'',
-			A2(
-				_elm_lang$core$Maybe$map,
-				function (_p26) {
-					var _p27 = _p26;
-					return A2(
-						_elm_lang$core$String$cons,
-						mutator(_p27._0),
-						_p27._1);
-				},
-				_elm_lang$core$String$uncons(word)));
-	});
-var _elm_community$string_extra$String_Extra$toSentenceCase = function (word) {
-	return A2(_elm_community$string_extra$String_Extra$changeCase, _elm_lang$core$Char$toUpper, word);
-};
-var _elm_community$string_extra$String_Extra$toTitleCase = function (ws) {
-	var uppercaseMatch = A3(
-		_elm_lang$core$Regex$replace,
-		_elm_lang$core$Regex$All,
-		_elm_lang$core$Regex$regex('\\w+'),
-		function (_p28) {
-			return _elm_community$string_extra$String_Extra$toSentenceCase(
-				function (_) {
-					return _.match;
-				}(_p28));
-		});
-	return A4(
-		_elm_lang$core$Regex$replace,
-		_elm_lang$core$Regex$All,
-		_elm_lang$core$Regex$regex('^([a-z])|\\s+([a-z])'),
-		function (_p29) {
-			return uppercaseMatch(
-				function (_) {
-					return _.match;
-				}(_p29));
-		},
-		ws);
-};
-var _elm_community$string_extra$String_Extra$classify = function (string) {
-	return _elm_community$string_extra$String_Extra$toSentenceCase(
-		A3(
-			_elm_community$string_extra$String_Extra$replace,
-			' ',
-			'',
-			_elm_community$string_extra$String_Extra$camelize(
-				A4(
-					_elm_lang$core$Regex$replace,
-					_elm_lang$core$Regex$All,
-					_elm_lang$core$Regex$regex('[\\W_]'),
-					_elm_lang$core$Basics$always(' '),
-					string))));
-};
-var _elm_community$string_extra$String_Extra$humanize = function (string) {
-	return _elm_community$string_extra$String_Extra$toSentenceCase(
-		_elm_lang$core$String$toLower(
-			_elm_lang$core$String$trim(
-				A4(
-					_elm_lang$core$Regex$replace,
-					_elm_lang$core$Regex$All,
-					_elm_lang$core$Regex$regex('_id$|[-_\\s]+'),
-					_elm_lang$core$Basics$always(' '),
-					A4(
-						_elm_lang$core$Regex$replace,
-						_elm_lang$core$Regex$All,
-						_elm_lang$core$Regex$regex('[A-Z]'),
-						function (_p30) {
-							return A2(
-								_elm_lang$core$String$append,
-								'-',
-								function (_) {
-									return _.match;
-								}(_p30));
-						},
-						string)))));
-};
-var _elm_community$string_extra$String_Extra$decapitalize = function (word) {
-	return A2(_elm_community$string_extra$String_Extra$changeCase, _elm_lang$core$Char$toLower, word);
-};
-
 //import Native.List //
 
 var _elm_lang$core$Native_Array = function() {
@@ -7404,6 +6510,1079 @@ var _elm_lang$core$Array$repeat = F2(
 			_elm_lang$core$Basics$always(e));
 	});
 var _elm_lang$core$Array$Array = {ctor: 'Array'};
+
+var _elm_community$maybe_extra$Maybe_Extra$foldrValues = F2(
+	function (item, list) {
+		var _p0 = item;
+		if (_p0.ctor === 'Nothing') {
+			return list;
+		} else {
+			return {ctor: '::', _0: _p0._0, _1: list};
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$values = A2(
+	_elm_lang$core$List$foldr,
+	_elm_community$maybe_extra$Maybe_Extra$foldrValues,
+	{ctor: '[]'});
+var _elm_community$maybe_extra$Maybe_Extra$filter = F2(
+	function (f, m) {
+		var _p1 = A2(_elm_lang$core$Maybe$map, f, m);
+		if ((_p1.ctor === 'Just') && (_p1._0 === true)) {
+			return m;
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$traverseArray = function (f) {
+	var step = F2(
+		function (e, acc) {
+			var _p2 = f(e);
+			if (_p2.ctor === 'Nothing') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				return A2(
+					_elm_lang$core$Maybe$map,
+					_elm_lang$core$Array$push(_p2._0),
+					acc);
+			}
+		});
+	return A2(
+		_elm_lang$core$Array$foldl,
+		step,
+		_elm_lang$core$Maybe$Just(_elm_lang$core$Array$empty));
+};
+var _elm_community$maybe_extra$Maybe_Extra$combineArray = _elm_community$maybe_extra$Maybe_Extra$traverseArray(_elm_lang$core$Basics$identity);
+var _elm_community$maybe_extra$Maybe_Extra$traverse = function (f) {
+	var step = F2(
+		function (e, acc) {
+			var _p3 = f(e);
+			if (_p3.ctor === 'Nothing') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				return A2(
+					_elm_lang$core$Maybe$map,
+					F2(
+						function (x, y) {
+							return {ctor: '::', _0: x, _1: y};
+						})(_p3._0),
+					acc);
+			}
+		});
+	return A2(
+		_elm_lang$core$List$foldr,
+		step,
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}));
+};
+var _elm_community$maybe_extra$Maybe_Extra$combine = _elm_community$maybe_extra$Maybe_Extra$traverse(_elm_lang$core$Basics$identity);
+var _elm_community$maybe_extra$Maybe_Extra$toArray = function (m) {
+	var _p4 = m;
+	if (_p4.ctor === 'Nothing') {
+		return _elm_lang$core$Array$empty;
+	} else {
+		return A2(_elm_lang$core$Array$repeat, 1, _p4._0);
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$toList = function (m) {
+	var _p5 = m;
+	if (_p5.ctor === 'Nothing') {
+		return {ctor: '[]'};
+	} else {
+		return {
+			ctor: '::',
+			_0: _p5._0,
+			_1: {ctor: '[]'}
+		};
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$orElse = F2(
+	function (ma, mb) {
+		var _p6 = mb;
+		if (_p6.ctor === 'Nothing') {
+			return ma;
+		} else {
+			return mb;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$orElseLazy = F2(
+	function (fma, mb) {
+		var _p7 = mb;
+		if (_p7.ctor === 'Nothing') {
+			return fma(
+				{ctor: '_Tuple0'});
+		} else {
+			return mb;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$orLazy = F2(
+	function (ma, fmb) {
+		var _p8 = ma;
+		if (_p8.ctor === 'Nothing') {
+			return fmb(
+				{ctor: '_Tuple0'});
+		} else {
+			return ma;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$or = F2(
+	function (ma, mb) {
+		var _p9 = ma;
+		if (_p9.ctor === 'Nothing') {
+			return mb;
+		} else {
+			return ma;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$prev = _elm_lang$core$Maybe$map2(_elm_lang$core$Basics$always);
+var _elm_community$maybe_extra$Maybe_Extra$next = _elm_lang$core$Maybe$map2(
+	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
+var _elm_community$maybe_extra$Maybe_Extra$andMap = _elm_lang$core$Maybe$map2(
+	F2(
+		function (x, y) {
+			return y(x);
+		}));
+var _elm_community$maybe_extra$Maybe_Extra$unpack = F3(
+	function (d, f, m) {
+		var _p10 = m;
+		if (_p10.ctor === 'Nothing') {
+			return d(
+				{ctor: '_Tuple0'});
+		} else {
+			return f(_p10._0);
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$unwrap = F3(
+	function (d, f, m) {
+		var _p11 = m;
+		if (_p11.ctor === 'Nothing') {
+			return d;
+		} else {
+			return f(_p11._0);
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$isJust = function (m) {
+	var _p12 = m;
+	if (_p12.ctor === 'Nothing') {
+		return false;
+	} else {
+		return true;
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$isNothing = function (m) {
+	var _p13 = m;
+	if (_p13.ctor === 'Nothing') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$join = function (mx) {
+	var _p14 = mx;
+	if (_p14.ctor === 'Just') {
+		return _p14._0;
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra_ops = _elm_community$maybe_extra$Maybe_Extra_ops || {};
+_elm_community$maybe_extra$Maybe_Extra_ops['?'] = F2(
+	function (mx, x) {
+		return A2(_elm_lang$core$Maybe$withDefault, x, mx);
+	});
+
+//import Maybe, Native.List //
+
+var _elm_lang$core$Native_Regex = function() {
+
+function escape(str)
+{
+	return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+function caseInsensitive(re)
+{
+	return new RegExp(re.source, 'gi');
+}
+function regex(raw)
+{
+	return new RegExp(raw, 'g');
+}
+
+function contains(re, string)
+{
+	return string.match(re) !== null;
+}
+
+function find(n, re, str)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	var out = [];
+	var number = 0;
+	var string = str;
+	var lastIndex = re.lastIndex;
+	var prevLastIndex = -1;
+	var result;
+	while (number++ < n && (result = re.exec(string)))
+	{
+		if (prevLastIndex === re.lastIndex) break;
+		var i = result.length - 1;
+		var subs = new Array(i);
+		while (i > 0)
+		{
+			var submatch = result[i];
+			subs[--i] = submatch === undefined
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
+		}
+		out.push({
+			match: result[0],
+			submatches: _elm_lang$core$Native_List.fromArray(subs),
+			index: result.index,
+			number: number
+		});
+		prevLastIndex = re.lastIndex;
+	}
+	re.lastIndex = lastIndex;
+	return _elm_lang$core$Native_List.fromArray(out);
+}
+
+function replace(n, re, replacer, string)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	var count = 0;
+	function jsReplacer(match)
+	{
+		if (count++ >= n)
+		{
+			return match;
+		}
+		var i = arguments.length - 3;
+		var submatches = new Array(i);
+		while (i > 0)
+		{
+			var submatch = arguments[i];
+			submatches[--i] = submatch === undefined
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
+		}
+		return replacer({
+			match: match,
+			submatches: _elm_lang$core$Native_List.fromArray(submatches),
+			index: arguments[arguments.length - 2],
+			number: count
+		});
+	}
+	return string.replace(re, jsReplacer);
+}
+
+function split(n, re, str)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	if (n === Infinity)
+	{
+		return _elm_lang$core$Native_List.fromArray(str.split(re));
+	}
+	var string = str;
+	var result;
+	var out = [];
+	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
+	while (n--)
+	{
+		if (!(result = re.exec(string))) break;
+		out.push(string.slice(start, result.index));
+		start = re.lastIndex;
+	}
+	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
+	return _elm_lang$core$Native_List.fromArray(out);
+}
+
+return {
+	regex: regex,
+	caseInsensitive: caseInsensitive,
+	escape: escape,
+
+	contains: F2(contains),
+	find: F3(find),
+	replace: F4(replace),
+	split: F3(split)
+};
+
+}();
+
+var _elm_lang$core$Regex$split = _elm_lang$core$Native_Regex.split;
+var _elm_lang$core$Regex$replace = _elm_lang$core$Native_Regex.replace;
+var _elm_lang$core$Regex$find = _elm_lang$core$Native_Regex.find;
+var _elm_lang$core$Regex$contains = _elm_lang$core$Native_Regex.contains;
+var _elm_lang$core$Regex$caseInsensitive = _elm_lang$core$Native_Regex.caseInsensitive;
+var _elm_lang$core$Regex$regex = _elm_lang$core$Native_Regex.regex;
+var _elm_lang$core$Regex$escape = _elm_lang$core$Native_Regex.escape;
+var _elm_lang$core$Regex$Match = F4(
+	function (a, b, c, d) {
+		return {match: a, submatches: b, index: c, number: d};
+	});
+var _elm_lang$core$Regex$Regex = {ctor: 'Regex'};
+var _elm_lang$core$Regex$AtMost = function (a) {
+	return {ctor: 'AtMost', _0: a};
+};
+var _elm_lang$core$Regex$All = {ctor: 'All'};
+
+var _elm_lang$core$Native_Bitwise = function() {
+
+return {
+	and: F2(function and(a, b) { return a & b; }),
+	or: F2(function or(a, b) { return a | b; }),
+	xor: F2(function xor(a, b) { return a ^ b; }),
+	complement: function complement(a) { return ~a; },
+	shiftLeftBy: F2(function(offset, a) { return a << offset; }),
+	shiftRightBy: F2(function(offset, a) { return a >> offset; }),
+	shiftRightZfBy: F2(function(offset, a) { return a >>> offset; })
+};
+
+}();
+
+var _elm_lang$core$Bitwise$shiftRightZfBy = _elm_lang$core$Native_Bitwise.shiftRightZfBy;
+var _elm_lang$core$Bitwise$shiftRightBy = _elm_lang$core$Native_Bitwise.shiftRightBy;
+var _elm_lang$core$Bitwise$shiftLeftBy = _elm_lang$core$Native_Bitwise.shiftLeftBy;
+var _elm_lang$core$Bitwise$complement = _elm_lang$core$Native_Bitwise.complement;
+var _elm_lang$core$Bitwise$xor = _elm_lang$core$Native_Bitwise.xor;
+var _elm_lang$core$Bitwise$or = _elm_lang$core$Native_Bitwise.or;
+var _elm_lang$core$Bitwise$and = _elm_lang$core$Native_Bitwise.and;
+
+var _elm_community$string_extra$String_Extra$nonEmpty = function (string) {
+	return _elm_lang$core$String$isEmpty(string) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(string);
+};
+var _elm_community$string_extra$String_Extra$replacementCodePoint = 65533;
+var _elm_community$string_extra$String_Extra$toCodePoints = function (string) {
+	var allCodeUnits = A2(
+		_elm_lang$core$List$map,
+		_elm_lang$core$Char$toCode,
+		_elm_lang$core$String$toList(string));
+	var combineAndReverse = F2(
+		function (codeUnits, accumulated) {
+			combineAndReverse:
+			while (true) {
+				var _p0 = codeUnits;
+				if (_p0.ctor === '[]') {
+					return accumulated;
+				} else {
+					var _p4 = _p0._0;
+					var _p3 = _p0._1;
+					if ((_elm_lang$core$Native_Utils.cmp(_p4, 0) > -1) && (_elm_lang$core$Native_Utils.cmp(_p4, 55295) < 1)) {
+						var _v1 = _p3,
+							_v2 = {ctor: '::', _0: _p4, _1: accumulated};
+						codeUnits = _v1;
+						accumulated = _v2;
+						continue combineAndReverse;
+					} else {
+						if ((_elm_lang$core$Native_Utils.cmp(_p4, 55296) > -1) && (_elm_lang$core$Native_Utils.cmp(_p4, 56319) < 1)) {
+							var _p1 = _p3;
+							if (_p1.ctor === '[]') {
+								return {ctor: '::', _0: _elm_community$string_extra$String_Extra$replacementCodePoint, _1: accumulated};
+							} else {
+								var _p2 = _p1._0;
+								if ((_elm_lang$core$Native_Utils.cmp(_p2, 56320) > -1) && (_elm_lang$core$Native_Utils.cmp(_p2, 57343) < 1)) {
+									var codePoint = (65536 + ((_p4 - 55296) * 1024)) + (_p2 - 56320);
+									var _v4 = _p1._1,
+										_v5 = {ctor: '::', _0: codePoint, _1: accumulated};
+									codeUnits = _v4;
+									accumulated = _v5;
+									continue combineAndReverse;
+								} else {
+									var _v6 = _p3,
+										_v7 = {ctor: '::', _0: _elm_community$string_extra$String_Extra$replacementCodePoint, _1: accumulated};
+									codeUnits = _v6;
+									accumulated = _v7;
+									continue combineAndReverse;
+								}
+							}
+						} else {
+							if ((_elm_lang$core$Native_Utils.cmp(_p4, 57344) > -1) && (_elm_lang$core$Native_Utils.cmp(_p4, 65535) < 1)) {
+								var _v8 = _p3,
+									_v9 = {ctor: '::', _0: _p4, _1: accumulated};
+								codeUnits = _v8;
+								accumulated = _v9;
+								continue combineAndReverse;
+							} else {
+								var _v10 = _p3,
+									_v11 = {ctor: '::', _0: _elm_community$string_extra$String_Extra$replacementCodePoint, _1: accumulated};
+								codeUnits = _v10;
+								accumulated = _v11;
+								continue combineAndReverse;
+							}
+						}
+					}
+				}
+			}
+		});
+	return _elm_lang$core$List$reverse(
+		A2(
+			combineAndReverse,
+			allCodeUnits,
+			{ctor: '[]'}));
+};
+var _elm_community$string_extra$String_Extra$fromCodePoints = function (allCodePoints) {
+	var splitAndReverse = F2(
+		function (codePoints, accumulated) {
+			splitAndReverse:
+			while (true) {
+				var _p5 = codePoints;
+				if (_p5.ctor === '[]') {
+					return accumulated;
+				} else {
+					var _p7 = _p5._1;
+					var _p6 = _p5._0;
+					if ((_elm_lang$core$Native_Utils.cmp(_p6, 0) > -1) && (_elm_lang$core$Native_Utils.cmp(_p6, 55295) < 1)) {
+						var _v13 = _p7,
+							_v14 = {ctor: '::', _0: _p6, _1: accumulated};
+						codePoints = _v13;
+						accumulated = _v14;
+						continue splitAndReverse;
+					} else {
+						if ((_elm_lang$core$Native_Utils.cmp(_p6, 65536) > -1) && (_elm_lang$core$Native_Utils.cmp(_p6, 1114111) < 1)) {
+							var subtracted = _p6 - 65536;
+							var leading = (subtracted >> 10) + 55296;
+							var trailing = (subtracted & 1023) + 56320;
+							var _v15 = _p7,
+								_v16 = {
+								ctor: '::',
+								_0: trailing,
+								_1: {ctor: '::', _0: leading, _1: accumulated}
+							};
+							codePoints = _v15;
+							accumulated = _v16;
+							continue splitAndReverse;
+						} else {
+							if ((_elm_lang$core$Native_Utils.cmp(_p6, 57344) > -1) && (_elm_lang$core$Native_Utils.cmp(_p6, 65535) < 1)) {
+								var _v17 = _p7,
+									_v18 = {ctor: '::', _0: _p6, _1: accumulated};
+								codePoints = _v17;
+								accumulated = _v18;
+								continue splitAndReverse;
+							} else {
+								var _v19 = _p7,
+									_v20 = {ctor: '::', _0: _elm_community$string_extra$String_Extra$replacementCodePoint, _1: accumulated};
+								codePoints = _v19;
+								accumulated = _v20;
+								continue splitAndReverse;
+							}
+						}
+					}
+				}
+			}
+		});
+	var allCodeUnits = _elm_lang$core$List$reverse(
+		A2(
+			splitAndReverse,
+			allCodePoints,
+			{ctor: '[]'}));
+	return _elm_lang$core$String$fromList(
+		A2(_elm_lang$core$List$map, _elm_lang$core$Char$fromCode, allCodeUnits));
+};
+var _elm_community$string_extra$String_Extra$fromFloat = _elm_lang$core$Basics$toString;
+var _elm_community$string_extra$String_Extra$fromInt = _elm_lang$core$Basics$toString;
+var _elm_community$string_extra$String_Extra$leftOfBack = F2(
+	function (pattern, string) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			A2(
+				_elm_lang$core$Maybe$map,
+				A2(_elm_lang$core$Basics$flip, _elm_lang$core$String$left, string),
+				_elm_lang$core$List$head(
+					_elm_lang$core$List$reverse(
+						A2(_elm_lang$core$String$indexes, pattern, string)))));
+	});
+var _elm_community$string_extra$String_Extra$rightOfBack = F2(
+	function (pattern, string) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (_p8) {
+					return A3(
+						_elm_lang$core$Basics$flip,
+						_elm_lang$core$String$dropLeft,
+						string,
+						A2(
+							F2(
+								function (x, y) {
+									return x + y;
+								}),
+							_elm_lang$core$String$length(pattern),
+							_p8));
+				},
+				_elm_lang$core$List$head(
+					_elm_lang$core$List$reverse(
+						A2(_elm_lang$core$String$indexes, pattern, string)))));
+	});
+var _elm_community$string_extra$String_Extra$firstResultHelp = F2(
+	function ($default, list) {
+		firstResultHelp:
+		while (true) {
+			var _p9 = list;
+			if (_p9.ctor === '[]') {
+				return $default;
+			} else {
+				if (_p9._0.ctor === 'Just') {
+					return _p9._0._0;
+				} else {
+					var _v22 = $default,
+						_v23 = _p9._1;
+					$default = _v22;
+					list = _v23;
+					continue firstResultHelp;
+				}
+			}
+		}
+	});
+var _elm_community$string_extra$String_Extra$firstResult = function (list) {
+	return A2(_elm_community$string_extra$String_Extra$firstResultHelp, '', list);
+};
+var _elm_community$string_extra$String_Extra$leftOf = F2(
+	function (pattern, string) {
+		return A2(
+			_elm_lang$core$String$join,
+			'',
+			A2(
+				_elm_lang$core$List$map,
+				function (_p10) {
+					return _elm_community$string_extra$String_Extra$firstResult(
+						function (_) {
+							return _.submatches;
+						}(_p10));
+				},
+				A3(
+					_elm_lang$core$Regex$find,
+					_elm_lang$core$Regex$AtMost(1),
+					_elm_lang$core$Regex$regex(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'^(.*?)',
+							_elm_lang$core$Regex$escape(pattern))),
+					string)));
+	});
+var _elm_community$string_extra$String_Extra$rightOf = F2(
+	function (pattern, string) {
+		return A2(
+			_elm_lang$core$String$join,
+			'',
+			A2(
+				_elm_lang$core$List$map,
+				function (_p11) {
+					return _elm_community$string_extra$String_Extra$firstResult(
+						function (_) {
+							return _.submatches;
+						}(_p11));
+				},
+				A3(
+					_elm_lang$core$Regex$find,
+					_elm_lang$core$Regex$AtMost(1),
+					_elm_lang$core$Regex$regex(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Regex$escape(pattern),
+							'(.*)$')),
+					string)));
+	});
+var _elm_community$string_extra$String_Extra$pluralize = F3(
+	function (singular, plural, count) {
+		return _elm_lang$core$Native_Utils.eq(count, 1) ? A2(_elm_lang$core$Basics_ops['++'], '1 ', singular) : A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Basics$toString(count),
+			A2(_elm_lang$core$Basics_ops['++'], ' ', plural));
+	});
+var _elm_community$string_extra$String_Extra$stripTags = function (string) {
+	return A4(
+		_elm_lang$core$Regex$replace,
+		_elm_lang$core$Regex$All,
+		_elm_lang$core$Regex$regex('<\\/?[^>]+>'),
+		_elm_lang$core$Basics$always(''),
+		string);
+};
+var _elm_community$string_extra$String_Extra$toSentenceHelper = F3(
+	function (lastPart, sentence, list) {
+		toSentenceHelper:
+		while (true) {
+			var _p12 = list;
+			if (_p12.ctor === '[]') {
+				return sentence;
+			} else {
+				if (_p12._1.ctor === '[]') {
+					return A2(
+						_elm_lang$core$Basics_ops['++'],
+						sentence,
+						A2(_elm_lang$core$Basics_ops['++'], lastPart, _p12._0));
+				} else {
+					var _v25 = lastPart,
+						_v26 = A2(
+						_elm_lang$core$Basics_ops['++'],
+						sentence,
+						A2(_elm_lang$core$Basics_ops['++'], ', ', _p12._0)),
+						_v27 = _p12._1;
+					lastPart = _v25;
+					sentence = _v26;
+					list = _v27;
+					continue toSentenceHelper;
+				}
+			}
+		}
+	});
+var _elm_community$string_extra$String_Extra$toSentenceBaseCase = function (list) {
+	var _p13 = list;
+	_v28_2:
+	do {
+		if (_p13.ctor === '::') {
+			if (_p13._1.ctor === '[]') {
+				return _p13._0;
+			} else {
+				if (_p13._1._1.ctor === '[]') {
+					return A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p13._0,
+						A2(_elm_lang$core$Basics_ops['++'], ' and ', _p13._1._0));
+				} else {
+					break _v28_2;
+				}
+			}
+		} else {
+			break _v28_2;
+		}
+	} while(false);
+	return '';
+};
+var _elm_community$string_extra$String_Extra$toSentenceOxford = function (list) {
+	var _p14 = list;
+	if (((_p14.ctor === '::') && (_p14._1.ctor === '::')) && (_p14._1._1.ctor === '::')) {
+		return A3(
+			_elm_community$string_extra$String_Extra$toSentenceHelper,
+			', and ',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p14._0,
+				A2(_elm_lang$core$Basics_ops['++'], ', ', _p14._1._0)),
+			{ctor: '::', _0: _p14._1._1._0, _1: _p14._1._1._1});
+	} else {
+		return _elm_community$string_extra$String_Extra$toSentenceBaseCase(list);
+	}
+};
+var _elm_community$string_extra$String_Extra$toSentence = function (list) {
+	var _p15 = list;
+	if (((_p15.ctor === '::') && (_p15._1.ctor === '::')) && (_p15._1._1.ctor === '::')) {
+		return A3(
+			_elm_community$string_extra$String_Extra$toSentenceHelper,
+			' and ',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p15._0,
+				A2(_elm_lang$core$Basics_ops['++'], ', ', _p15._1._0)),
+			{ctor: '::', _0: _p15._1._1._0, _1: _p15._1._1._1});
+	} else {
+		return _elm_community$string_extra$String_Extra$toSentenceBaseCase(list);
+	}
+};
+var _elm_community$string_extra$String_Extra$ellipsisWith = F3(
+	function (howLong, append, string) {
+		return (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$String$length(string),
+			howLong) < 1) ? string : A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(
+				_elm_lang$core$String$left,
+				howLong - _elm_lang$core$String$length(append),
+				string),
+			append);
+	});
+var _elm_community$string_extra$String_Extra$ellipsis = F2(
+	function (howLong, string) {
+		return A3(_elm_community$string_extra$String_Extra$ellipsisWith, howLong, '...', string);
+	});
+var _elm_community$string_extra$String_Extra$countOccurrences = F2(
+	function (needle, haystack) {
+		return (_elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$String$length(needle),
+			0) || _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$String$length(haystack),
+			0)) ? 0 : _elm_lang$core$List$length(
+			A2(_elm_lang$core$String$indexes, needle, haystack));
+	});
+var _elm_community$string_extra$String_Extra$unindent = function (multilineSting) {
+	var isNotWhitespace = function ($char) {
+		return (!_elm_lang$core$Native_Utils.eq(
+			$char,
+			_elm_lang$core$Native_Utils.chr(' '))) && (!_elm_lang$core$Native_Utils.eq(
+			$char,
+			_elm_lang$core$Native_Utils.chr('\t')));
+	};
+	var countLeadingWhitespace = F2(
+		function (count, line) {
+			countLeadingWhitespace:
+			while (true) {
+				var _p16 = _elm_lang$core$String$uncons(line);
+				if (_p16.ctor === 'Nothing') {
+					return count;
+				} else {
+					var _p18 = _p16._0._1;
+					var _p17 = _p16._0._0;
+					switch (_p17.valueOf()) {
+						case ' ':
+							var _v33 = count + 1,
+								_v34 = _p18;
+							count = _v33;
+							line = _v34;
+							continue countLeadingWhitespace;
+						case '\t':
+							var _v35 = count + 1,
+								_v36 = _p18;
+							count = _v35;
+							line = _v36;
+							continue countLeadingWhitespace;
+						default:
+							return count;
+					}
+				}
+			}
+		});
+	var lines = _elm_lang$core$String$lines(multilineSting);
+	var minLead = A2(
+		_elm_lang$core$Maybe$withDefault,
+		0,
+		_elm_lang$core$List$minimum(
+			A2(
+				_elm_lang$core$List$map,
+				countLeadingWhitespace(0),
+				A2(
+					_elm_lang$core$List$filter,
+					_elm_lang$core$String$any(isNotWhitespace),
+					lines))));
+	return A2(
+		_elm_lang$core$String$join,
+		'\n',
+		A2(
+			_elm_lang$core$List$map,
+			_elm_lang$core$String$dropLeft(minLead),
+			lines));
+};
+var _elm_community$string_extra$String_Extra$dasherize = function (string) {
+	return _elm_lang$core$String$toLower(
+		A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$All,
+			_elm_lang$core$Regex$regex('[_-\\s]+'),
+			_elm_lang$core$Basics$always('-'),
+			A4(
+				_elm_lang$core$Regex$replace,
+				_elm_lang$core$Regex$All,
+				_elm_lang$core$Regex$regex('([A-Z])'),
+				function (_p19) {
+					return A2(
+						_elm_lang$core$String$append,
+						'-',
+						function (_) {
+							return _.match;
+						}(_p19));
+				},
+				_elm_lang$core$String$trim(string))));
+};
+var _elm_community$string_extra$String_Extra$underscored = function (string) {
+	return _elm_lang$core$String$toLower(
+		A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$All,
+			_elm_lang$core$Regex$regex('[_-\\s]+'),
+			_elm_lang$core$Basics$always('_'),
+			A4(
+				_elm_lang$core$Regex$replace,
+				_elm_lang$core$Regex$All,
+				_elm_lang$core$Regex$regex('([a-z\\d])([A-Z]+)'),
+				function (_p20) {
+					return A2(
+						_elm_lang$core$String$join,
+						'_',
+						A2(
+							_elm_lang$core$List$filterMap,
+							_elm_lang$core$Basics$identity,
+							function (_) {
+								return _.submatches;
+							}(_p20)));
+				},
+				_elm_lang$core$String$trim(string))));
+};
+var _elm_community$string_extra$String_Extra$unsurround = F2(
+	function (wrap, string) {
+		if (A2(_elm_lang$core$String$startsWith, wrap, string) && A2(_elm_lang$core$String$endsWith, wrap, string)) {
+			var length = _elm_lang$core$String$length(wrap);
+			return A2(
+				_elm_lang$core$String$dropRight,
+				length,
+				A2(_elm_lang$core$String$dropLeft, length, string));
+		} else {
+			return string;
+		}
+	});
+var _elm_community$string_extra$String_Extra$unquote = function (string) {
+	return A2(_elm_community$string_extra$String_Extra$unsurround, '\"', string);
+};
+var _elm_community$string_extra$String_Extra$surround = F2(
+	function (wrap, string) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			wrap,
+			A2(_elm_lang$core$Basics_ops['++'], string, wrap));
+	});
+var _elm_community$string_extra$String_Extra$quote = function (string) {
+	return A2(_elm_community$string_extra$String_Extra$surround, '\"', string);
+};
+var _elm_community$string_extra$String_Extra$camelize = function (string) {
+	return A4(
+		_elm_lang$core$Regex$replace,
+		_elm_lang$core$Regex$All,
+		_elm_lang$core$Regex$regex('[-_\\s]+(.)?'),
+		function (_p21) {
+			var _p22 = _p21;
+			var _p23 = _p22.submatches;
+			if ((_p23.ctor === '::') && (_p23._0.ctor === 'Just')) {
+				return _elm_lang$core$String$toUpper(_p23._0._0);
+			} else {
+				return '';
+			}
+		},
+		_elm_lang$core$String$trim(string));
+};
+var _elm_community$string_extra$String_Extra$isBlank = function (string) {
+	return A2(
+		_elm_lang$core$Regex$contains,
+		_elm_lang$core$Regex$regex('^\\s*$'),
+		string);
+};
+var _elm_community$string_extra$String_Extra$clean = function (string) {
+	return _elm_lang$core$String$trim(
+		A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$All,
+			_elm_lang$core$Regex$regex('\\s\\s+'),
+			_elm_lang$core$Basics$always(' '),
+			string));
+};
+var _elm_community$string_extra$String_Extra$softBreakRegexp = function (width) {
+	return _elm_lang$core$Regex$regex(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'.{1,',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(width),
+				'}(\\s+|$)|\\S+?(\\s+|$)')));
+};
+var _elm_community$string_extra$String_Extra$softEllipsis = F2(
+	function (howLong, string) {
+		return (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$String$length(string),
+			howLong) < 1) ? string : A3(
+			_elm_lang$core$Basics$flip,
+			_elm_lang$core$String$append,
+			'...',
+			A4(
+				_elm_lang$core$Regex$replace,
+				_elm_lang$core$Regex$All,
+				_elm_lang$core$Regex$regex('([\\.,;:\\s])+$'),
+				_elm_lang$core$Basics$always(''),
+				A2(
+					_elm_lang$core$String$join,
+					'',
+					A2(
+						_elm_lang$core$List$map,
+						function (_) {
+							return _.match;
+						},
+						A3(
+							_elm_lang$core$Regex$find,
+							_elm_lang$core$Regex$AtMost(1),
+							_elm_community$string_extra$String_Extra$softBreakRegexp(howLong),
+							string)))));
+	});
+var _elm_community$string_extra$String_Extra$softBreak = F2(
+	function (width, string) {
+		return (_elm_lang$core$Native_Utils.cmp(width, 0) < 1) ? {ctor: '[]'} : A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.match;
+			},
+			A3(
+				_elm_lang$core$Regex$find,
+				_elm_lang$core$Regex$All,
+				_elm_community$string_extra$String_Extra$softBreakRegexp(width),
+				string));
+	});
+var _elm_community$string_extra$String_Extra$softWrapWith = F3(
+	function (width, separator, string) {
+		return A2(
+			_elm_lang$core$String$join,
+			separator,
+			A2(_elm_community$string_extra$String_Extra$softBreak, width, string));
+	});
+var _elm_community$string_extra$String_Extra$softWrap = F2(
+	function (width, string) {
+		return A3(_elm_community$string_extra$String_Extra$softWrapWith, width, '\n', string);
+	});
+var _elm_community$string_extra$String_Extra$breaker = F3(
+	function (width, string, acc) {
+		breaker:
+		while (true) {
+			var _p24 = string;
+			if (_p24 === '') {
+				return _elm_lang$core$List$reverse(acc);
+			} else {
+				var _v40 = width,
+					_v41 = A2(_elm_lang$core$String$dropLeft, width, string),
+					_v42 = {
+					ctor: '::',
+					_0: A3(_elm_lang$core$String$slice, 0, width, string),
+					_1: acc
+				};
+				width = _v40;
+				string = _v41;
+				acc = _v42;
+				continue breaker;
+			}
+		}
+	});
+var _elm_community$string_extra$String_Extra$break = F2(
+	function (width, string) {
+		return (_elm_lang$core$Native_Utils.eq(width, 0) || _elm_lang$core$Native_Utils.eq(string, '')) ? {
+			ctor: '::',
+			_0: string,
+			_1: {ctor: '[]'}
+		} : A3(
+			_elm_community$string_extra$String_Extra$breaker,
+			width,
+			string,
+			{ctor: '[]'});
+	});
+var _elm_community$string_extra$String_Extra$wrapWith = F3(
+	function (width, separator, string) {
+		return A2(
+			_elm_lang$core$String$join,
+			separator,
+			A2(_elm_community$string_extra$String_Extra$break, width, string));
+	});
+var _elm_community$string_extra$String_Extra$wrap = F2(
+	function (width, string) {
+		return A3(_elm_community$string_extra$String_Extra$wrapWith, width, '\n', string);
+	});
+var _elm_community$string_extra$String_Extra$replaceSlice = F4(
+	function (substitution, start, end, string) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			A3(_elm_lang$core$String$slice, 0, start, string),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				substitution,
+				A3(
+					_elm_lang$core$String$slice,
+					end,
+					_elm_lang$core$String$length(string),
+					string)));
+	});
+var _elm_community$string_extra$String_Extra$insertAt = F3(
+	function (insert, pos, string) {
+		return A4(_elm_community$string_extra$String_Extra$replaceSlice, insert, pos, pos, string);
+	});
+var _elm_community$string_extra$String_Extra$replace = F3(
+	function (search, substitution, string) {
+		return A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$All,
+			_elm_lang$core$Regex$regex(
+				_elm_lang$core$Regex$escape(search)),
+			function (_p25) {
+				return substitution;
+			},
+			string);
+	});
+var _elm_community$string_extra$String_Extra$changeCase = F2(
+	function (mutator, word) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (_p26) {
+					var _p27 = _p26;
+					return A2(
+						_elm_lang$core$String$cons,
+						mutator(_p27._0),
+						_p27._1);
+				},
+				_elm_lang$core$String$uncons(word)));
+	});
+var _elm_community$string_extra$String_Extra$toSentenceCase = function (word) {
+	return A2(_elm_community$string_extra$String_Extra$changeCase, _elm_lang$core$Char$toUpper, word);
+};
+var _elm_community$string_extra$String_Extra$toTitleCase = function (ws) {
+	var uppercaseMatch = A3(
+		_elm_lang$core$Regex$replace,
+		_elm_lang$core$Regex$All,
+		_elm_lang$core$Regex$regex('\\w+'),
+		function (_p28) {
+			return _elm_community$string_extra$String_Extra$toSentenceCase(
+				function (_) {
+					return _.match;
+				}(_p28));
+		});
+	return A4(
+		_elm_lang$core$Regex$replace,
+		_elm_lang$core$Regex$All,
+		_elm_lang$core$Regex$regex('^([a-z])|\\s+([a-z])'),
+		function (_p29) {
+			return uppercaseMatch(
+				function (_) {
+					return _.match;
+				}(_p29));
+		},
+		ws);
+};
+var _elm_community$string_extra$String_Extra$classify = function (string) {
+	return _elm_community$string_extra$String_Extra$toSentenceCase(
+		A3(
+			_elm_community$string_extra$String_Extra$replace,
+			' ',
+			'',
+			_elm_community$string_extra$String_Extra$camelize(
+				A4(
+					_elm_lang$core$Regex$replace,
+					_elm_lang$core$Regex$All,
+					_elm_lang$core$Regex$regex('[\\W_]'),
+					_elm_lang$core$Basics$always(' '),
+					string))));
+};
+var _elm_community$string_extra$String_Extra$humanize = function (string) {
+	return _elm_community$string_extra$String_Extra$toSentenceCase(
+		_elm_lang$core$String$toLower(
+			_elm_lang$core$String$trim(
+				A4(
+					_elm_lang$core$Regex$replace,
+					_elm_lang$core$Regex$All,
+					_elm_lang$core$Regex$regex('_id$|[-_\\s]+'),
+					_elm_lang$core$Basics$always(' '),
+					A4(
+						_elm_lang$core$Regex$replace,
+						_elm_lang$core$Regex$All,
+						_elm_lang$core$Regex$regex('[A-Z]'),
+						function (_p30) {
+							return A2(
+								_elm_lang$core$String$append,
+								'-',
+								function (_) {
+									return _.match;
+								}(_p30));
+						},
+						string)))));
+};
+var _elm_community$string_extra$String_Extra$decapitalize = function (word) {
+	return A2(_elm_community$string_extra$String_Extra$changeCase, _elm_lang$core$Char$toLower, word);
+};
 
 //import Result //
 
@@ -14451,7 +14630,10 @@ var _user$project$Types$initialModel = {
 	loadingEnvironments: true,
 	environments: {ctor: '[]'},
 	loadingBugs: false,
-	bugs: {ctor: '[]'},
+	bugs: {
+		items: {ctor: '[]'},
+		nextItem: _elm_lang$core$Maybe$Nothing
+	},
 	loadingFocusedBug: false,
 	focusedBug: _elm_lang$core$Maybe$Nothing,
 	focusedBugOccurrences: _elm_lang$core$Maybe$Nothing,
@@ -14463,6 +14645,10 @@ var _user$project$Types$initialModel = {
 	now: _elm_lang$core$Date$fromTime(0),
 	showTimeAgo: true
 };
+var _user$project$Types$Chunk = F2(
+	function (a, b) {
+		return {items: a, nextItem: b};
+	});
 var _user$project$Types$Model = function (a) {
 	return function (b) {
 		return function (c) {
@@ -14852,47 +15038,48 @@ var _user$project$View$errorClass = function (bug) {
 		_elm_lang$core$List$head(
 			A2(_elm_lang$core$String$split, ' : ', bug.message)));
 };
-var _user$project$View$bugGroups = function (model) {
-	var groupFor = function (diff) {
-		return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > -1) ? 'Earlier' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > -1) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > -1) ? 'Earlier Today' : 'Past Hour'));
-	};
-	var groupNames = {
-		ctor: '::',
-		_0: 'Past Hour',
-		_1: {
+var _user$project$View$bugGroups = F2(
+	function (now, bugs) {
+		var groupFor = function (diff) {
+			return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > -1) ? 'Earlier' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > -1) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > -1) ? 'Earlier Today' : 'Past Hour'));
+		};
+		var groupNames = {
 			ctor: '::',
-			_0: 'Past Day',
+			_0: 'Past Hour',
 			_1: {
 				ctor: '::',
-				_0: 'Past Week',
+				_0: 'Past Day',
 				_1: {
 					ctor: '::',
-					_0: 'Earlier',
-					_1: {ctor: '[]'}
+					_0: 'Past Week',
+					_1: {
+						ctor: '::',
+						_0: 'Earlier',
+						_1: {ctor: '[]'}
+					}
 				}
 			}
-		}
-	};
-	var periodDiff = function (bug) {
-		return A2(_rluiten$elm_date_extra$Date_Extra_Period$diff, model.now, bug.lastOccurredAt);
-	};
-	var group = function (name) {
-		return {
-			ctor: '_Tuple2',
-			_0: name,
-			_1: A2(
-				_elm_lang$core$List$filter,
-				function (bug) {
-					return _elm_lang$core$Native_Utils.eq(
-						groupFor(
-							periodDiff(bug)),
-						name);
-				},
-				model.bugs)
 		};
-	};
-	return A2(_elm_lang$core$List$map, group, groupNames);
-};
+		var periodDiff = function (bug) {
+			return A2(_rluiten$elm_date_extra$Date_Extra_Period$diff, now, bug.lastOccurredAt);
+		};
+		var group = function (name) {
+			return {
+				ctor: '_Tuple2',
+				_0: name,
+				_1: A2(
+					_elm_lang$core$List$filter,
+					function (bug) {
+						return _elm_lang$core$Native_Utils.eq(
+							groupFor(
+								periodDiff(bug)),
+							name);
+					},
+					bugs)
+			};
+		};
+		return A2(_elm_lang$core$List$map, group, groupNames);
+	});
 var _user$project$View$formatDate = F2(
 	function (model, date) {
 		return model.showTimeAgo ? A2(_user$project$TimeAgo$timeAgo, model.now, date) : A2(_mgold$elm_date_format$Date_Format$format, '%e %b %Y %k:%M:%S', date);
@@ -14993,6 +15180,38 @@ var _user$project$View$occurrenceDisplay = F2(
 				}
 			});
 	});
+var _user$project$View$paginatedList = F2(
+	function (displayItems, page) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				displayItems(page.items),
+				function () {
+					var _p2 = page.nextItem;
+					if (_p2.ctor === 'Just') {
+						return {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$button,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('button'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Show more'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						};
+					} else {
+						return {ctor: '[]'};
+					}
+				}()));
+	});
 var _user$project$View$occurrencesDisplay = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -15076,13 +15295,22 @@ var _user$project$View$occurrencesDisplay = function (model) {
 						_0: _elm_lang$html$Html_Attributes$class('panel'),
 						_1: {ctor: '[]'}
 					},
-					A2(
-						_elm_lang$core$List$map,
-						_user$project$View$occurrenceDisplay(model),
-						A2(
-							_elm_lang$core$Maybe$withDefault,
-							{ctor: '[]'},
-							model.focusedBugOccurrences))),
+					{
+						ctor: '::',
+						_0: function () {
+							var _p3 = model.focusedBugOccurrences;
+							if (_p3.ctor === 'Just') {
+								return A2(
+									_user$project$View$paginatedList,
+									_elm_lang$core$List$map(
+										_user$project$View$occurrenceDisplay(model)),
+									_p3._0);
+							} else {
+								return _elm_lang$html$Html$text('Loading...');
+							}
+						}(),
+						_1: {ctor: '[]'}
+					}),
 				_1: {ctor: '[]'}
 			}
 		});
@@ -15401,9 +15629,9 @@ var _user$project$View$selectedBug = function (model) {
 				_1: {ctor: '[]'}
 			});
 	} else {
-		var _p2 = model.focusedBug;
-		if (_p2.ctor === 'Just') {
-			var _p3 = _p2._0;
+		var _p4 = model.focusedBug;
+		if (_p4.ctor === 'Just') {
+			var _p5 = _p4._0;
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -15413,13 +15641,13 @@ var _user$project$View$selectedBug = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: A2(_user$project$View$selectedBugHeader, model, _p3),
+					_0: A2(_user$project$View$selectedBugHeader, model, _p5),
 					_1: {
 						ctor: '::',
-						_0: _user$project$View$linkedIssue(_p3),
+						_0: _user$project$View$linkedIssue(_p5),
 						_1: {
 							ctor: '::',
-							_0: A2(_user$project$View$stackTraceDisplay, model, _p3),
+							_0: A2(_user$project$View$stackTraceDisplay, model, _p5),
 							_1: {
 								ctor: '::',
 								_0: _user$project$View$occurrencesDisplay(model),
@@ -15443,9 +15671,9 @@ var _user$project$View$selectedBug = function (model) {
 var _user$project$View$sidebarBug = F2(
 	function (model, bug) {
 		var isSelected = function () {
-			var _p4 = model.focusedBug;
-			if (_p4.ctor === 'Just') {
-				return _elm_lang$core$Native_Utils.eq(_p4._0.id, bug.id);
+			var _p6 = model.focusedBug;
+			if (_p6.ctor === 'Just') {
+				return _elm_lang$core$Native_Utils.eq(_p6._0.id, bug.id);
 			} else {
 				return false;
 			}
@@ -15560,11 +15788,11 @@ var _user$project$View$sidebarBug = F2(
 			});
 	});
 var _user$project$View$sidebarBugGroup = F2(
-	function (model, _p5) {
-		var _p6 = _p5;
-		var _p7 = _p6._1;
+	function (model, _p7) {
+		var _p8 = _p7;
+		var _p9 = _p8._1;
 		return (_elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$List$length(_p7),
+			_elm_lang$core$List$length(_p9),
 			0) > 0) ? {
 			ctor: '::',
 			_0: A2(
@@ -15576,7 +15804,7 @@ var _user$project$View$sidebarBugGroup = F2(
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p6._0),
+					_0: _elm_lang$html$Html$text(_p8._0),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -15591,10 +15819,17 @@ var _user$project$View$sidebarBugGroup = F2(
 					A2(
 						_elm_lang$core$List$map,
 						_user$project$View$sidebarBug(model),
-						_p7)),
+						_p9)),
 				_1: {ctor: '[]'}
 			}
 		} : {ctor: '[]'};
+	});
+var _user$project$View$sidebarBugGroups = F2(
+	function (model, bugs) {
+		return A2(
+			_elm_lang$core$List$concatMap,
+			_user$project$View$sidebarBugGroup(model),
+			A2(_user$project$View$bugGroups, model.now, bugs));
 	});
 var _user$project$View$sidebarBugs = function (model) {
 	return A2(
@@ -15613,40 +15848,21 @@ var _user$project$View$sidebarBugs = function (model) {
 				_1: {ctor: '[]'}
 			}
 		},
-		model.loadingBugs ? {
+		{
 			ctor: '::',
-			_0: A2(
+			_0: model.loadingBugs ? A2(
 				_elm_lang$html$Html$span,
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$class('loading-spinner'),
 					_1: {ctor: '[]'}
 				},
-				{ctor: '[]'}),
+				{ctor: '[]'}) : A2(
+				_user$project$View$paginatedList,
+				_user$project$View$sidebarBugGroups(model),
+				model.bugs),
 			_1: {ctor: '[]'}
-		} : A2(
-			_elm_lang$core$Basics_ops['++'],
-			A2(
-				_elm_lang$core$List$concatMap,
-				_user$project$View$sidebarBugGroup(model),
-				_user$project$View$bugGroups(model)),
-			_elm_lang$core$List$isEmpty(
-				_user$project$View$bugGroups(model)) ? {ctor: '[]'} : {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$button,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('button'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Load more'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}));
+		});
 };
 var _user$project$View$environmentMenuItem = F2(
 	function (selectedEnvironmentIds, environment) {
@@ -15880,8 +16096,8 @@ var _user$project$View$content = function (model) {
 		});
 };
 var _user$project$View$errorMessages = function (model) {
-	var _p8 = model.error;
-	if (_p8.ctor === 'Just') {
+	var _p10 = model.error;
+	if (_p10.ctor === 'Just') {
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -15905,7 +16121,7 @@ var _user$project$View$errorMessages = function (model) {
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p8._0),
+					_0: _elm_lang$html$Html$text(_p10._0),
 					_1: {ctor: '[]'}
 				}
 			});
@@ -15959,6 +16175,22 @@ var _user$project$Rest$stacktrace = _elm_lang$core$Json_Decode$maybe(
 			}
 		},
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
+var _user$project$Rest$decodeChunk = F2(
+	function (pageSize, decodeItem) {
+		var toPage = function (items) {
+			var _p2 = A2(_elm_community$list_extra$List_Extra$splitAt, pageSize, items);
+			var wanted = _p2._0;
+			var rest = _p2._1;
+			return A2(
+				_user$project$Types$Chunk,
+				wanted,
+				_elm_lang$core$List$head(rest));
+		};
+		return A2(
+			_elm_lang$core$Json_Decode$map,
+			toPage,
+			_elm_lang$core$Json_Decode$list(decodeItem));
+	});
 var _user$project$Rest$decodeUUID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$UUID, _elm_lang$core$Json_Decode$string);
 var _user$project$Rest$decodeEnvironmentID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$EnvironmentID, _user$project$Rest$decodeUUID);
 var _user$project$Rest$decodeEnvironment = A3(
@@ -15971,9 +16203,9 @@ var _user$project$Rest$decodeOccurrenceID = A2(_elm_lang$core$Json_Decode$map, _
 var _user$project$Rest$decodeEnvironments = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeEnvironment);
 var _user$project$Rest$date = function () {
 	var decodeDateFromString = function (s) {
-		var _p2 = _elm_lang$core$Date$fromString(s);
-		if (_p2.ctor === 'Ok') {
-			return _elm_lang$core$Json_Decode$succeed(_p2._0);
+		var _p3 = _elm_lang$core$Date$fromString(s);
+		if (_p3.ctor === 'Ok') {
+			return _elm_lang$core$Json_Decode$succeed(_p3._0);
 		} else {
 			return _elm_lang$core$Json_Decode$fail(
 				A2(_elm_lang$core$Basics_ops['++'], 'Invalid date: ', s));
@@ -15995,7 +16227,6 @@ var _user$project$Rest$decodeBug = A9(
 		'closed_at',
 		_elm_lang$core$Json_Decode$maybe(_user$project$Rest$date)),
 	_user$project$Rest$stacktrace);
-var _user$project$Rest$decodeBugs = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeBug);
 var _user$project$Rest$closeBug = function (bugId) {
 	return A2(
 		_elm_lang$http$Http$send,
@@ -16014,17 +16245,16 @@ var _user$project$Rest$decodeOccurrence = A6(
 	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode$field, 'data', _elm_lang$core$Json_Decode$value));
-var _user$project$Rest$decodeOccurrences = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeOccurrence);
-var _user$project$Rest$occurrencesUrl = function (_p3) {
-	var _p4 = _p3;
+var _user$project$Rest$occurrencesUrl = function (_p4) {
+	var _p5 = _p4;
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		'/bugs/',
-		A2(_elm_lang$core$Basics_ops['++'], _p4._0.toString, '/occurrences'));
+		A2(_elm_lang$core$Basics_ops['++'], _p5._0.toString, '/occurrences'));
 };
-var _user$project$Rest$detailsUrl = function (_p5) {
-	var _p6 = _p5;
-	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', _p6._0.toString);
+var _user$project$Rest$detailsUrl = function (_p6) {
+	var _p7 = _p6;
+	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', _p7._0.toString);
 };
 var _user$project$Rest$loadBugDetails = function (bugId) {
 	return _elm_lang$core$Platform_Cmd$batch(
@@ -16045,7 +16275,7 @@ var _user$project$Rest$loadBugDetails = function (bugId) {
 					A2(
 						_elm_lang$http$Http$get,
 						_user$project$Rest$occurrencesUrl(bugId),
-						_user$project$Rest$decodeOccurrences)),
+						A2(_user$project$Rest$decodeChunk, 100, _user$project$Rest$decodeOccurrence))),
 				_1: {ctor: '[]'}
 			}
 		});
@@ -16063,9 +16293,9 @@ var _user$project$Rest$openBugsUrl = function (environmentIds) {
 				'&',
 				A2(
 					_elm_lang$core$List$map,
-					function (_p7) {
-						var _p8 = _p7;
-						return A2(_elm_lang$core$Basics_ops['++'], 'environment_ids[]=', _p8._0.toString);
+					function (_p8) {
+						var _p9 = _p8;
+						return A2(_elm_lang$core$Basics_ops['++'], 'environment_ids[]=', _p9._0.toString);
 					},
 					environmentIds))));
 };
@@ -16075,7 +16305,10 @@ var _user$project$Rest$loadBugs = F2(
 		return A2(
 			_elm_lang$http$Http$send,
 			_user$project$Types$LoadedBugs,
-			A2(_elm_lang$http$Http$get, url, _user$project$Rest$decodeBugs));
+			A2(
+				_elm_lang$http$Http$get,
+				url,
+				A2(_user$project$Rest$decodeChunk, 100, _user$project$Rest$decodeBug)));
 	});
 var _user$project$Rest$environmentsUrl = '/environments';
 var _user$project$Rest$loadEnvironments = A2(
@@ -16094,17 +16327,9 @@ var _user$project$Main$bugInEnvironment = F2(
 	function (environmentId, bug) {
 		return _elm_lang$core$Native_Utils.eq(bug.environmentId, environmentId);
 	});
-var _user$project$Main$isJust = function (x) {
-	var _p0 = x;
-	if (_p0.ctor === 'Just') {
-		return true;
-	} else {
-		return false;
-	}
-};
 var _user$project$Main$bugInList = F2(
 	function (bugs, bug) {
-		return !_user$project$Main$isJust(
+		return !_elm_community$maybe_extra$Maybe_Extra$isJust(
 			A2(
 				_elm_community$list_extra$List_Extra$find,
 				function (x) {
@@ -16127,7 +16352,7 @@ var _user$project$Main$loadedBugs = F2(
 		var newFocusedBug = A2(
 			_user$project$Main$shouldHideFocusedBug,
 			model,
-			_user$project$Main$bugInList(bugs)) ? _elm_lang$core$Maybe$Nothing : model.focusedBug;
+			_user$project$Main$bugInList(bugs.items)) ? _elm_lang$core$Maybe$Nothing : model.focusedBug;
 		return _user$project$Main$noCmd(
 			_elm_lang$core$Native_Utils.update(
 				model,
@@ -16135,38 +16360,47 @@ var _user$project$Main$loadedBugs = F2(
 	});
 var _user$project$Main$closedBug = F2(
 	function (model, bugDetails) {
-		var bugList = A3(
-			_elm_community$list_extra$List_Extra$replaceIf,
-			function (x) {
-				return _elm_lang$core$Native_Utils.eq(bugDetails.id, x.id);
-			},
-			bugDetails,
-			model.bugs);
+		var filteredBugs = function (bugs) {
+			return _elm_lang$core$Native_Utils.update(
+				bugs,
+				{
+					items: A3(
+						_elm_community$list_extra$List_Extra$replaceIf,
+						function (x) {
+							return _elm_lang$core$Native_Utils.eq(bugDetails.id, x.id);
+						},
+						bugDetails,
+						bugs.items)
+				});
+		};
 		var bug = _elm_lang$core$Maybe$Just(bugDetails);
 		return _user$project$Main$noCmd(
 			_elm_lang$core$Native_Utils.update(
 				model,
-				{focusedBug: bug, bugs: bugList}));
+				{
+					focusedBug: bug,
+					bugs: filteredBugs(model.bugs)
+				}));
 	});
 var _user$project$Main$handleResult = F3(
 	function (handler, model, result) {
-		var _p1 = result;
-		if (_p1.ctor === 'Err') {
+		var _p0 = result;
+		if (_p0.ctor === 'Err') {
 			return _user$project$Main$noCmd(
 				_elm_lang$core$Native_Utils.update(
 					model,
 					{
 						error: _elm_lang$core$Maybe$Just(
-							_elm_lang$core$Basics$toString(_p1._0))
+							_elm_lang$core$Basics$toString(_p0._0))
 					}));
 		} else {
-			return handler(_p1._0);
+			return handler(_p0._0);
 		}
 	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p2 = msg;
-		switch (_p2.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'LoadedEnvironments':
 				return A3(
 					_user$project$Main$handleResult,
@@ -16177,13 +16411,13 @@ var _user$project$Main$update = F2(
 								{environments: environments, loadingEnvironments: false}));
 					},
 					model,
-					_p2._0);
+					_p1._0);
 			case 'LoadedBugs':
 				return A3(
 					_user$project$Main$handleResult,
 					_user$project$Main$loadedBugs(model),
 					model,
-					_p2._0);
+					_p1._0);
 			case 'ShowEnvironmentBugs':
 				var newModel = _elm_lang$core$Native_Utils.update(
 					model,
@@ -16193,7 +16427,7 @@ var _user$project$Main$update = F2(
 							model.selectedEnvironmentIds,
 							{
 								ctor: '::',
-								_0: _p2._0,
+								_0: _p1._0,
 								_1: {ctor: '[]'}
 							}),
 						loadingBugs: true
@@ -16207,17 +16441,17 @@ var _user$project$Main$update = F2(
 						_1: {ctor: '[]'}
 					});
 			case 'HideEnvironmentBugs':
-				var _p3 = _p2._0;
+				var _p2 = _p1._0;
 				var newEnvironmentIds = A2(
 					_elm_lang$core$List$filter,
 					function (x) {
-						return !_elm_lang$core$Native_Utils.eq(x, _p3);
+						return !_elm_lang$core$Native_Utils.eq(x, _p2);
 					},
 					model.selectedEnvironmentIds);
 				var newFocusedBug = A2(
 					_user$project$Main$shouldHideFocusedBug,
 					model,
-					_user$project$Main$bugInEnvironment(_p3)) ? _elm_lang$core$Maybe$Nothing : model.focusedBug;
+					_user$project$Main$bugInEnvironment(_p2)) ? _elm_lang$core$Maybe$Nothing : model.focusedBug;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
@@ -16229,15 +16463,15 @@ var _user$project$Main$update = F2(
 						_1: {ctor: '[]'}
 					});
 			case 'SetSelectedEnvironmentIds':
-				var _p4 = _p2._0;
+				var _p3 = _p1._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selectedEnvironmentIds: _p4, loadingBugs: true}),
+						{selectedEnvironmentIds: _p3, loadingBugs: true}),
 					{
 						ctor: '::',
-						_0: A2(_user$project$Rest$loadBugs, _p4, false),
+						_0: A2(_user$project$Rest$loadBugs, _p3, false),
 						_1: {ctor: '[]'}
 					});
 			case 'RequestDetails':
@@ -16251,7 +16485,7 @@ var _user$project$Main$update = F2(
 						}),
 					{
 						ctor: '::',
-						_0: _user$project$Rest$loadBugDetails(_p2._0),
+						_0: _user$project$Rest$loadBugDetails(_p1._0),
 						_1: {ctor: '[]'}
 					});
 			case 'LoadedDetails':
@@ -16267,7 +16501,7 @@ var _user$project$Main$update = F2(
 								}));
 					},
 					model,
-					_p2._0);
+					_p1._0);
 			case 'LoadedOccurrences':
 				return A3(
 					_user$project$Main$handleResult,
@@ -16280,20 +16514,20 @@ var _user$project$Main$update = F2(
 								}));
 					},
 					model,
-					_p2._0);
+					_p1._0);
 			case 'ClosedBug':
 				return A3(
 					_user$project$Main$handleResult,
 					_user$project$Main$closedBug(model),
 					model,
-					_p2._0);
+					_p1._0);
 			case 'CloseBug':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
 					{
 						ctor: '::',
-						_0: _user$project$Rest$closeBug(_p2._0),
+						_0: _user$project$Rest$closeBug(_p1._0),
 						_1: {ctor: '[]'}
 					});
 			case 'HideBug':
@@ -16347,22 +16581,22 @@ var _user$project$Main$update = F2(
 						model,
 						{showFullStackTrace: !model.showFullStackTrace}));
 			case 'ToggleOccurrence':
-				var _p5 = _p2._0;
-				return A2(_elm_lang$core$List$member, _p5, model.expandedOccurrences) ? _user$project$Main$noCmd(
+				var _p4 = _p1._0;
+				return A2(_elm_lang$core$List$member, _p4, model.expandedOccurrences) ? _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
 							expandedOccurrences: A2(
 								_elm_lang$core$List$filter,
 								function (oId) {
-									return !_elm_lang$core$Native_Utils.eq(oId, _p5);
+									return !_elm_lang$core$Native_Utils.eq(oId, _p4);
 								},
 								model.expandedOccurrences)
 						})) : _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							expandedOccurrences: {ctor: '::', _0: _p5, _1: model.expandedOccurrences}
+							expandedOccurrences: {ctor: '::', _0: _p4, _1: model.expandedOccurrences}
 						}));
 			case 'ToggleTimeFormat':
 				return _user$project$Main$noCmd(
@@ -16374,7 +16608,7 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							now: _elm_lang$core$Date$fromTime(_p2._0)
+							now: _elm_lang$core$Date$fromTime(_p1._0)
 						}));
 		}
 	});
@@ -16384,8 +16618,8 @@ var _user$project$Main$subscriptions = function (model) {
 var _user$project$Main$location2messages = function (location) {
 	var builder = _rgrempel$elm_route_url$RouteUrl_Builder$fromUrl(location.href);
 	var selectedEnvironmentIds = function () {
-		var _p6 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
-		if (_p6.ctor === 'Just') {
+		var _p5 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
+		if (_p5.ctor === 'Just') {
 			return A2(
 				_elm_lang$core$List$filter,
 				function (s) {
@@ -16393,7 +16627,7 @@ var _user$project$Main$location2messages = function (location) {
 						_elm_lang$core$String$length(s),
 						0) > 0;
 				},
-				A2(_elm_lang$core$String$split, ',', _p6._0));
+				A2(_elm_lang$core$String$split, ',', _p5._0));
 		} else {
 			return {ctor: '[]'};
 		}
@@ -16425,17 +16659,17 @@ var _user$project$Main$location2messages = function (location) {
 		},
 		focusBug);
 };
-var _user$project$Main$environmentIDToString = function (_p7) {
-	var _p8 = _p7;
-	return _p8._0.toString;
+var _user$project$Main$environmentIDToString = function (_p6) {
+	var _p7 = _p6;
+	return _p7._0.toString;
 };
 var _user$project$Main$delta2url = F2(
-	function (_p9, model) {
+	function (_p8, model) {
 		var selectedBug = function () {
-			var _p10 = model.focusedBug;
-			if (_p10.ctor === 'Just') {
-				var _p11 = _p10._0.id;
-				var uuid = _p11._0;
+			var _p9 = model.focusedBug;
+			if (_p9.ctor === 'Just') {
+				var _p10 = _p9._0.id;
+				var uuid = _p10._0;
 				return A2(_elm_lang$core$Basics_ops['++'], '#', uuid.toString);
 			} else {
 				return '#';

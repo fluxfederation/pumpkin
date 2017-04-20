@@ -208,11 +208,11 @@ noCmd model =
     model ! [ Cmd.none ]
 
 
-loadedBugs : Model -> List Bug -> ( Model, Cmd Msg )
+loadedBugs : Model -> Chunk Bug -> ( Model, Cmd Msg )
 loadedBugs model bugs =
     let
         newFocusedBug =
-            if shouldHideFocusedBug model (bugInList bugs) then
+            if shouldHideFocusedBug model (bugInList bugs.items) then
                 Nothing
             else
                 model.focusedBug
@@ -226,12 +226,10 @@ closedBug model bugDetails =
         bug =
             Just bugDetails
 
-        bugList =
-            ListX.replaceIf (\x -> bugDetails.id == x.id) bugDetails model.bugs
+        filteredBugs bugs =
+            { bugs | items = ListX.replaceIf (\x -> bugDetails.id == x.id) bugDetails bugs.items }
     in
-        noCmd { model | focusedBug = bug, bugs = bugList }
-
-
+        noCmd { model | focusedBug = bug, bugs = filteredBugs (model.bugs) }
 
 
 bugInList : List Bug -> Bug -> Bool
