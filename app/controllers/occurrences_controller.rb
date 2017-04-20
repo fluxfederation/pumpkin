@@ -28,12 +28,12 @@ class OccurrencesController < ApplicationController
   def authenticate!
     authorization = request.headers['Authorization']
     if authorization.blank?
-      render json: {message: "Unauthorized"}, status: :unauthorized
+      render json: {message: "Unauthorized - missing token"}, status: :unauthorized
       return
     end
     raw_token = authorization.split(" ").last
     if !ActiveSupport::SecurityUtils.secure_compare(raw_token, Rails.application.secrets.auth_token)
-      render json: {message: "Unauthorized"}, status: :unauthorized
+      render json: {message: "Unauthorized - token doesn't match"}, status: :unauthorized
       return
     end
   end
