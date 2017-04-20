@@ -1,6 +1,6 @@
 default: js
 
-ELM_FILES = $(shell find elm/src -type f -name '*.elm')
+ELM_FILES = $(shell find elm/src -type f -name '*.elm' -not -name '.\#*')
 
 js: public/js/app.js
 
@@ -21,7 +21,7 @@ realclean: clean clean-deps
 
 watch: js
 	@echo "Watching for changes..."
-	@fswatch elm/src/ | while read; do clear; date; make js; done
+	@fswatch elm/src/ | grep -v '.\#' | while read changed; do date; echo "MODIFIED: $$changed"; make js; done
 
 .PHONY: js
 .PHONY: realclean
