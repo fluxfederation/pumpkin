@@ -79,10 +79,6 @@ type alias Bug =
     }
 
 
-type alias Occurrences =
-    List Occurrence
-
-
 type alias Occurrence =
     { id : String
     , environmentId : String

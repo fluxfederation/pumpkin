@@ -87,7 +87,7 @@ decodeBug =
         (stacktrace)
 
 
-decodeOccurrences : Decoder Occurrences
+decodeOccurrences : Decoder (List Occurrence)
 decodeOccurrences =
     list decodeOccurrence
 
