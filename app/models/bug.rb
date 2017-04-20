@@ -5,8 +5,8 @@ class Bug < ApplicationRecord
 
   belongs_to :latest_event, class_name: 'Event', optional: true
 
-  scope :in_occurrance_order, ->{ order('last_occurred_at DESC') }
-  scope :with_occurrance_includes, ->{ includes(:primary_occurrence => :environment) }
+  scope :in_occurrence_order, ->{ order('last_occurred_at DESC') }
+  scope :with_occurrence_includes, ->{ includes(:primary_occurrence => :environment) }
   scope :with_primary_occurrence_in_environment, ->(environment_ids){ joins(:primary_occurrence).merge(Occurrence.where(:environment_id => environment_ids)) }
 
   # closed and open rely on latest_even_name from the bug_with_latest_details view
