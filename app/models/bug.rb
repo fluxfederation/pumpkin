@@ -7,7 +7,10 @@ class Bug < ApplicationRecord
 
   scope :in_occurrence_order, ->{ order('last_occurred_at DESC') }
   scope :with_occurrence_includes, ->{ includes(:primary_occurrence => :environment) }
-  scope :with_primary_occurrence_in_environment, ->(environment_ids){ joins(:primary_occurrence).merge(Occurrence.where(:environment_id => environment_ids)) }
+
+  #Assumes join with primary_occurrence
+  scope :with_primary_occurrence_in_environment, ->(environment_ids) { joins(:primary_occurrence).merge(Occurrence.where(:environment_id => environment_ids)) }
+  scope :search, ->(query){ distinct.joins(:occurrences).merge(Occurrence.where("occurrences.message @@ ?", query)) }
 
   # closed and open rely on latest_even_name from the bug_with_latest_details view
   scope :closed, ->{ where("latest_event_name =?", "closed") }

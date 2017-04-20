@@ -1,6 +1,12 @@
 class BugsController < ApplicationController
   def index
-    search = BugSearch.new(ids: params[:ids], environment_ids: params[:environment_ids], closed: (params[:closed] == "true"), limit: params[:limit])
+    search = BugSearch.new(
+      ids: params[:ids],
+      environment_ids: params[:environment_ids],
+      closed: (params[:closed] == "true"),
+      search: params[:search].presence,
+      limit: params[:limit]
+    )
 
     render json: search.bugs, include: []
   end

@@ -55,6 +55,31 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
     assert_response_schema "bugs/index.json"
   end
 
+  test "index with matching search clauses" do
+    get bugs_path, params: {environment_ids: @default_environment_ids, search: "Pumpkin"}
+    assert_response :success
+    assert_response_schema "bugs/index.json"
+
+    messages = JSON::parse(@response.body).map { |bug| bug["message"] }
+    # Even though there's two occurrences we should only be finding one bug
+    assert_equal ["Pumpkin"], messages
+  end
+
+  test "index with no matching search clauses" do
+    get bugs_path, params: {environment_ids: @default_environment_ids, search: "Squash"}
+    assert_response :success
+    assert_empty JSON.parse(@response.body)
+  end
+
+  test "index with matching search clauses filters by environment" do
+    get bugs_path, params: {environment_ids: environments(:qa).to_param, search: "normal"}
+    assert_response :success
+    assert_response_schema "bugs/index.json"
+
+    messages = JSON::parse(@response.body).map { |bug| bug["message"] }
+    assert_equal [occurrences(:qa_normal).message], messages
+  end
+
   test "show" do
     get bug_path(bugs(:prod_normal))
     assert_response :success
