@@ -7,6 +7,7 @@ import Types exposing (..)
 import View
 import Rest
 import List.Extra as ListX
+import Maybe.Extra as MaybeX
 import Navigation exposing (..)
 import RouteUrl exposing (..)
 import RouteUrl.Builder as BuildUrl
@@ -231,19 +232,11 @@ closedBug model bugDetails =
         noCmd { model | focusedBug = bug, bugs = bugList }
 
 
-isJust : Maybe x -> Bool
-isJust x =
-    case x of
-        Just _ ->
-            True
-
-        Nothing ->
-            False
 
 
 bugInList : List Bug -> Bug -> Bool
 bugInList bugs bug =
-    not <| isJust <| (ListX.find (\x -> x.id == bug.id) bugs)
+    not <| MaybeX.isJust <| (ListX.find (\x -> x.id == bug.id) bugs)
 
 
 bugInEnvironment : EnvironmentID -> Bug -> Bool
