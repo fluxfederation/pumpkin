@@ -8,7 +8,7 @@ class BugSearch
 
     @bugs = bugs.with_primary_occurrence_in_environment(environment_ids)
 
-    @bugs.limit(limit) if limit
+    @bugs = @bugs.limit(limit) if limit
 
     @bugs = closed ? bugs.closed : bugs.open
   end
