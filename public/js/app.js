@@ -16564,251 +16564,228 @@ var _user$project$Main$handleResult = F3(
 	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p2 = msg;
-		switch (_p2.ctor) {
-			case 'LoadedEnvironments':
-				return A3(
-					_user$project$Main$handleResult,
-					function (environments) {
-						return _user$project$Main$noCmd(
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{environments: environments, loadingEnvironments: false}));
-					},
-					model,
-					_p2._0);
-			case 'LoadedBugs':
-				return A3(
-					_user$project$Main$handleResult,
-					_user$project$Main$loadedBugs(model),
-					model,
-					_p2._0);
-			case 'ShowEnvironmentBugs':
-				var newModel = _elm_lang$core$Native_Utils.update(
-					model,
-					{
-						selectedEnvironmentIds: A2(
-							_elm_lang$core$Basics_ops['++'],
-							model.selectedEnvironmentIds,
+		update:
+		while (true) {
+			var _p2 = msg;
+			switch (_p2.ctor) {
+				case 'LoadedEnvironments':
+					return A3(
+						_user$project$Main$handleResult,
+						function (environments) {
+							return _user$project$Main$noCmd(
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{environments: environments, loadingEnvironments: false}));
+						},
+						model,
+						_p2._0);
+				case 'LoadedBugs':
+					return A3(
+						_user$project$Main$handleResult,
+						_user$project$Main$loadedBugs(model),
+						model,
+						_p2._0);
+				case 'ShowEnvironmentBugs':
+					var _v3 = _user$project$Types$SearchSubmit,
+						_v4 = _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							selectedEnvironmentIds: A2(
+								_elm_lang$core$Basics_ops['++'],
+								model.selectedEnvironmentIds,
+								{
+									ctor: '::',
+									_0: _p2._0,
+									_1: {ctor: '[]'}
+								})
+						});
+					msg = _v3;
+					model = _v4;
+					continue update;
+				case 'HideEnvironmentBugs':
+					var _p3 = _p2._0;
+					var newEnvironmentIds = A2(
+						_elm_lang$core$List$filter,
+						function (x) {
+							return !_elm_lang$core$Native_Utils.eq(x, _p3);
+						},
+						model.selectedEnvironmentIds);
+					var newFocusedBug = A2(
+						_user$project$Main$shouldHideFocusedBug,
+						model,
+						_user$project$Main$bugInEnvironment(_p3)) ? _elm_lang$core$Maybe$Nothing : model.focusedBug;
+					var _v5 = _user$project$Types$SearchSubmit,
+						_v6 = _elm_lang$core$Native_Utils.update(
+						model,
+						{selectedEnvironmentIds: newEnvironmentIds, focusedBug: newFocusedBug});
+					msg = _v5;
+					model = _v6;
+					continue update;
+				case 'SetSelectedEnvironmentIds':
+					var _v7 = _user$project$Types$SearchSubmit,
+						_v8 = _elm_lang$core$Native_Utils.update(
+						model,
+						{selectedEnvironmentIds: _p2._0});
+					msg = _v7;
+					model = _v8;
+					continue update;
+				case 'RequestDetails':
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
 							{
-								ctor: '::',
-								_0: _p2._0,
-								_1: {ctor: '[]'}
+								expandedOccurrences: {ctor: '[]'},
+								loadingFocusedBug: true
 							}),
-						loadingBugs: true
-					});
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					newModel,
-					{
-						ctor: '::',
-						_0: A4(_user$project$Rest$loadBugs, newModel.selectedEnvironmentIds, false, _elm_lang$core$Maybe$Nothing, newModel.search),
-						_1: {ctor: '[]'}
-					});
-			case 'HideEnvironmentBugs':
-				var _p3 = _p2._0;
-				var newEnvironmentIds = A2(
-					_elm_lang$core$List$filter,
-					function (x) {
-						return !_elm_lang$core$Native_Utils.eq(x, _p3);
-					},
-					model.selectedEnvironmentIds);
-				var newFocusedBug = A2(
-					_user$project$Main$shouldHideFocusedBug,
-					model,
-					_user$project$Main$bugInEnvironment(_p3)) ? _elm_lang$core$Maybe$Nothing : model.focusedBug;
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{selectedEnvironmentIds: newEnvironmentIds, focusedBug: newFocusedBug, loadingBugs: true}),
-					{
-						ctor: '::',
-						_0: A4(_user$project$Rest$loadBugs, newEnvironmentIds, false, _elm_lang$core$Maybe$Nothing, model.search),
-						_1: {ctor: '[]'}
-					});
-			case 'SetSelectedEnvironmentIds':
-				var _p4 = _p2._0;
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{selectedEnvironmentIds: _p4, loadingBugs: true}),
-					{
-						ctor: '::',
-						_0: A4(_user$project$Rest$loadBugs, _p4, false, _elm_lang$core$Maybe$Nothing, model.search),
-						_1: {ctor: '[]'}
-					});
-			case 'RequestDetails':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
 						{
-							expandedOccurrences: {ctor: '[]'},
-							loadingFocusedBug: true
-						}),
-					{
-						ctor: '::',
-						_0: _user$project$Rest$loadBugDetails(_p2._0),
-						_1: {ctor: '[]'}
-					});
-			case 'LoadedDetails':
-				return A3(
-					_user$project$Main$handleResult,
-					function (bugDetails) {
-						return _user$project$Main$noCmd(
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{
-									focusedBug: _elm_lang$core$Maybe$Just(bugDetails),
-									loadingFocusedBug: false
-								}));
-					},
-					model,
-					_p2._0);
-			case 'LoadedOccurrences':
-				return A3(
-					_user$project$Main$handleResult,
-					function (occurrences) {
-						return _user$project$Main$noCmd(
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{
-									focusedBugOccurrences: _elm_lang$core$Maybe$Just(occurrences)
-								}));
-					},
-					model,
-					_p2._0);
-			case 'ClosedBug':
-				return A3(
-					_user$project$Main$handleResult,
-					_user$project$Main$closedBug(model),
-					model,
-					_p2._0);
-			case 'CloseBug':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{
-						ctor: '::',
-						_0: _user$project$Rest$closeBug(_p2._0),
-						_1: {ctor: '[]'}
-					});
-			case 'HideBug':
-				return _user$project$Main$noCmd(
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{focusedBug: _elm_lang$core$Maybe$Nothing}));
-			case 'ClearError':
-				return _user$project$Main$noCmd(
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{error: _elm_lang$core$Maybe$Nothing}));
-			case 'ShowClosedBugs':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{showClosedBugs: true, loadingBugs: true}),
-					{
-						ctor: '::',
-						_0: _user$project$Rest$loadEnvironments,
-						_1: {
 							ctor: '::',
-							_0: A4(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, true, _elm_lang$core$Maybe$Nothing, model.search),
+							_0: _user$project$Rest$loadBugDetails(_p2._0),
 							_1: {ctor: '[]'}
-						}
-					});
-			case 'HideClosedBugs':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
+						});
+				case 'LoadedDetails':
+					return A3(
+						_user$project$Main$handleResult,
+						function (bugDetails) {
+							return _user$project$Main$noCmd(
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										focusedBug: _elm_lang$core$Maybe$Just(bugDetails),
+										loadingFocusedBug: false
+									}));
+						},
 						model,
-						{showClosedBugs: false, loadingBugs: true}),
-					{
-						ctor: '::',
-						_0: _user$project$Rest$loadEnvironments,
-						_1: {
+						_p2._0);
+				case 'LoadedOccurrences':
+					return A3(
+						_user$project$Main$handleResult,
+						function (occurrences) {
+							return _user$project$Main$noCmd(
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										focusedBugOccurrences: _elm_lang$core$Maybe$Just(occurrences)
+									}));
+						},
+						model,
+						_p2._0);
+				case 'ClosedBug':
+					return A3(
+						_user$project$Main$handleResult,
+						_user$project$Main$closedBug(model),
+						model,
+						_p2._0);
+				case 'CloseBug':
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						model,
+						{
 							ctor: '::',
-							_0: A4(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, false, _elm_lang$core$Maybe$Nothing, model.search),
+							_0: _user$project$Rest$closeBug(_p2._0),
 							_1: {ctor: '[]'}
-						}
-					});
-			case 'ToggleMenu':
-				return _user$project$Main$noCmd(
-					_elm_lang$core$Native_Utils.update(
+						});
+				case 'HideBug':
+					return _user$project$Main$noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{focusedBug: _elm_lang$core$Maybe$Nothing}));
+				case 'ClearError':
+					return _user$project$Main$noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{error: _elm_lang$core$Maybe$Nothing}));
+				case 'ShowClosedBugs':
+					var _v9 = _user$project$Types$SearchSubmit,
+						_v10 = _elm_lang$core$Native_Utils.update(
 						model,
-						{showMenu: !model.showMenu}));
-			case 'ToggleFullStackTrace':
-				return _user$project$Main$noCmd(
-					_elm_lang$core$Native_Utils.update(
+						{showClosedBugs: true});
+					msg = _v9;
+					model = _v10;
+					continue update;
+				case 'HideClosedBugs':
+					var _v11 = _user$project$Types$SearchSubmit,
+						_v12 = _elm_lang$core$Native_Utils.update(
 						model,
-						{showFullStackTrace: !model.showFullStackTrace}));
-			case 'ToggleOccurrence':
-				var _p5 = _p2._0;
-				return A2(_elm_lang$core$List$member, _p5, model.expandedOccurrences) ? _user$project$Main$noCmd(
-					_elm_lang$core$Native_Utils.update(
-						model,
+						{showClosedBugs: false});
+					msg = _v11;
+					model = _v12;
+					continue update;
+				case 'ToggleMenu':
+					return _user$project$Main$noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{showMenu: !model.showMenu}));
+				case 'ToggleFullStackTrace':
+					return _user$project$Main$noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{showFullStackTrace: !model.showFullStackTrace}));
+				case 'ToggleOccurrence':
+					var _p4 = _p2._0;
+					return A2(_elm_lang$core$List$member, _p4, model.expandedOccurrences) ? _user$project$Main$noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								expandedOccurrences: A2(
+									_elm_lang$core$List$filter,
+									function (oId) {
+										return !_elm_lang$core$Native_Utils.eq(oId, _p4);
+									},
+									model.expandedOccurrences)
+							})) : _user$project$Main$noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								expandedOccurrences: {ctor: '::', _0: _p4, _1: model.expandedOccurrences}
+							}));
+				case 'ToggleTimeFormat':
+					return _user$project$Main$noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{showTimeAgo: !model.showTimeAgo}));
+				case 'TimeTick':
+					return _user$project$Main$noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								now: _elm_lang$core$Date$fromTime(_p2._0)
+							}));
+				case 'SearchChange':
+					return _user$project$Main$noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{search: _p2._0}));
+				case 'SearchSubmit':
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{loadingBugs: true}),
 						{
-							expandedOccurrences: A2(
-								_elm_lang$core$List$filter,
-								function (oId) {
-									return !_elm_lang$core$Native_Utils.eq(oId, _p5);
-								},
-								model.expandedOccurrences)
-						})) : _user$project$Main$noCmd(
-					_elm_lang$core$Native_Utils.update(
-						model,
+							ctor: '::',
+							_0: A4(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, model.showClosedBugs, _elm_lang$core$Maybe$Nothing, model.search),
+							_1: {ctor: '[]'}
+						});
+				case 'LoadMoreOccurrences':
+					return _user$project$Main$noCmd(model);
+				default:
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{loadingBugs: true}),
 						{
-							expandedOccurrences: {ctor: '::', _0: _p5, _1: model.expandedOccurrences}
-						}));
-			case 'ToggleTimeFormat':
-				return _user$project$Main$noCmd(
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{showTimeAgo: !model.showTimeAgo}));
-			case 'TimeTick':
-				return _user$project$Main$noCmd(
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							now: _elm_lang$core$Date$fromTime(_p2._0)
-						}));
-			case 'SearchChange':
-				return _user$project$Main$noCmd(
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{search: _p2._0}));
-			case 'SearchSubmit':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{loadingBugs: true}),
-					{
-						ctor: '::',
-						_0: A4(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, false, _elm_lang$core$Maybe$Nothing, model.search),
-						_1: {ctor: '[]'}
-					});
-			case 'LoadMoreOccurrences':
-				return _user$project$Main$noCmd(model);
-			default:
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{loadingBugs: true}),
-					{
-						ctor: '::',
-						_0: A4(
-							_user$project$Rest$loadBugs,
-							model.selectedEnvironmentIds,
-							false,
-							_elm_lang$core$Maybe$Just(_p2._0.id),
-							model.search),
-						_1: {ctor: '[]'}
-					});
+							ctor: '::',
+							_0: A4(
+								_user$project$Rest$loadBugs,
+								model.selectedEnvironmentIds,
+								model.showClosedBugs,
+								_elm_lang$core$Maybe$Just(_p2._0.id),
+								model.search),
+							_1: {ctor: '[]'}
+						});
+			}
 		}
 	});
 var _user$project$Main$subscriptions = function (model) {
@@ -16817,8 +16794,8 @@ var _user$project$Main$subscriptions = function (model) {
 var _user$project$Main$location2messages = function (location) {
 	var builder = _rgrempel$elm_route_url$RouteUrl_Builder$fromUrl(location.href);
 	var selectedEnvironmentIds = function () {
-		var _p6 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
-		if (_p6.ctor === 'Just') {
+		var _p5 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
+		if (_p5.ctor === 'Just') {
 			return A2(
 				_elm_lang$core$List$filter,
 				function (s) {
@@ -16826,7 +16803,7 @@ var _user$project$Main$location2messages = function (location) {
 						_elm_lang$core$String$length(s),
 						0) > 0;
 				},
-				A2(_elm_lang$core$String$split, ',', _p6._0));
+				A2(_elm_lang$core$String$split, ',', _p5._0));
 		} else {
 			return {ctor: '[]'};
 		}
@@ -16858,17 +16835,17 @@ var _user$project$Main$location2messages = function (location) {
 		},
 		focusBug);
 };
-var _user$project$Main$environmentIDToString = function (_p7) {
-	var _p8 = _p7;
-	return _p8._0.toString;
+var _user$project$Main$environmentIDToString = function (_p6) {
+	var _p7 = _p6;
+	return _p7._0.toString;
 };
 var _user$project$Main$delta2url = F2(
-	function (_p9, model) {
+	function (_p8, model) {
 		var selectedBug = function () {
-			var _p10 = model.focusedBug;
-			if (_p10.ctor === 'Just') {
-				var _p11 = _p10._0.id;
-				var uuid = _p11._0;
+			var _p9 = model.focusedBug;
+			if (_p9.ctor === 'Just') {
+				var _p10 = _p9._0.id;
+				var uuid = _p10._0;
 				return A2(_elm_lang$core$Basics_ops['++'], '#', uuid.toString);
 			} else {
 				return '#';
