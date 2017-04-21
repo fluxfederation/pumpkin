@@ -6,7 +6,6 @@ import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Format as DF
 import Date.Extra.Period as Period
-import List.Extra as ListX
 import String.Extra exposing (pluralize)
 import Types exposing (..)
 import TimeAgo exposing (timeAgo)
@@ -119,7 +118,7 @@ sidebarBugs model =
         [ if model.loadingBugs then
             span [ class "loading-spinner" ] []
           else
-            paginatedList (sidebarBugGroups model) model.bugs
+            paginatedList (sidebarBugGroups model) model.bugs LoadMoreBugs
         ]
 
 
@@ -264,31 +263,36 @@ stackTraceLine line =
 
 occurrencesDisplay : Model -> Html Msg
 occurrencesDisplay model =
-    div []
-        [ div [ class "section-title" ]
-            [ h3 [ class "menu-label" ] [ text "Occurrences" ]
-            , button [ class "button is-small is-primary is-inverted" ] [ text "Filter" ]
-            , button [ class "button is-small is-primary is-inverted" ] [ text "Map" ]
-            , button [ class "button is-small is-primary is-inverted" ] [ text "Export JSON" ]
-            ]
-        , ul [ class "panel" ]
-            [ case model.focusedBugOccurrences of
-                Just page ->
-                    paginatedList (List.map (occurrenceDisplay model)) page
+    case model.focusedBug of
+        Just bug ->
+            div []
+                [ div [ class "section-title" ]
+                    [ h3 [ class "menu-label" ] [ text "Occurrences" ]
+                    , button [ class "button is-small is-primary is-inverted" ] [ text "Filter" ]
+                    , button [ class "button is-small is-primary is-inverted" ] [ text "Map" ]
+                    , button [ class "button is-small is-primary is-inverted" ] [ text "Export JSON" ]
+                    ]
+                , ul [ class "panel" ]
+                    [ case model.focusedBugOccurrences of
+                        Just page ->
+                            paginatedList (List.map (occurrenceDisplay model)) page (LoadMoreOccurrences bug.id)
 
-                Nothing ->
-                    text "Loading..."
-            ]
-        ]
+                        Nothing ->
+                            text "Loading..."
+                    ]
+                ]
+
+        Nothing ->
+            div [] []
 
 
-paginatedList : (List a -> List (Html Msg)) -> Chunk a -> Html Msg
-paginatedList displayItems page =
+paginatedList : (List a -> List (Html Msg)) -> Chunk a -> (a -> Msg) -> Html Msg
+paginatedList displayItems page loadMoreMessage =
     div []
         ((displayItems page.items)
             ++ case page.nextItem of
-                Just _ ->
-                    [ button [ class "button" ] [ text "Show more" ] ]
+                Just next ->
+                    [ button [ class "button", onClick (loadMoreMessage next) ] [ text "Show more" ] ]
 
                 Nothing ->
                     []

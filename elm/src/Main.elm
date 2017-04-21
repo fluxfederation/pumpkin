@@ -208,6 +208,12 @@ update msg model =
         SearchSubmit ->
             { model | loadingBugs = True } ! [ Rest.loadBugs model.selectedEnvironmentIds False Nothing model.search ]
 
+        LoadMoreOccurrences bugId start ->
+            noCmd model
+
+        LoadMoreBugs start ->
+            { model | loadingBugs = True } ! [ Rest.loadBugs model.selectedEnvironmentIds False (Just start.id) model.search ]
+
 
 noCmd : model -> ( model, Cmd Msg )
 noCmd model =
@@ -222,8 +228,19 @@ loadedBugs model bugs =
                 Nothing
             else
                 model.focusedBug
+
+        newBugs =
+            case model.bugs.nextItem of
+                Nothing ->
+                    bugs
+
+                maybeNext ->
+                    if maybeNext == List.head bugs.items then
+                        { bugs | items = model.bugs.items ++ bugs.items }
+                    else
+                        bugs
     in
-        noCmd { model | bugs = bugs, focusedBug = newFocusedBug, loadingBugs = False }
+        noCmd { model | bugs = newBugs, focusedBug = newFocusedBug, loadingBugs = False }
 
 
 closedBug : Model -> Bug -> ( Model, Cmd Msg )

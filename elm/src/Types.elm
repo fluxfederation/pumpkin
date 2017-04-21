@@ -32,6 +32,8 @@ type Msg
     | TimeTick Time.Time
     | SearchChange String
     | SearchSubmit
+    | LoadMoreOccurrences BugID Occurrence
+    | LoadMoreBugs Bug
 
 
 type alias Chunk a =
