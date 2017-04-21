@@ -17,6 +17,9 @@ clean:
 	rm -f public/js/app.js
 	rm -rf elm/elm-stuff/build-artifacts
 
+debug:
+	cd elm && elm-make --debug --yes src/Main.elm --output ../public/js/app.js
+
 realclean: clean clean-deps
 
 watch: js

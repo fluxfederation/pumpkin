@@ -126,7 +126,7 @@ update msg model =
                 newModel =
                     { model | selectedEnvironmentIds = model.selectedEnvironmentIds ++ [ projectName ], loadingBugs = True }
             in
-                newModel ! [ Rest.loadBugs newModel.selectedEnvironmentIds False Nothing ]
+                newModel ! [ Rest.loadBugs newModel.selectedEnvironmentIds False Nothing newModel.search ]
 
         HideEnvironmentBugs environmentId ->
             let
@@ -139,10 +139,10 @@ update msg model =
                 newEnvironmentIds =
                     List.filter (\x -> x /= environmentId) model.selectedEnvironmentIds
             in
-                { model | selectedEnvironmentIds = newEnvironmentIds, focusedBug = newFocusedBug, loadingBugs = True } ! [ Rest.loadBugs newEnvironmentIds False Nothing ]
+                { model | selectedEnvironmentIds = newEnvironmentIds, focusedBug = newFocusedBug, loadingBugs = True } ! [ Rest.loadBugs newEnvironmentIds False Nothing model.search ]
 
         SetSelectedEnvironmentIds ids ->
-            { model | selectedEnvironmentIds = ids, loadingBugs = True } ! [ Rest.loadBugs ids False Nothing ]
+            { model | selectedEnvironmentIds = ids, loadingBugs = True } ! [ Rest.loadBugs ids False Nothing model.search ]
 
         RequestDetails bugId ->
             { model | expandedOccurrences = [], loadingFocusedBug = True } ! [ Rest.loadBugDetails bugId ]
@@ -179,10 +179,10 @@ update msg model =
             noCmd { model | error = Nothing }
 
         ShowClosedBugs ->
-            { model | showClosedBugs = True, loadingBugs = True } ! [ Rest.loadEnvironments, Rest.loadBugs model.selectedEnvironmentIds True Nothing ]
+            { model | showClosedBugs = True, loadingBugs = True } ! [ Rest.loadEnvironments, Rest.loadBugs model.selectedEnvironmentIds True Nothing model.search ]
 
         HideClosedBugs ->
-            { model | showClosedBugs = False, loadingBugs = True } ! [ Rest.loadEnvironments, Rest.loadBugs model.selectedEnvironmentIds False Nothing ]
+            { model | showClosedBugs = False, loadingBugs = True } ! [ Rest.loadEnvironments, Rest.loadBugs model.selectedEnvironmentIds False Nothing model.search ]
 
         ToggleMenu ->
             noCmd { model | showMenu = not model.showMenu }
@@ -201,6 +201,12 @@ update msg model =
 
         TimeTick time ->
             noCmd { model | now = (Date.fromTime time) }
+
+        SearchChange newSearch ->
+            noCmd { model | search = newSearch }
+
+        SearchSubmit ->
+            { model | loadingBugs = True } ! [ Rest.loadBugs model.selectedEnvironmentIds False Nothing model.search ]
 
 
 noCmd : model -> ( model, Cmd Msg )

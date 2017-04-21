@@ -38,7 +38,8 @@ content : Model -> Html Msg
 content model =
     main_ []
         [ div [ class "sidebar" ]
-            [ sidebarHeader model
+            [ sidebarSearch model
+            , sidebarHeader model
             , div [ class "sidebar-content" ] [ sidebarMenu model, sidebarBugs model ]
             ]
         , selectedBug model
@@ -58,8 +59,16 @@ sidebarHeader model =
                     "is-hidden"
                 )
             ]
-        , a [ class "search-button button", classList [ ( "is-hidden", model.showMenu ) ] ]
-            [ icon "search" "" ]
+        ]
+
+
+sidebarSearch : Model -> Html Msg
+sidebarSearch model =
+    Html.form [ onSubmit SearchSubmit ]
+        [ div []
+            [ input [ onInput SearchChange, class "input", type_ "text", value model.search, placeholder "Search Me!" ] []
+            , button [ onClick SearchSubmit, class "button" ] [ text "Search" ]
+            ]
         ]
 
 

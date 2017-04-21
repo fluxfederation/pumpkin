@@ -14643,7 +14643,8 @@ var _user$project$Types$initialModel = {
 	showClosedBugs: false,
 	showMenu: false,
 	now: _elm_lang$core$Date$fromTime(0),
-	showTimeAgo: true
+	showTimeAgo: true,
+	search: ''
 };
 var _user$project$Types$Chunk = F2(
 	function (a, b) {
@@ -14664,7 +14665,9 @@ var _user$project$Types$Model = function (a) {
 												return function (m) {
 													return function (n) {
 														return function (o) {
-															return {selectedEnvironmentIds: a, loadingEnvironments: b, environments: c, loadingBugs: d, bugs: e, loadingFocusedBug: f, focusedBug: g, focusedBugOccurrences: h, expandedOccurrences: i, showFullStackTrace: j, error: k, showClosedBugs: l, showMenu: m, now: n, showTimeAgo: o};
+															return function (p) {
+																return {selectedEnvironmentIds: a, loadingEnvironments: b, environments: c, loadingBugs: d, bugs: e, loadingFocusedBug: f, focusedBug: g, focusedBugOccurrences: h, expandedOccurrences: i, showFullStackTrace: j, error: k, showClosedBugs: l, showMenu: m, now: n, showTimeAgo: o, search: p};
+															};
 														};
 													};
 												};
@@ -14698,6 +14701,10 @@ var _user$project$Types$Occurrence = F5(
 	function (a, b, c, d, e) {
 		return {id: a, environmentId: b, message: c, occurredAt: d, data: e};
 	});
+var _user$project$Types$SearchSubmit = {ctor: 'SearchSubmit'};
+var _user$project$Types$SearchChange = function (a) {
+	return {ctor: 'SearchChange', _0: a};
+};
 var _user$project$Types$TimeTick = function (a) {
 	return {ctor: 'TimeTick', _0: a};
 };
@@ -15967,6 +15974,69 @@ var _user$project$View$currentEnvironmentsAsTags = function (model) {
 		},
 		A2(_elm_lang$core$List$map, tag, model.selectedEnvironmentIds));
 };
+var _user$project$View$sidebarSearch = function (model) {
+	return A2(
+		_elm_lang$html$Html$form,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onSubmit(_user$project$Types$SearchSubmit),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$Types$SearchChange),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('input'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$type_('text'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value(model.search),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$placeholder('Search Me!'),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Types$SearchSubmit),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('button'),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Search'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
 var _user$project$View$sidebarHeader = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -16024,31 +16094,7 @@ var _user$project$View$sidebarHeader = function (model) {
 						}
 					}
 				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$a,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('search-button button'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$classList(
-								{
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'is-hidden', _1: model.showMenu},
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
-					},
-					{
-						ctor: '::',
-						_0: A2(_user$project$View$icon, 'search', ''),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}
+			_1: {ctor: '[]'}
 		});
 };
 var _user$project$View$content = function (model) {
@@ -16066,26 +16112,30 @@ var _user$project$View$content = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: _user$project$View$sidebarHeader(model),
+					_0: _user$project$View$sidebarSearch(model),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('sidebar-content'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _user$project$View$sidebarMenu(model),
-								_1: {
+						_0: _user$project$View$sidebarHeader(model),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
 									ctor: '::',
-									_0: _user$project$View$sidebarBugs(model),
+									_0: _elm_lang$html$Html_Attributes$class('sidebar-content'),
 									_1: {ctor: '[]'}
-								}
-							}),
-						_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _user$project$View$sidebarMenu(model),
+									_1: {
+										ctor: '::',
+										_0: _user$project$View$sidebarBugs(model),
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {ctor: '[]'}
+						}
 					}
 				}),
 			_1: {
@@ -16290,8 +16340,8 @@ var _user$project$Rest$pageParams = F3(
 				}
 			}());
 	});
-var _user$project$Rest$openBugsUrl = F3(
-	function (environmentIds, limit, startFrom) {
+var _user$project$Rest$openBugsUrl = F4(
+	function (environmentIds, limit, startFrom, search) {
 		return A2(
 			_elm_lang$core$Basics_ops['++'],
 			'/bugs?',
@@ -16303,7 +16353,11 @@ var _user$project$Rest$openBugsUrl = F3(
 					{
 						ctor: '::',
 						_0: 'closed=false',
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$core$Basics_ops['++'], 'search=', search),
+							_1: {ctor: '[]'}
+						}
 					},
 					A2(
 						_elm_lang$core$Basics_ops['++'],
@@ -16315,20 +16369,27 @@ var _user$project$Rest$openBugsUrl = F3(
 							},
 							A2(_elm_lang$core$List$map, _user$project$Rest$envIDToParam, environmentIds))))));
 	});
-var _user$project$Rest$allBugsUrl = F2(
-	function (limit, startFrom) {
+var _user$project$Rest$allBugsUrl = F3(
+	function (limit, startFrom, search) {
 		return A2(
 			_elm_lang$core$Basics_ops['++'],
 			'/bugs?',
 			A2(
 				_elm_lang$core$String$join,
 				'&',
-				A3(_user$project$Rest$pageParams, _user$project$Rest$bugIDToParam, limit, startFrom)));
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A3(_user$project$Rest$pageParams, _user$project$Rest$bugIDToParam, limit, startFrom),
+					{
+						ctor: '::',
+						_0: A2(_elm_lang$core$Basics_ops['++'], 'search=', search),
+						_1: {ctor: '[]'}
+					})));
 	});
-var _user$project$Rest$loadBugs = F3(
-	function (environmentIds, includeClosedBugs, startFrom) {
+var _user$project$Rest$loadBugs = F4(
+	function (environmentIds, includeClosedBugs, startFrom, search) {
 		var pageSize = _user$project$Rest$defaultPageSize;
-		var url = includeClosedBugs ? A2(_user$project$Rest$allBugsUrl, pageSize + 1, startFrom) : A3(_user$project$Rest$openBugsUrl, environmentIds, pageSize + 1, startFrom);
+		var url = includeClosedBugs ? A3(_user$project$Rest$allBugsUrl, pageSize + 1, startFrom, search) : A4(_user$project$Rest$openBugsUrl, environmentIds, pageSize + 1, startFrom, search);
 		return A2(
 			_elm_lang$http$Http$send,
 			_user$project$Types$LoadedBugs,
@@ -16505,7 +16566,7 @@ var _user$project$Main$update = F2(
 					newModel,
 					{
 						ctor: '::',
-						_0: A3(_user$project$Rest$loadBugs, newModel.selectedEnvironmentIds, false, _elm_lang$core$Maybe$Nothing),
+						_0: A4(_user$project$Rest$loadBugs, newModel.selectedEnvironmentIds, false, _elm_lang$core$Maybe$Nothing, newModel.search),
 						_1: {ctor: '[]'}
 					});
 			case 'HideEnvironmentBugs':
@@ -16527,7 +16588,7 @@ var _user$project$Main$update = F2(
 						{selectedEnvironmentIds: newEnvironmentIds, focusedBug: newFocusedBug, loadingBugs: true}),
 					{
 						ctor: '::',
-						_0: A3(_user$project$Rest$loadBugs, newEnvironmentIds, false, _elm_lang$core$Maybe$Nothing),
+						_0: A4(_user$project$Rest$loadBugs, newEnvironmentIds, false, _elm_lang$core$Maybe$Nothing, model.search),
 						_1: {ctor: '[]'}
 					});
 			case 'SetSelectedEnvironmentIds':
@@ -16539,7 +16600,7 @@ var _user$project$Main$update = F2(
 						{selectedEnvironmentIds: _p3, loadingBugs: true}),
 					{
 						ctor: '::',
-						_0: A3(_user$project$Rest$loadBugs, _p3, false, _elm_lang$core$Maybe$Nothing),
+						_0: A4(_user$project$Rest$loadBugs, _p3, false, _elm_lang$core$Maybe$Nothing, model.search),
 						_1: {ctor: '[]'}
 					});
 			case 'RequestDetails':
@@ -16619,7 +16680,7 @@ var _user$project$Main$update = F2(
 						_0: _user$project$Rest$loadEnvironments,
 						_1: {
 							ctor: '::',
-							_0: A3(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, true, _elm_lang$core$Maybe$Nothing),
+							_0: A4(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, true, _elm_lang$core$Maybe$Nothing, model.search),
 							_1: {ctor: '[]'}
 						}
 					});
@@ -16634,7 +16695,7 @@ var _user$project$Main$update = F2(
 						_0: _user$project$Rest$loadEnvironments,
 						_1: {
 							ctor: '::',
-							_0: A3(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, false, _elm_lang$core$Maybe$Nothing),
+							_0: A4(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, false, _elm_lang$core$Maybe$Nothing, model.search),
 							_1: {ctor: '[]'}
 						}
 					});
@@ -16671,13 +16732,29 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{showTimeAgo: !model.showTimeAgo}));
-			default:
+			case 'TimeTick':
 				return _user$project$Main$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
 							now: _elm_lang$core$Date$fromTime(_p1._0)
 						}));
+			case 'SearchChange':
+				return _user$project$Main$noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{search: _p1._0}));
+			default:
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{loadingBugs: true}),
+					{
+						ctor: '::',
+						_0: A4(_user$project$Rest$loadBugs, model.selectedEnvironmentIds, false, _elm_lang$core$Maybe$Nothing, model.search),
+						_1: {ctor: '[]'}
+					});
 		}
 	});
 var _user$project$Main$subscriptions = function (model) {

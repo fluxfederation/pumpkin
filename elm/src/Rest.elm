@@ -42,21 +42,21 @@ occurrenceIDToParam (OccurrenceID uuid) =
     uuid.toString
 
 
-openBugsUrl : List EnvironmentID -> Int -> Maybe BugID -> String
-openBugsUrl environmentIds limit startFrom =
+openBugsUrl : List EnvironmentID -> Int -> Maybe BugID -> String -> String
+openBugsUrl environmentIds limit startFrom search =
     "/bugs?"
         ++ (String.join
                 "&"
-                ([ "closed=false" ]
+                ([ "closed=false", ("search=" ++ search) ]
                     ++ (pageParams bugIDToParam limit startFrom)
                     ++ (List.map (\id -> "environment_ids[]=" ++ id) (List.map envIDToParam environmentIds))
                 )
            )
 
 
-allBugsUrl : Int -> Maybe BugID -> String
-allBugsUrl limit startFrom =
-    "/bugs?" ++ String.join "&" (pageParams bugIDToParam limit startFrom)
+allBugsUrl : Int -> Maybe BugID -> String -> String
+allBugsUrl limit startFrom search =
+    "/bugs?" ++ String.join "&" ((pageParams bugIDToParam limit startFrom) ++ [ ("search=" ++ search) ])
 
 
 detailsUrl : BugID -> String
@@ -210,16 +210,16 @@ loadEnvironments =
     Http.send LoadedEnvironments <| Http.get environmentsUrl decodeEnvironments
 
 
-loadBugs : List EnvironmentID -> Bool -> Maybe BugID -> Cmd Msg
-loadBugs environmentIds includeClosedBugs startFrom =
+loadBugs : List EnvironmentID -> Bool -> Maybe BugID -> String -> Cmd Msg
+loadBugs environmentIds includeClosedBugs startFrom search =
     let
         pageSize =
             defaultPageSize
 
         url =
             if includeClosedBugs then
-                allBugsUrl (pageSize + 1) startFrom
+                allBugsUrl (pageSize + 1) startFrom search
             else
-                openBugsUrl environmentIds (pageSize + 1) startFrom
+                openBugsUrl environmentIds (pageSize + 1) startFrom search
     in
         Http.send LoadedBugs <| Http.get url (decodeChunk pageSize decodeBug)

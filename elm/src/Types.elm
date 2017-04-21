@@ -30,6 +30,8 @@ type Msg
     | ToggleOccurrence OccurrenceID
     | ToggleTimeFormat
     | TimeTick Time.Time
+    | SearchChange String
+    | SearchSubmit
 
 
 type alias Chunk a =
@@ -58,6 +60,7 @@ type alias Model =
     , showMenu : Bool
     , now : Date.Date
     , showTimeAgo : Bool
+    , search : String
     }
 
 
@@ -123,6 +126,7 @@ initialModel =
     , showMenu = False
     , now = (Date.fromTime 0)
     , showTimeAgo = True
+    , search = ""
     }
 
 
