@@ -37,6 +37,13 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2, JSON::parse(@response.body).size
   end
 
+  test "index with limit and start" do
+    get bugs_path, params: {environment_ids: @default_environment_ids, limit: "2", closed: "true", start: bugs(:prod_closed).id}
+    assert_response :success
+    assert_response_schema "bugs/index.json"
+    assert_equal 1, JSON::parse(@response.body).size
+  end
+
   test "index with environment filtering" do
     get bugs_path, params: {environment_ids: [environments(:qa)].map(&:to_param)}
     assert_response :success

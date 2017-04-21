@@ -13,9 +13,9 @@ prod_twice_created:
 prod_closed_created:
   bug: prod_closed
   name: "created"
-  created_at: "2016-01-01"
+  created_at: "2015-12-30"
 
 prod_closed_closed:
   bug: prod_closed
   name: "closed"
-  created_at: "2016-01-02"
+  created_at: "2015-12-31"

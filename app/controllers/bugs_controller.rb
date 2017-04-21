@@ -5,9 +5,9 @@ class BugsController < ApplicationController
       environment_ids: params[:environment_ids],
       closed: (params[:closed] == "true"),
       search: params[:search].presence,
-      limit: params[:limit]
+      limit: params[:limit],
+      start: params[:start]
     )
-
     render json: search.bugs, include: []
   end
 

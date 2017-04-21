@@ -41,6 +41,6 @@ prod_twice2:
 prod_closed:
   environment: prod
   bug: prod_closed
-  occurred_at: "2016-01-01"
+  occurred_at: "2015-12-31"
   message: "Very closed occurrence"
   data: {"admin_id":5}

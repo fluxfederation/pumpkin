@@ -16,6 +16,8 @@ class Bug < ApplicationRecord
   scope :closed, ->{ where("latest_event_name =?", "closed") }
   scope :open, ->{ where.not("latest_event_name =?", "closed") }
 
+  scope :not_newer_than_bug, ->(bug_id) { where('last_occurred_at <= (SELECT last_occurred_at FROM bugs b2 WHERE b2.id = ?)', bug_id) }
+
   def self.with_latest_details
     from('bug_with_latest_details AS bugs')
   end
