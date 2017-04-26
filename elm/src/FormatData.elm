@@ -3,10 +3,9 @@ module FormatData exposing (formatData)
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Json.Decode exposing (..)
-import Types exposing (..)
 
 
-formatData : List String -> Value -> List (Html Msg)
+formatData : List String -> Value -> List (Html msg)
 formatData blacklist val =
     let
         asString =
@@ -24,20 +23,20 @@ formatData blacklist val =
             ++ formatFallback [ isSuccess asString, isSuccess asList, isSuccess asPairs ] val
 
 
-formatString : Result String String -> List (Html Msg)
+formatString : Result String String -> List (Html msg)
 formatString result =
     handleFormatError result <|
         \str -> [ span [ class "json-string" ] [ text str ] ]
 
 
-formatList : List String -> Result String (List Value) -> List (Html Msg)
+formatList : List String -> Result String (List Value) -> List (Html msg)
 formatList blacklist result =
     handleFormatError result <|
         \values ->
             [ div [ class "json-array" ] (List.concatMap (formatData blacklist) values) ]
 
 
-formatPairs : List String -> Result String (List ( String, Value )) -> List (Html Msg)
+formatPairs : List String -> Result String (List ( String, Value )) -> List (Html msg)
 formatPairs blacklist result =
     let
         filteredPairs pairs =
@@ -54,7 +53,7 @@ formatPairs blacklist result =
                 [ div [ class "json-object" ] (List.map formatPair (filteredPairs pairs)) ]
 
 
-formatFallback : List Bool -> Value -> List (Html Msg)
+formatFallback : List Bool -> Value -> List (Html msg)
 formatFallback results val =
     let
         anySuccess =
@@ -66,14 +65,9 @@ formatFallback results val =
             [ span [ class "json-other" ] [ text (toString val) ] ]
 
 
-handleFormatError : Result String a -> (a -> List (Html Msg)) -> List (Html Msg)
+handleFormatError : Result String a -> (a -> List (Html msg)) -> List (Html msg)
 handleFormatError result view =
-    case result of
-        Ok val ->
-            view val
-
-        Err _ ->
-            []
+    Result.withDefault [] <| Result.map view result
 
 
 isSuccess : Result a b -> Bool

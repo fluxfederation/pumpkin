@@ -1,19 +1,8 @@
-main {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  background-color: #eee;
-}
-
-.sidebar {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  max-width: 35vw;
-  padding: 0.75rem;
-}
-
 /* Misc */
+html {
+    padding: 0.5rem;
+    background-color: #eee;
+}
 
 .loading-spinner {
   position: absolute;
@@ -39,40 +28,12 @@ main {
   to { transform: rotate(180deg); }
 }
 
+
+.sidebar .panel-block {
+    background-color: #fff;
+}
+
 /* Sidebar header */
-
-.sidebar-header {
-  display: flex;
-  margin-bottom: 0.5rem;
-}
-
-.menu-button {
-  flex: 1;
-  height: auto;
-  min-height: 3.75rem;
-  padding: 0.5rem;
-  justify-content: flex-start;
-  align-items: center;
-  line-height: 1;
-}
-
-.menu-button-tags {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  min-width: 0;
-}
-
-.menu-button-tags > .tag {
-  margin: 0.25rem 0.25rem 0.25rem 0;
-}
-
-.search-button {
-  height: auto;
-  margin-left: 0.5rem;
-  padding: 0.75rem 1.25rem;
-}
 
 .logo {
   width: 2rem;
@@ -81,20 +42,6 @@ main {
 
 /* Sidebar content */
 
-.sidebar-content {
-  flex: 1;
-  position: relative;
-}
-
-.sidebar-content > * {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
-  background-color: #eee;
-}
 
 .sidebar-bugs .loading-spinner,
 .sidebar-menu .loading-spinner {
@@ -165,16 +112,6 @@ main {
 
 .sidebar-bug-tags > * {
   margin-left: 0.25rem;
-}
-
-/* Selected bug */
-
-.selected-bug {
-  flex: 1;
-  position: relative;
-  margin: 0.75rem 0.75rem 0.75rem 0.25rem;
-  padding: 1rem;
-  overflow-y: auto;
 }
 
 .selected-bug .loading-spinner {

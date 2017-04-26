@@ -5,6 +5,7 @@ import Json.Decode exposing (..)
 import Types exposing (..)
 import Date
 import List.Extra exposing (splitAt)
+import RemoteData
 
 
 -- URLs
@@ -189,28 +190,29 @@ defaultPageSize =
     100
 
 
-loadBugDetails : BugID -> Cmd Msg
+loadBugDetails : BugID -> Http.Request Bug
 loadBugDetails bugId =
-    Cmd.batch
-        [ Http.send LoadedDetails <| Http.get (detailsUrl bugId) decodeBug
-        , Http.send LoadedOccurrences <|
-            Http.get
-                (occurrencesUrl bugId defaultPageSize Nothing)
-                (decodeChunk defaultPageSize decodeOccurrence)
-        ]
+    Http.get (detailsUrl bugId) decodeBug
 
 
-closeBug : BugID -> Cmd Msg
+loadOccurrences : BugID -> Maybe OccurrenceID -> Http.Request (Chunk Occurrence)
+loadOccurrences bugId start =
+    Http.get
+        (occurrencesUrl bugId defaultPageSize start)
+        (decodeChunk defaultPageSize decodeOccurrence)
+
+
+closeBug : BugID -> Http.Request Bug
 closeBug bugId =
-    Http.send ClosedBug <| Http.post (closeBugUrl bugId) Http.emptyBody decodeBug
+    Http.post (closeBugUrl bugId) Http.emptyBody decodeBug
 
 
-loadEnvironments : Cmd Msg
+loadEnvironments : Http.Request (List Environment)
 loadEnvironments =
-    Http.send LoadedEnvironments <| Http.get environmentsUrl decodeEnvironments
+    Http.get environmentsUrl decodeEnvironments
 
 
-loadBugs : List EnvironmentID -> Bool -> Maybe BugID -> String -> Cmd Msg
+loadBugs : List EnvironmentID -> Bool -> Maybe BugID -> String -> Http.Request (Chunk Bug)
 loadBugs environmentIds includeClosedBugs startFrom search =
     let
         pageSize =
@@ -222,4 +224,9 @@ loadBugs environmentIds includeClosedBugs startFrom search =
             else
                 openBugsUrl environmentIds (pageSize + 1) startFrom search
     in
-        Http.send LoadedBugs <| Http.get url (decodeChunk pageSize decodeBug)
+        Http.get url (decodeChunk pageSize decodeBug)
+
+
+fetch : (RemoteData.WebData a -> msg) -> Http.Request a -> Cmd msg
+fetch msger req =
+    Cmd.map msger (RemoteData.asCmd (Http.toTask req))
