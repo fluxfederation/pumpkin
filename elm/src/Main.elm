@@ -81,6 +81,14 @@ initialModel =
     }
 
 
+toFilter : Model -> BugList.Filter
+toFilter model =
+    { environmentIDs = model.selectedEnvironmentIds
+    , includeClosed = model.showClosedBugs
+    , search = model.search
+    }
+
+
 main : RouteUrlProgram Never Model Msg
 main =
     RouteUrl.program
@@ -260,14 +268,9 @@ update msg model =
 
         SearchSubmit ->
             let
-                filter =
-                    { environmentIDs = model.selectedEnvironmentIds
-                    , includeClosed = model.showClosedBugs
-                    , search = model.search
-                    }
-
                 ( bugList, cmd ) =
-                    BugList.init filter (Maybe.map (\bugModel -> bugModel.bug.id) (RemoteData.toMaybe model.focusedBug))
+                    BugList.init (toFilter model)
+                        (Maybe.map (.bug >> .id) (RemoteData.toMaybe model.focusedBug))
             in
                 ( { model | bugList = Just bugList }
                 , Cmd.map BugListMsg cmd
@@ -306,23 +309,6 @@ update msg model =
 
         TimeTick time ->
             noCmd { model | now = (Date.fromTime time) }
-
-
-passBugListMsg : (Model -> BugList.Msg -> ( Model, Cmd Msg )) -> Model -> BugList.Msg -> ( Model, Cmd Msg )
-passBugListMsg updater model msg =
-    case model.bugList of
-        Nothing ->
-            noCmd { model | error = Just "Got message for missing buglist" }
-
-        Just bugListModel ->
-            let
-                ( newBugListModel, listcmd ) =
-                    BugList.update msg bugListModel
-
-                ( newModel, cmd ) =
-                    updater { model | bugList = Just newBugListModel } msg
-            in
-                ( newModel, Cmd.batch [ Cmd.map BugListMsg listcmd, cmd ] )
 
 
 noCmd : model -> ( model, Cmd Msg )
@@ -420,7 +406,7 @@ currentEnvironmentsAsTags model =
         tag id =
             span [ class "tag is-primary" ] [ text (environmentName model.environments id) ]
     in
-        p [ class "panel-block" ]
+        p [ class "panel-block", onClick ToggleMenu ]
             (if List.isEmpty tags then
                 [ text "None" ]
              else

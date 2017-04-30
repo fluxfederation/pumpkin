@@ -16570,46 +16570,6 @@ var _user$project$BugList$update = F2(
 		}
 	});
 
-var _user$project$Main$currentEnvironmentsAsTags = function (model) {
-	var tag = function (id) {
-		return A2(
-			_elm_lang$html$Html$span,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('tag is-primary'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(
-					A2(_user$project$ViewCommon$environmentName, model.environments, id)),
-				_1: {ctor: '[]'}
-			});
-	};
-	var tags = A2(_elm_lang$core$List$map, tag, model.selectedEnvironmentIds);
-	return A2(
-		_elm_lang$html$Html$p,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('panel-block'),
-			_1: {ctor: '[]'}
-		},
-		_elm_lang$core$List$isEmpty(tags) ? {
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('None'),
-			_1: {ctor: '[]'}
-		} : {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$p,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$List$intersperse,
-					_elm_lang$html$Html$text(' '),
-					tags)),
-			_1: {ctor: '[]'}
-		});
-};
 var _user$project$Main$shouldHideFocusedBug = F2(
 	function (model, f) {
 		return A2(
@@ -16673,6 +16633,9 @@ var _user$project$Main$delta2url = F2(
 				url: A2(_elm_lang$core$Basics_ops['++'], selectedEnvironments, selectedBug)
 			});
 	});
+var _user$project$Main$toFilter = function (model) {
+	return {environmentIDs: model.selectedEnvironmentIds, includeClosed: model.showClosedBugs, search: model.search};
+};
 var _user$project$Main$initialModel = {
 	selectedEnvironmentIds: {ctor: '[]'},
 	loadingEnvironments: true,
@@ -16712,46 +16675,6 @@ var _user$project$Main$TimeTick = function (a) {
 var _user$project$Main$BugListMsg = function (a) {
 	return {ctor: 'BugListMsg', _0: a};
 };
-var _user$project$Main$passBugListMsg = F3(
-	function (updater, model, msg) {
-		var _p6 = model.bugList;
-		if (_p6.ctor === 'Nothing') {
-			return _user$project$Main$noCmd(
-				_elm_lang$core$Native_Utils.update(
-					model,
-					{
-						error: _elm_lang$core$Maybe$Just('Got message for missing buglist')
-					}));
-		} else {
-			var _p7 = A2(_user$project$BugList$update, msg, _p6._0);
-			var newBugListModel = _p7._0;
-			var listcmd = _p7._1;
-			var _p8 = A2(
-				updater,
-				_elm_lang$core$Native_Utils.update(
-					model,
-					{
-						bugList: _elm_lang$core$Maybe$Just(newBugListModel)
-					}),
-				msg);
-			var newModel = _p8._0;
-			var cmd = _p8._1;
-			return {
-				ctor: '_Tuple2',
-				_0: newModel,
-				_1: _elm_lang$core$Platform_Cmd$batch(
-					{
-						ctor: '::',
-						_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, listcmd),
-						_1: {
-							ctor: '::',
-							_0: cmd,
-							_1: {ctor: '[]'}
-						}
-					})
-			};
-		}
-	});
 var _user$project$Main$sidebarBugs = function (model) {
 	var empty = A2(
 		_elm_lang$html$Html$div,
@@ -16760,12 +16683,12 @@ var _user$project$Main$sidebarBugs = function (model) {
 	if (model.showMenu) {
 		return empty;
 	} else {
-		var _p9 = model.bugList;
-		if (_p9.ctor === 'Just') {
+		var _p6 = model.bugList;
+		if (_p6.ctor === 'Just') {
 			return A2(
 				_elm_lang$html$Html$map,
 				_user$project$Main$BugListMsg,
-				_user$project$BugList$view(_p9._0));
+				_user$project$BugList$view(_p6._0));
 		} else {
 			return empty;
 		}
@@ -16782,12 +16705,12 @@ var _user$project$Main$subscriptions = function (model) {
 			_1: {
 				ctor: '::',
 				_0: function () {
-					var _p10 = model.focusedBug;
-					if (_p10.ctor === 'Success') {
+					var _p7 = model.focusedBug;
+					if (_p7.ctor === 'Success') {
 						return A2(
 							_elm_lang$core$Platform_Sub$map,
 							_user$project$Main$FocusedBugMsg,
-							_user$project$BugDetails$subscriptions(_p10._0));
+							_user$project$BugDetails$subscriptions(_p7._0));
 					} else {
 						return _elm_lang$core$Platform_Sub$none;
 					}
@@ -16795,12 +16718,12 @@ var _user$project$Main$subscriptions = function (model) {
 				_1: {
 					ctor: '::',
 					_0: function () {
-						var _p11 = model.bugList;
-						if (_p11.ctor === 'Just') {
+						var _p8 = model.bugList;
+						if (_p8.ctor === 'Just') {
 							return A2(
 								_elm_lang$core$Platform_Sub$map,
 								_user$project$Main$BugListMsg,
-								_user$project$BugList$subscriptions(_p11._0));
+								_user$project$BugList$subscriptions(_p8._0));
 						} else {
 							return _elm_lang$core$Platform_Sub$none;
 						}
@@ -16819,15 +16742,15 @@ var _user$project$Main$selectedBug = function (model) {
 			_1: {ctor: '[]'}
 		},
 		function () {
-			var _p12 = model.focusedBug;
-			switch (_p12.ctor) {
+			var _p9 = model.focusedBug;
+			switch (_p9.ctor) {
 				case 'Success':
 					return {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$map,
 							_user$project$Main$FocusedBugMsg,
-							_user$project$BugDetails$view(_p12._0)),
+							_user$project$BugDetails$view(_p9._0)),
 						_1: {ctor: '[]'}
 					};
 				case 'Loading':
@@ -16904,14 +16827,58 @@ var _user$project$Main$sidebarSearch = function (model) {
 		});
 };
 var _user$project$Main$ToggleMenu = {ctor: 'ToggleMenu'};
+var _user$project$Main$currentEnvironmentsAsTags = function (model) {
+	var tag = function (id) {
+		return A2(
+			_elm_lang$html$Html$span,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('tag is-primary'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_user$project$ViewCommon$environmentName, model.environments, id)),
+				_1: {ctor: '[]'}
+			});
+	};
+	var tags = A2(_elm_lang$core$List$map, tag, model.selectedEnvironmentIds);
+	return A2(
+		_elm_lang$html$Html$p,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('panel-block'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleMenu),
+				_1: {ctor: '[]'}
+			}
+		},
+		_elm_lang$core$List$isEmpty(tags) ? {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('None'),
+			_1: {ctor: '[]'}
+		} : {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$p,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$intersperse,
+					_elm_lang$html$Html$text(' '),
+					tags)),
+			_1: {ctor: '[]'}
+		});
+};
 var _user$project$Main$ClearError = {ctor: 'ClearError'};
 var _user$project$Main$errorMessages = function (model) {
-	var _p13 = model.error;
-	if (_p13.ctor === 'Just') {
+	var _p10 = model.error;
+	if (_p10.ctor === 'Just') {
 		return A2(
 			_user$project$ViewCommon$errorNotification,
 			_elm_lang$core$Maybe$Just(_user$project$Main$ClearError),
-			_p13._0);
+			_p10._0);
 	} else {
 		return A2(
 			_elm_lang$html$Html$div,
@@ -16929,8 +16896,8 @@ var _user$project$Main$update = F2(
 	function (msg, model) {
 		update:
 		while (true) {
-			var _p14 = msg;
-			switch (_p14.ctor) {
+			var _p11 = msg;
+			switch (_p11.ctor) {
 				case 'LoadedEnvironments':
 					return A3(
 						_user$project$Main$handleResult,
@@ -16952,10 +16919,10 @@ var _user$project$Main$update = F2(
 									}));
 						},
 						model,
-						_p14._0);
+						_p11._0);
 				case 'ShowEnvironmentBugs':
-					var _v10 = _user$project$Main$SearchSubmit,
-						_v11 = _elm_lang$core$Native_Utils.update(
+					var _v9 = _user$project$Main$SearchSubmit,
+						_v10 = _elm_lang$core$Native_Utils.update(
 						model,
 						{
 							selectedEnvironmentIds: A2(
@@ -16963,39 +16930,39 @@ var _user$project$Main$update = F2(
 								model.selectedEnvironmentIds,
 								{
 									ctor: '::',
-									_0: _p14._0,
+									_0: _p11._0,
 									_1: {ctor: '[]'}
 								})
 						});
-					msg = _v10;
-					model = _v11;
+					msg = _v9;
+					model = _v10;
 					continue update;
 				case 'HideEnvironmentBugs':
-					var _p15 = _p14._0;
+					var _p12 = _p11._0;
 					var newEnvironmentIds = A2(
 						_elm_lang$core$List$filter,
 						function (x) {
-							return !_elm_lang$core$Native_Utils.eq(x, _p15);
+							return !_elm_lang$core$Native_Utils.eq(x, _p12);
 						},
 						model.selectedEnvironmentIds);
 					var newFocusedBug = A2(
 						_user$project$Main$shouldHideFocusedBug,
 						model,
-						_user$project$Main$bugInEnvironment(_p15)) ? _bloom$remotedata$RemoteData$NotAsked : model.focusedBug;
-					var _v12 = _user$project$Main$SearchSubmit,
-						_v13 = _elm_lang$core$Native_Utils.update(
+						_user$project$Main$bugInEnvironment(_p12)) ? _bloom$remotedata$RemoteData$NotAsked : model.focusedBug;
+					var _v11 = _user$project$Main$SearchSubmit,
+						_v12 = _elm_lang$core$Native_Utils.update(
 						model,
 						{selectedEnvironmentIds: newEnvironmentIds, focusedBug: newFocusedBug});
-					msg = _v12;
-					model = _v13;
+					msg = _v11;
+					model = _v12;
 					continue update;
 				case 'SetSelectedEnvironmentIds':
-					var _v14 = _user$project$Main$SearchSubmit,
-						_v15 = _elm_lang$core$Native_Utils.update(
+					var _v13 = _user$project$Main$SearchSubmit,
+						_v14 = _elm_lang$core$Native_Utils.update(
 						model,
-						{selectedEnvironmentIds: _p14._0});
-					msg = _v14;
-					model = _v15;
+						{selectedEnvironmentIds: _p11._0});
+					msg = _v13;
+					model = _v14;
 					continue update;
 				case 'RequestDetails':
 					return {
@@ -17004,13 +16971,13 @@ var _user$project$Main$update = F2(
 						_1: A2(
 							_user$project$Rest$fetch,
 							_user$project$Main$LoadedDetails,
-							_user$project$Rest$loadBugDetails(_p14._0))
+							_user$project$Rest$loadBugDetails(_p11._0))
 					};
 				case 'LoadedDetails':
 					var inited = A2(
 						_bloom$remotedata$RemoteData$map,
 						A2(_elm_lang$core$Basics$flip, _user$project$BugDetails$init, model.environments),
-						_p14._0);
+						_p11._0);
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -17019,9 +16986,9 @@ var _user$project$Main$update = F2(
 								focusedBug: A2(_bloom$remotedata$RemoteData$map, _elm_lang$core$Tuple$first, inited)
 							}),
 						_1: function () {
-							var _p16 = A2(_bloom$remotedata$RemoteData$map, _elm_lang$core$Tuple$second, inited);
-							if (_p16.ctor === 'Success') {
-								return A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, _p16._0);
+							var _p13 = A2(_bloom$remotedata$RemoteData$map, _elm_lang$core$Tuple$second, inited);
+							if (_p13.ctor === 'Success') {
+								return A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, _p13._0);
 							} else {
 								return _elm_lang$core$Platform_Cmd$none;
 							}
@@ -17033,20 +17000,20 @@ var _user$project$Main$update = F2(
 							model,
 							{error: _elm_lang$core$Maybe$Nothing}));
 				case 'ShowClosedBugs':
-					var _v17 = _user$project$Main$SearchSubmit,
-						_v18 = _elm_lang$core$Native_Utils.update(
+					var _v16 = _user$project$Main$SearchSubmit,
+						_v17 = _elm_lang$core$Native_Utils.update(
 						model,
 						{showClosedBugs: true});
-					msg = _v17;
-					model = _v18;
+					msg = _v16;
+					model = _v17;
 					continue update;
 				case 'HideClosedBugs':
-					var _v19 = _user$project$Main$SearchSubmit,
-						_v20 = _elm_lang$core$Native_Utils.update(
+					var _v18 = _user$project$Main$SearchSubmit,
+						_v19 = _elm_lang$core$Native_Utils.update(
 						model,
 						{showClosedBugs: false});
-					msg = _v19;
-					model = _v20;
+					msg = _v18;
+					model = _v19;
 					continue update;
 				case 'ToggleMenu':
 					return _user$project$Main$noCmd(
@@ -17057,20 +17024,24 @@ var _user$project$Main$update = F2(
 					return _user$project$Main$noCmd(
 						_elm_lang$core$Native_Utils.update(
 							model,
-							{search: _p14._0}));
+							{search: _p11._0}));
 				case 'SearchSubmit':
-					var filter = {environmentIDs: model.selectedEnvironmentIds, includeClosed: model.showClosedBugs, search: model.search};
-					var _p17 = A2(
+					var _p14 = A2(
 						_user$project$BugList$init,
-						filter,
+						_user$project$Main$toFilter(model),
 						A2(
 							_elm_lang$core$Maybe$map,
-							function (bugModel) {
-								return bugModel.bug.id;
+							function (_p15) {
+								return function (_) {
+									return _.id;
+								}(
+									function (_) {
+										return _.bug;
+									}(_p15));
 							},
 							_bloom$remotedata$RemoteData$toMaybe(model.focusedBug)));
-					var bugList = _p17._0;
-					var cmd = _p17._1;
+					var bugList = _p14._0;
+					var cmd = _p14._1;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -17081,11 +17052,11 @@ var _user$project$Main$update = F2(
 						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, cmd)
 					};
 				case 'FocusedBugMsg':
-					var _p18 = model.focusedBug;
-					if (_p18.ctor === 'Success') {
-						var _p19 = A2(_user$project$BugDetails$update, _p14._0, _p18._0);
-						var newBugModel = _p19._0;
-						var cmd = _p19._1;
+					var _p16 = model.focusedBug;
+					if (_p16.ctor === 'Success') {
+						var _p17 = A2(_user$project$BugDetails$update, _p11._0, _p16._0);
+						var newBugModel = _p17._0;
+						var cmd = _p17._1;
 						return {
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
@@ -17104,29 +17075,29 @@ var _user$project$Main$update = F2(
 								}));
 					}
 				case 'BugListMsg':
-					var _p23 = _p14._0;
-					var pass = function (_p20) {
-						var _p21 = _p20;
+					var _p21 = _p11._0;
+					var pass = function (_p18) {
+						var _p19 = _p18;
 						return {
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
 								{
-									bugList: _elm_lang$core$Maybe$Just(_p21._0)
+									bugList: _elm_lang$core$Maybe$Just(_p19._0)
 								}),
 							_1: _elm_lang$core$Platform_Cmd$batch(
 								{
 									ctor: '::',
-									_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, _p21._1),
+									_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, _p19._1),
 									_1: {
 										ctor: '::',
 										_0: function () {
-											var _p22 = _p23;
-											if ((_p22.ctor === 'SelectBug') && (_p22._0.ctor === 'Just')) {
+											var _p20 = _p21;
+											if ((_p20.ctor === 'SelectBug') && (_p20._0.ctor === 'Just')) {
 												return A2(
 													_user$project$Rest$fetch,
 													_user$project$Main$LoadedDetails,
-													_user$project$Rest$loadBugDetails(_p22._0._0));
+													_user$project$Rest$loadBugDetails(_p20._0._0));
 											} else {
 												return _elm_lang$core$Platform_Cmd$none;
 											}
@@ -17144,14 +17115,14 @@ var _user$project$Main$update = F2(
 							pass,
 							A2(
 								_elm_lang$core$Maybe$map,
-								_user$project$BugList$update(_p23),
+								_user$project$BugList$update(_p21),
 								model.bugList)));
 				default:
 					return _user$project$Main$noCmd(
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								now: _elm_lang$core$Date$fromTime(_p14._0)
+								now: _elm_lang$core$Date$fromTime(_p11._0)
 							}));
 			}
 		}
@@ -17164,8 +17135,8 @@ var _user$project$Main$SetSelectedEnvironmentIds = function (a) {
 var _user$project$Main$location2messages = function (location) {
 	var builder = _rgrempel$elm_route_url$RouteUrl_Builder$fromUrl(location.href);
 	var selectedEnvironmentIds = function () {
-		var _p24 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
-		if (_p24.ctor === 'Just') {
+		var _p22 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
+		if (_p22.ctor === 'Just') {
 			return A2(
 				_elm_lang$core$List$filter,
 				function (s) {
@@ -17173,7 +17144,7 @@ var _user$project$Main$location2messages = function (location) {
 						_elm_lang$core$String$length(s),
 						0) > 0;
 				},
-				A2(_elm_lang$core$String$split, ',', _p24._0));
+				A2(_elm_lang$core$String$split, ',', _p22._0));
 		} else {
 			return {ctor: '[]'};
 		}
