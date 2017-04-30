@@ -17022,52 +17022,43 @@ var _user$project$Main$update = F2(
 						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, cmd)
 					};
 				case 'FocusedBugMsg':
-					var _p16 = model.focusedBug;
-					if (_p16.ctor === 'Success') {
-						var _p17 = A2(_user$project$BugDetails$update, _p11._0, _p16._0);
-						var newBugModel = _p17._0;
-						var cmd = _p17._1;
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{
-									focusedBug: _bloom$remotedata$RemoteData$Success(newBugModel)
-								}),
-							_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, cmd)
-						};
-					} else {
-						return _user$project$Main$noCmd(
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{
-									error: _elm_lang$core$Maybe$Just('Got message for no-longer-selected bug')
-								}));
-					}
+					var _p16 = A2(
+						_bloom$remotedata$RemoteData$update,
+						_user$project$BugDetails$update(_p11._0),
+						model.focusedBug);
+					var newBugModel = _p16._0;
+					var cmd = _p16._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{focusedBug: newBugModel}),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, cmd)
+					};
 				case 'BugListMsg':
-					var _p21 = _p11._0;
-					var pass = function (_p18) {
-						var _p19 = _p18;
+					var _p20 = _p11._0;
+					var pass = function (_p17) {
+						var _p18 = _p17;
 						return {
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
 								{
-									bugList: _elm_lang$core$Maybe$Just(_p19._0)
+									bugList: _elm_lang$core$Maybe$Just(_p18._0)
 								}),
 							_1: _elm_lang$core$Platform_Cmd$batch(
 								{
 									ctor: '::',
-									_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, _p19._1),
+									_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, _p18._1),
 									_1: {
 										ctor: '::',
 										_0: function () {
-											var _p20 = _p21;
-											if ((_p20.ctor === 'SelectBug') && (_p20._0.ctor === 'Just')) {
+											var _p19 = _p20;
+											if ((_p19.ctor === 'SelectBug') && (_p19._0.ctor === 'Just')) {
 												return A2(
 													_user$project$Rest$fetch,
 													_user$project$Main$LoadedDetails,
-													_user$project$Rest$loadBugDetails(_p20._0._0));
+													_user$project$Rest$loadBugDetails(_p19._0._0));
 											} else {
 												return _elm_lang$core$Platform_Cmd$none;
 											}
@@ -17085,7 +17076,7 @@ var _user$project$Main$update = F2(
 							pass,
 							A2(
 								_elm_lang$core$Maybe$map,
-								_user$project$BugList$update(_p21),
+								_user$project$BugList$update(_p20),
 								model.bugList)));
 				default:
 					return _user$project$Main$noCmd(
@@ -17105,8 +17096,8 @@ var _user$project$Main$SetSelectedEnvironmentIds = function (a) {
 var _user$project$Main$location2messages = function (location) {
 	var builder = _rgrempel$elm_route_url$RouteUrl_Builder$fromUrl(location.href);
 	var selectedEnvironmentIds = function () {
-		var _p22 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
-		if (_p22.ctor === 'Just') {
+		var _p21 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
+		if (_p21.ctor === 'Just') {
 			return A2(
 				_elm_lang$core$List$filter,
 				function (s) {
@@ -17114,7 +17105,7 @@ var _user$project$Main$location2messages = function (location) {
 						_elm_lang$core$String$length(s),
 						0) > 0;
 				},
-				A2(_elm_lang$core$String$split, ',', _p22._0));
+				A2(_elm_lang$core$String$split, ',', _p21._0));
 		} else {
 			return {ctor: '[]'};
 		}

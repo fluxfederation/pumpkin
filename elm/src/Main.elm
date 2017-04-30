@@ -272,16 +272,11 @@ update msg model =
                 )
 
         FocusedBugMsg m ->
-            case model.focusedBug of
-                RemoteData.Success bugModel ->
-                    let
-                        ( newBugModel, cmd ) =
-                            BugDetails.update m bugModel
-                    in
-                        ( { model | focusedBug = RemoteData.Success newBugModel }, Cmd.map FocusedBugMsg cmd )
-
-                _ ->
-                    noCmd { model | error = Just "Got message for no-longer-selected bug" }
+            let
+                ( newBugModel, cmd ) =
+                    RemoteData.update (BugDetails.update m) model.focusedBug
+            in
+                ( { model | focusedBug = newBugModel }, Cmd.map FocusedBugMsg cmd )
 
         BugListMsg m ->
             let
