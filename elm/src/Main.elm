@@ -46,7 +46,7 @@ type alias Model =
     { selectedEnvironmentIds : List EnvironmentID
     , loadingEnvironments : Bool
     , environments : List Environment
-    , bugList : Maybe BugList.Model
+    , bugList : BugList.Model
     , focusedBug : WebData BugDetails.Model
     , error : Maybe String
     , showClosedBugs : Bool
@@ -58,27 +58,32 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel
-    , Cmd.batch
-        [ Http.send LoadedEnvironments Rest.loadEnvironments
-        , Task.perform TimeTick Time.now
-        ]
-    )
-
-
-initialModel : Model
-initialModel =
-    { selectedEnvironmentIds = []
-    , loadingEnvironments = True
-    , environments = []
-    , bugList = Nothing
-    , focusedBug = RemoteData.NotAsked
-    , error = Nothing
-    , showClosedBugs = False
-    , showMenu = False
-    , search = ""
-    , now = (Date.fromTime 0)
-    }
+    let
+        ( bugList, bugListCmd ) =
+            BugList.init
+                { environmentIDs = []
+                , includeClosed = False
+                , search = ""
+                }
+                Nothing
+    in
+        ( { selectedEnvironmentIds = []
+          , loadingEnvironments = True
+          , environments = []
+          , bugList = bugList
+          , focusedBug = RemoteData.NotAsked
+          , error = Nothing
+          , showClosedBugs = False
+          , showMenu = False
+          , search = ""
+          , now = (Date.fromTime 0)
+          }
+        , Cmd.batch
+            [ Http.send LoadedEnvironments Rest.loadEnvironments
+            , Task.perform TimeTick Time.now
+            , Cmd.map BugListMsg bugListCmd
+            ]
+        )
 
 
 toFilter : Model -> BugList.Filter
@@ -174,12 +179,7 @@ subscriptions model =
 
             _ ->
                 Sub.none
-        , case model.bugList of
-            Just bugList ->
-                Sub.map BugListMsg (BugList.subscriptions bugList)
-
-            _ ->
-                Sub.none
+        , Sub.map BugListMsg (BugList.subscriptions model.bugList)
         ]
 
 
@@ -267,7 +267,7 @@ update msg model =
                     BugList.init (toFilter model)
                         (Maybe.map (.bug >> .id) (RemoteData.toMaybe model.focusedBug))
             in
-                ( { model | bugList = Just bugList }
+                ( { model | bugList = bugList }
                 , Cmd.map BugListMsg cmd
                 )
 
@@ -280,22 +280,20 @@ update msg model =
 
         BugListMsg m ->
             let
-                pass ( newBugList, listCmd ) =
-                    ( { model | bugList = Just newBugList }
-                    , Cmd.batch
-                        [ Cmd.map BugListMsg listCmd
-                        , case m of
-                            BugList.SelectBug (Just id) ->
-                                Rest.fetch LoadedDetails (Rest.loadBugDetails id)
-
-                            _ ->
-                                Cmd.none
-                        ]
-                    )
+                ( newBugList, listCmd ) =
+                    (BugList.update m model.bugList)
             in
-                Maybe.withDefault (noCmd model) <|
-                    Maybe.map pass <|
-                        Maybe.map (BugList.update m) model.bugList
+                ( { model | bugList = newBugList }
+                , Cmd.batch
+                    [ Cmd.map BugListMsg listCmd
+                    , case m of
+                        BugList.SelectBug (Just id) ->
+                            Rest.fetch LoadedDetails (Rest.loadBugDetails id)
+
+                        _ ->
+                            Cmd.none
+                    ]
+                )
 
         TimeTick time ->
             noCmd { model | now = (Date.fromTime time) }
@@ -436,9 +434,4 @@ sidebarBugs model =
         if model.showMenu then
             empty
         else
-            case model.bugList of
-                Just bugList ->
-                    Html.map BugListMsg (BugList.view bugList)
-
-                _ ->
-                    empty
+            Html.map BugListMsg (BugList.view model.bugList)

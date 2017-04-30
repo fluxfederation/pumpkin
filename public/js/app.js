@@ -16669,18 +16669,6 @@ var _user$project$Main$delta2url = F2(
 var _user$project$Main$toFilter = function (model) {
 	return {environmentIDs: model.selectedEnvironmentIds, includeClosed: model.showClosedBugs, search: model.search};
 };
-var _user$project$Main$initialModel = {
-	selectedEnvironmentIds: {ctor: '[]'},
-	loadingEnvironments: true,
-	environments: {ctor: '[]'},
-	bugList: _elm_lang$core$Maybe$Nothing,
-	focusedBug: _bloom$remotedata$RemoteData$NotAsked,
-	error: _elm_lang$core$Maybe$Nothing,
-	showClosedBugs: false,
-	showMenu: false,
-	search: '',
-	now: _elm_lang$core$Date$fromTime(0)
-};
 var _user$project$Main$Model = function (a) {
 	return function (b) {
 		return function (c) {
@@ -16713,19 +16701,10 @@ var _user$project$Main$sidebarBugs = function (model) {
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		{ctor: '[]'});
-	if (model.showMenu) {
-		return empty;
-	} else {
-		var _p6 = model.bugList;
-		if (_p6.ctor === 'Just') {
-			return A2(
-				_elm_lang$html$Html$map,
-				_user$project$Main$BugListMsg,
-				_user$project$BugList$view(_p6._0));
-		} else {
-			return empty;
-		}
-	}
+	return model.showMenu ? empty : A2(
+		_elm_lang$html$Html$map,
+		_user$project$Main$BugListMsg,
+		_user$project$BugList$view(model.bugList));
 };
 var _user$project$Main$FocusedBugMsg = function (a) {
 	return {ctor: 'FocusedBugMsg', _0: a};
@@ -16738,29 +16717,22 @@ var _user$project$Main$subscriptions = function (model) {
 			_1: {
 				ctor: '::',
 				_0: function () {
-					var _p7 = model.focusedBug;
-					if (_p7.ctor === 'Success') {
+					var _p6 = model.focusedBug;
+					if (_p6.ctor === 'Success') {
 						return A2(
 							_elm_lang$core$Platform_Sub$map,
 							_user$project$Main$FocusedBugMsg,
-							_user$project$BugDetails$subscriptions(_p7._0));
+							_user$project$BugDetails$subscriptions(_p6._0));
 					} else {
 						return _elm_lang$core$Platform_Sub$none;
 					}
 				}(),
 				_1: {
 					ctor: '::',
-					_0: function () {
-						var _p8 = model.bugList;
-						if (_p8.ctor === 'Just') {
-							return A2(
-								_elm_lang$core$Platform_Sub$map,
-								_user$project$Main$BugListMsg,
-								_user$project$BugList$subscriptions(_p8._0));
-						} else {
-							return _elm_lang$core$Platform_Sub$none;
-						}
-					}(),
+					_0: A2(
+						_elm_lang$core$Platform_Sub$map,
+						_user$project$Main$BugListMsg,
+						_user$project$BugList$subscriptions(model.bugList)),
 					_1: {ctor: '[]'}
 				}
 			}
@@ -16775,15 +16747,15 @@ var _user$project$Main$selectedBug = function (model) {
 			_1: {ctor: '[]'}
 		},
 		function () {
-			var _p9 = model.focusedBug;
-			switch (_p9.ctor) {
+			var _p7 = model.focusedBug;
+			switch (_p7.ctor) {
 				case 'Success':
 					return {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$map,
 							_user$project$Main$FocusedBugMsg,
-							_user$project$BugDetails$view(_p9._0)),
+							_user$project$BugDetails$view(_p7._0)),
 						_1: {ctor: '[]'}
 					};
 				case 'Loading':
@@ -16862,12 +16834,12 @@ var _user$project$Main$sidebarSearch = function (model) {
 var _user$project$Main$ToggleMenu = {ctor: 'ToggleMenu'};
 var _user$project$Main$ClearError = {ctor: 'ClearError'};
 var _user$project$Main$errorMessages = function (model) {
-	var _p10 = model.error;
-	if (_p10.ctor === 'Just') {
+	var _p8 = model.error;
+	if (_p8.ctor === 'Just') {
 		return A2(
 			_user$project$ViewCommon$errorNotification,
 			_elm_lang$core$Maybe$Just(_user$project$Main$ClearError),
-			_p10._0);
+			_p8._0);
 	} else {
 		return A2(
 			_elm_lang$html$Html$div,
@@ -16885,8 +16857,8 @@ var _user$project$Main$update = F2(
 	function (msg, model) {
 		update:
 		while (true) {
-			var _p11 = msg;
-			switch (_p11.ctor) {
+			var _p9 = msg;
+			switch (_p9.ctor) {
 				case 'LoadedEnvironments':
 					return A3(
 						_user$project$Main$handleResult,
@@ -16908,31 +16880,31 @@ var _user$project$Main$update = F2(
 									}));
 						},
 						model,
-						_p11._0);
+						_p9._0);
 				case 'ShowEnvironmentBugs':
-					var _p12 = _p11._0;
-					var newEnvironmentIds = _p11._1 ? A2(
+					var _p10 = _p9._0;
+					var newEnvironmentIds = _p9._1 ? A2(
 						_elm_lang$core$Basics_ops['++'],
 						model.selectedEnvironmentIds,
 						{
 							ctor: '::',
-							_0: _p12,
+							_0: _p10,
 							_1: {ctor: '[]'}
-						}) : A2(_elm_community$list_extra$List_Extra$remove, _p12, model.selectedEnvironmentIds);
+						}) : A2(_elm_community$list_extra$List_Extra$remove, _p10, model.selectedEnvironmentIds);
+					var _v7 = _user$project$Main$SearchSubmit,
+						_v8 = _elm_lang$core$Native_Utils.update(
+						model,
+						{selectedEnvironmentIds: newEnvironmentIds});
+					msg = _v7;
+					model = _v8;
+					continue update;
+				case 'SetSelectedEnvironmentIds':
 					var _v9 = _user$project$Main$SearchSubmit,
 						_v10 = _elm_lang$core$Native_Utils.update(
 						model,
-						{selectedEnvironmentIds: newEnvironmentIds});
+						{selectedEnvironmentIds: _p9._0});
 					msg = _v9;
 					model = _v10;
-					continue update;
-				case 'SetSelectedEnvironmentIds':
-					var _v11 = _user$project$Main$SearchSubmit,
-						_v12 = _elm_lang$core$Native_Utils.update(
-						model,
-						{selectedEnvironmentIds: _p11._0});
-					msg = _v11;
-					model = _v12;
 					continue update;
 				case 'RequestDetails':
 					return {
@@ -16941,13 +16913,13 @@ var _user$project$Main$update = F2(
 						_1: A2(
 							_user$project$Rest$fetch,
 							_user$project$Main$LoadedDetails,
-							_user$project$Rest$loadBugDetails(_p11._0))
+							_user$project$Rest$loadBugDetails(_p9._0))
 					};
 				case 'LoadedDetails':
 					var inited = A2(
 						_bloom$remotedata$RemoteData$map,
 						A2(_elm_lang$core$Basics$flip, _user$project$BugDetails$init, model.environments),
-						_p11._0);
+						_p9._0);
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -16956,9 +16928,9 @@ var _user$project$Main$update = F2(
 								focusedBug: A2(_bloom$remotedata$RemoteData$map, _elm_lang$core$Tuple$first, inited)
 							}),
 						_1: function () {
-							var _p13 = A2(_bloom$remotedata$RemoteData$map, _elm_lang$core$Tuple$second, inited);
-							if (_p13.ctor === 'Success') {
-								return A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, _p13._0);
+							var _p11 = A2(_bloom$remotedata$RemoteData$map, _elm_lang$core$Tuple$second, inited);
+							if (_p11.ctor === 'Success') {
+								return A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, _p11._0);
 							} else {
 								return _elm_lang$core$Platform_Cmd$none;
 							}
@@ -16970,20 +16942,20 @@ var _user$project$Main$update = F2(
 							model,
 							{error: _elm_lang$core$Maybe$Nothing}));
 				case 'ShowClosedBugs':
+					var _v12 = _user$project$Main$SearchSubmit,
+						_v13 = _elm_lang$core$Native_Utils.update(
+						model,
+						{showClosedBugs: true});
+					msg = _v12;
+					model = _v13;
+					continue update;
+				case 'HideClosedBugs':
 					var _v14 = _user$project$Main$SearchSubmit,
 						_v15 = _elm_lang$core$Native_Utils.update(
 						model,
-						{showClosedBugs: true});
+						{showClosedBugs: false});
 					msg = _v14;
 					model = _v15;
-					continue update;
-				case 'HideClosedBugs':
-					var _v16 = _user$project$Main$SearchSubmit,
-						_v17 = _elm_lang$core$Native_Utils.update(
-						model,
-						{showClosedBugs: false});
-					msg = _v16;
-					model = _v17;
 					continue update;
 				case 'ToggleMenu':
 					return _user$project$Main$noCmd(
@@ -16994,40 +16966,38 @@ var _user$project$Main$update = F2(
 					return _user$project$Main$noCmd(
 						_elm_lang$core$Native_Utils.update(
 							model,
-							{search: _p11._0}));
+							{search: _p9._0}));
 				case 'SearchSubmit':
-					var _p14 = A2(
+					var _p12 = A2(
 						_user$project$BugList$init,
 						_user$project$Main$toFilter(model),
 						A2(
 							_elm_lang$core$Maybe$map,
-							function (_p15) {
+							function (_p13) {
 								return function (_) {
 									return _.id;
 								}(
 									function (_) {
 										return _.bug;
-									}(_p15));
+									}(_p13));
 							},
 							_bloom$remotedata$RemoteData$toMaybe(model.focusedBug)));
-					var bugList = _p14._0;
-					var cmd = _p14._1;
+					var bugList = _p12._0;
+					var cmd = _p12._1;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{
-								bugList: _elm_lang$core$Maybe$Just(bugList)
-							}),
+							{bugList: bugList}),
 						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, cmd)
 					};
 				case 'FocusedBugMsg':
-					var _p16 = A2(
+					var _p14 = A2(
 						_bloom$remotedata$RemoteData$update,
-						_user$project$BugDetails$update(_p11._0),
+						_user$project$BugDetails$update(_p9._0),
 						model.focusedBug);
-					var newBugModel = _p16._0;
-					var cmd = _p16._1;
+					var newBugModel = _p14._0;
+					var cmd = _p14._1;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -17036,54 +17006,42 @@ var _user$project$Main$update = F2(
 						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, cmd)
 					};
 				case 'BugListMsg':
-					var _p20 = _p11._0;
-					var pass = function (_p17) {
-						var _p18 = _p17;
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{
-									bugList: _elm_lang$core$Maybe$Just(_p18._0)
-								}),
-							_1: _elm_lang$core$Platform_Cmd$batch(
-								{
+					var _p17 = _p9._0;
+					var _p15 = A2(_user$project$BugList$update, _p17, model.bugList);
+					var newBugList = _p15._0;
+					var listCmd = _p15._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{bugList: newBugList}),
+						_1: _elm_lang$core$Platform_Cmd$batch(
+							{
+								ctor: '::',
+								_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, listCmd),
+								_1: {
 									ctor: '::',
-									_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, _p18._1),
-									_1: {
-										ctor: '::',
-										_0: function () {
-											var _p19 = _p20;
-											if ((_p19.ctor === 'SelectBug') && (_p19._0.ctor === 'Just')) {
-												return A2(
-													_user$project$Rest$fetch,
-													_user$project$Main$LoadedDetails,
-													_user$project$Rest$loadBugDetails(_p19._0._0));
-											} else {
-												return _elm_lang$core$Platform_Cmd$none;
-											}
-										}(),
-										_1: {ctor: '[]'}
-									}
-								})
-						};
+									_0: function () {
+										var _p16 = _p17;
+										if ((_p16.ctor === 'SelectBug') && (_p16._0.ctor === 'Just')) {
+											return A2(
+												_user$project$Rest$fetch,
+												_user$project$Main$LoadedDetails,
+												_user$project$Rest$loadBugDetails(_p16._0._0));
+										} else {
+											return _elm_lang$core$Platform_Cmd$none;
+										}
+									}(),
+									_1: {ctor: '[]'}
+								}
+							})
 					};
-					return A2(
-						_elm_lang$core$Maybe$withDefault,
-						_user$project$Main$noCmd(model),
-						A2(
-							_elm_lang$core$Maybe$map,
-							pass,
-							A2(
-								_elm_lang$core$Maybe$map,
-								_user$project$BugList$update(_p20),
-								model.bugList)));
 				default:
 					return _user$project$Main$noCmd(
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								now: _elm_lang$core$Date$fromTime(_p11._0)
+								now: _elm_lang$core$Date$fromTime(_p9._0)
 							}));
 			}
 		}
@@ -17096,8 +17054,8 @@ var _user$project$Main$SetSelectedEnvironmentIds = function (a) {
 var _user$project$Main$location2messages = function (location) {
 	var builder = _rgrempel$elm_route_url$RouteUrl_Builder$fromUrl(location.href);
 	var selectedEnvironmentIds = function () {
-		var _p21 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
-		if (_p21.ctor === 'Just') {
+		var _p18 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
+		if (_p18.ctor === 'Just') {
 			return A2(
 				_elm_lang$core$List$filter,
 				function (s) {
@@ -17105,7 +17063,7 @@ var _user$project$Main$location2messages = function (location) {
 						_elm_lang$core$String$length(s),
 						0) > 0;
 				},
-				A2(_elm_lang$core$String$split, ',', _p21._0));
+				A2(_elm_lang$core$String$split, ',', _p18._0));
 		} else {
 			return {ctor: '[]'};
 		}
@@ -17394,20 +17352,47 @@ var _user$project$Main$view = function (model) {
 var _user$project$Main$LoadedEnvironments = function (a) {
 	return {ctor: 'LoadedEnvironments', _0: a};
 };
-var _user$project$Main$init = {
-	ctor: '_Tuple2',
-	_0: _user$project$Main$initialModel,
-	_1: _elm_lang$core$Platform_Cmd$batch(
+var _user$project$Main$init = function () {
+	var _p19 = A2(
+		_user$project$BugList$init,
 		{
-			ctor: '::',
-			_0: A2(_elm_lang$http$Http$send, _user$project$Main$LoadedEnvironments, _user$project$Rest$loadEnvironments),
-			_1: {
+			environmentIDs: {ctor: '[]'},
+			includeClosed: false,
+			search: ''
+		},
+		_elm_lang$core$Maybe$Nothing);
+	var bugList = _p19._0;
+	var bugListCmd = _p19._1;
+	return {
+		ctor: '_Tuple2',
+		_0: {
+			selectedEnvironmentIds: {ctor: '[]'},
+			loadingEnvironments: true,
+			environments: {ctor: '[]'},
+			bugList: bugList,
+			focusedBug: _bloom$remotedata$RemoteData$NotAsked,
+			error: _elm_lang$core$Maybe$Nothing,
+			showClosedBugs: false,
+			showMenu: false,
+			search: '',
+			now: _elm_lang$core$Date$fromTime(0)
+		},
+		_1: _elm_lang$core$Platform_Cmd$batch(
+			{
 				ctor: '::',
-				_0: A2(_elm_lang$core$Task$perform, _user$project$Main$TimeTick, _elm_lang$core$Time$now),
-				_1: {ctor: '[]'}
-			}
-		})
-};
+				_0: A2(_elm_lang$http$Http$send, _user$project$Main$LoadedEnvironments, _user$project$Rest$loadEnvironments),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$core$Task$perform, _user$project$Main$TimeTick, _elm_lang$core$Time$now),
+					_1: {
+						ctor: '::',
+						_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, bugListCmd),
+						_1: {ctor: '[]'}
+					}
+				}
+			})
+	};
+}();
 var _user$project$Main$main = _rgrempel$elm_route_url$RouteUrl$program(
 	{delta2url: _user$project$Main$delta2url, location2messages: _user$project$Main$location2messages, init: _user$project$Main$init, view: _user$project$Main$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
 
