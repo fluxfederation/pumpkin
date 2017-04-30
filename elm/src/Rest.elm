@@ -11,17 +11,21 @@ import RemoteData
 -- URLs
 
 
+type Param
+    = Param String String
+
+
 environmentsUrl : String
 environmentsUrl =
     "/environments"
 
 
-pageParams : (a -> String) -> Int -> Maybe a -> List String
+pageParams : (a -> String) -> Int -> Maybe a -> List Param
 pageParams idToString limit startFrom =
-    [ "limit=" ++ toString limit ]
+    [ Param "limit" (toString limit) ]
         ++ (case startFrom of
                 Just id ->
-                    [ "start=" ++ idToString id ]
+                    [ Param "start" (idToString id) ]
 
                 Nothing ->
                     []
@@ -43,21 +47,27 @@ occurrenceIDToParam (OccurrenceID uuid) =
     uuid.toString
 
 
+addParams : String -> List Param -> String
+addParams path params =
+    path
+        ++ if List.isEmpty params then
+            ""
+           else
+            "?" ++ String.join "&" (List.map (\(Param k v) -> k ++ "=" ++ v) params)
+
+
 openBugsUrl : List EnvironmentID -> Int -> Maybe BugID -> String -> String
 openBugsUrl environmentIds limit startFrom search =
-    "/bugs?"
-        ++ (String.join
-                "&"
-                ([ "closed=false", ("search=" ++ search) ]
-                    ++ (pageParams bugIDToParam limit startFrom)
-                    ++ (List.map (\id -> "environment_ids[]=" ++ id) (List.map envIDToParam environmentIds))
-                )
-           )
+    addParams "/bugs"
+        ([ Param "closed" "false", Param "search" search ]
+            ++ (pageParams bugIDToParam limit startFrom)
+            ++ (List.map (\id -> Param "environment_ids[]" id) (List.map envIDToParam environmentIds))
+        )
 
 
 allBugsUrl : Int -> Maybe BugID -> String -> String
 allBugsUrl limit startFrom search =
-    "/bugs?" ++ String.join "&" ((pageParams bugIDToParam limit startFrom) ++ [ ("search=" ++ search) ])
+    addParams "/bugs" (pageParams bugIDToParam limit startFrom ++ [ (Param "search" search) ])
 
 
 detailsUrl : BugID -> String
@@ -67,17 +77,8 @@ detailsUrl (BugID uuid) =
 
 occurrencesUrl : BugID -> Int -> Maybe OccurrenceID -> String
 occurrencesUrl (BugID uuid) limit occurrenceID =
-    "/bugs/"
-        ++ uuid.toString
-        ++ "/occurrences?"
-        ++ (String.join
-                "&"
-                (pageParams
-                    occurrenceIDToParam
-                    limit
-                    occurrenceID
-                )
-           )
+    addParams ("/bugs/" ++ uuid.toString ++ "/occurrences")
+        (pageParams occurrenceIDToParam limit occurrenceID)
 
 
 

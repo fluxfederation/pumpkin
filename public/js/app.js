@@ -15026,18 +15026,46 @@ var _user$project$Rest$loadBugDetails = function (bugId) {
 		_user$project$Rest$detailsUrl(bugId),
 		_user$project$Rest$decodeBug);
 };
-var _user$project$Rest$occurrenceIDToParam = function (_p6) {
-	var _p7 = _p6;
-	return _p7._0.toString;
-};
-var _user$project$Rest$envIDToParam = function (_p8) {
+var _user$project$Rest$addParams = F2(
+	function (path, params) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			path,
+			_elm_lang$core$List$isEmpty(params) ? '' : A2(
+				_elm_lang$core$Basics_ops['++'],
+				'?',
+				A2(
+					_elm_lang$core$String$join,
+					'&',
+					A2(
+						_elm_lang$core$List$map,
+						function (_p6) {
+							var _p7 = _p6;
+							return A2(
+								_elm_lang$core$Basics_ops['++'],
+								_p7._0,
+								A2(_elm_lang$core$Basics_ops['++'], '=', _p7._1));
+						},
+						params))));
+	});
+var _user$project$Rest$occurrenceIDToParam = function (_p8) {
 	var _p9 = _p8;
 	return _p9._0.toString;
 };
-var _user$project$Rest$bugIDToParam = function (_p10) {
+var _user$project$Rest$envIDToParam = function (_p10) {
 	var _p11 = _p10;
 	return _p11._0.toString;
 };
+var _user$project$Rest$bugIDToParam = function (_p12) {
+	var _p13 = _p12;
+	return _p13._0.toString;
+};
+var _user$project$Rest$environmentsUrl = '/environments';
+var _user$project$Rest$loadEnvironments = A2(_elm_lang$http$Http$get, _user$project$Rest$environmentsUrl, _user$project$Rest$decodeEnvironments);
+var _user$project$Rest$Param = F2(
+	function (a, b) {
+		return {ctor: 'Param', _0: a, _1: b};
+	});
 var _user$project$Rest$pageParams = F3(
 	function (idToString, limit, startFrom) {
 		return A2(
@@ -15045,20 +15073,20 @@ var _user$project$Rest$pageParams = F3(
 			{
 				ctor: '::',
 				_0: A2(
-					_elm_lang$core$Basics_ops['++'],
-					'limit=',
+					_user$project$Rest$Param,
+					'limit',
 					_elm_lang$core$Basics$toString(limit)),
 				_1: {ctor: '[]'}
 			},
 			function () {
-				var _p12 = startFrom;
-				if (_p12.ctor === 'Just') {
+				var _p14 = startFrom;
+				if (_p14.ctor === 'Just') {
 					return {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$core$Basics_ops['++'],
-							'start=',
-							idToString(_p12._0)),
+							_user$project$Rest$Param,
+							'start',
+							idToString(_p14._0)),
 						_1: {ctor: '[]'}
 					};
 				} else {
@@ -15066,51 +15094,63 @@ var _user$project$Rest$pageParams = F3(
 				}
 			}());
 	});
+var _user$project$Rest$occurrencesUrl = F3(
+	function (_p15, limit, occurrenceID) {
+		var _p16 = _p15;
+		return A2(
+			_user$project$Rest$addParams,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'/bugs/',
+				A2(_elm_lang$core$Basics_ops['++'], _p16._0.toString, '/occurrences')),
+			A3(_user$project$Rest$pageParams, _user$project$Rest$occurrenceIDToParam, limit, occurrenceID));
+	});
+var _user$project$Rest$loadOccurrences = F2(
+	function (bugId, start) {
+		return A2(
+			_elm_lang$http$Http$get,
+			A3(_user$project$Rest$occurrencesUrl, bugId, _user$project$Rest$defaultPageSize, start),
+			A2(_user$project$Rest$decodeChunk, _user$project$Rest$defaultPageSize, _user$project$Rest$decodeOccurrence));
+	});
 var _user$project$Rest$openBugsUrl = F4(
 	function (environmentIds, limit, startFrom, search) {
 		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			'/bugs?',
+			_user$project$Rest$addParams,
+			'/bugs',
 			A2(
-				_elm_lang$core$String$join,
-				'&',
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: A2(_user$project$Rest$Param, 'closed', 'false'),
+					_1: {
+						ctor: '::',
+						_0: A2(_user$project$Rest$Param, 'search', search),
+						_1: {ctor: '[]'}
+					}
+				},
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					{
-						ctor: '::',
-						_0: 'closed=false',
-						_1: {
-							ctor: '::',
-							_0: A2(_elm_lang$core$Basics_ops['++'], 'search=', search),
-							_1: {ctor: '[]'}
-						}
-					},
+					A3(_user$project$Rest$pageParams, _user$project$Rest$bugIDToParam, limit, startFrom),
 					A2(
-						_elm_lang$core$Basics_ops['++'],
-						A3(_user$project$Rest$pageParams, _user$project$Rest$bugIDToParam, limit, startFrom),
-						A2(
-							_elm_lang$core$List$map,
-							function (id) {
-								return A2(_elm_lang$core$Basics_ops['++'], 'environment_ids[]=', id);
-							},
-							A2(_elm_lang$core$List$map, _user$project$Rest$envIDToParam, environmentIds))))));
+						_elm_lang$core$List$map,
+						function (id) {
+							return A2(_user$project$Rest$Param, 'environment_ids[]', id);
+						},
+						A2(_elm_lang$core$List$map, _user$project$Rest$envIDToParam, environmentIds)))));
 	});
 var _user$project$Rest$allBugsUrl = F3(
 	function (limit, startFrom, search) {
 		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			'/bugs?',
+			_user$project$Rest$addParams,
+			'/bugs',
 			A2(
-				_elm_lang$core$String$join,
-				'&',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					A3(_user$project$Rest$pageParams, _user$project$Rest$bugIDToParam, limit, startFrom),
-					{
-						ctor: '::',
-						_0: A2(_elm_lang$core$Basics_ops['++'], 'search=', search),
-						_1: {ctor: '[]'}
-					})));
+				_elm_lang$core$Basics_ops['++'],
+				A3(_user$project$Rest$pageParams, _user$project$Rest$bugIDToParam, limit, startFrom),
+				{
+					ctor: '::',
+					_0: A2(_user$project$Rest$Param, 'search', search),
+					_1: {ctor: '[]'}
+				}));
 	});
 var _user$project$Rest$loadBugs = F4(
 	function (environmentIds, includeClosedBugs, startFrom, search) {
@@ -15121,32 +15161,6 @@ var _user$project$Rest$loadBugs = F4(
 			url,
 			A2(_user$project$Rest$decodeChunk, pageSize, _user$project$Rest$decodeBug));
 	});
-var _user$project$Rest$occurrencesUrl = F3(
-	function (_p13, limit, occurrenceID) {
-		var _p14 = _p13;
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			'/bugs/',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p14._0.toString,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'/occurrences?',
-					A2(
-						_elm_lang$core$String$join,
-						'&',
-						A3(_user$project$Rest$pageParams, _user$project$Rest$occurrenceIDToParam, limit, occurrenceID)))));
-	});
-var _user$project$Rest$loadOccurrences = F2(
-	function (bugId, start) {
-		return A2(
-			_elm_lang$http$Http$get,
-			A3(_user$project$Rest$occurrencesUrl, bugId, _user$project$Rest$defaultPageSize, start),
-			A2(_user$project$Rest$decodeChunk, _user$project$Rest$defaultPageSize, _user$project$Rest$decodeOccurrence));
-	});
-var _user$project$Rest$environmentsUrl = '/environments';
-var _user$project$Rest$loadEnvironments = A2(_elm_lang$http$Http$get, _user$project$Rest$environmentsUrl, _user$project$Rest$decodeEnvironments);
 
 var _user$project$TimeAgo$buildDatePeriods = F2(
 	function (date1, date2) {
