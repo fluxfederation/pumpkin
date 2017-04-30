@@ -2,6 +2,7 @@ module ChunkList exposing (Chunk, ChunkList, update, next, items)
 
 import RemoteData exposing (..)
 import List.Extra as ListX
+import Maybe.Extra as MaybeX
 
 
 type alias Chunk a =
@@ -16,8 +17,31 @@ type alias ChunkList a =
 
 update : ChunkList a -> WebData (Chunk a) -> ChunkList a
 update previous data =
-    -- TODO: consolidate chunks
-    (ListX.takeWhile RemoteData.isSuccess previous) ++ [ data ]
+    let
+        newChunks =
+            previous ++ [ data ]
+
+        successful =
+            MaybeX.values (List.map RemoteData.toMaybe newChunks)
+
+        consolidated =
+            case ListX.last successful of
+                Just last ->
+                    [ Success
+                        { items = List.concatMap .items successful
+                        , nextItem = last.nextItem
+                        }
+                    ]
+
+                _ ->
+                    []
+    in
+        consolidated
+            ++ (if RemoteData.isSuccess data then
+                    []
+                else
+                    [ data ]
+               )
 
 
 next : ChunkList a -> Maybe a
