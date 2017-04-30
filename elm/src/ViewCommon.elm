@@ -10,6 +10,7 @@ import Types exposing (..)
 import ChunkList exposing (ChunkList)
 import RemoteData
 import Maybe.Extra as MaybeX
+import List.Extra as ListX
 
 
 formatDate : Bool -> Date.Date -> Date -> String
@@ -35,14 +36,9 @@ environmentName : List Environment -> EnvironmentID -> String
 environmentName environments id =
     let
         environment =
-            List.head (List.filter (\environment -> environment.id == id) environments)
+            ListX.find (\env -> env.id == id) environments
     in
-        case environment of
-            Just e ->
-                e.name
-
-            _ ->
-                "UNKNOWN"
+        Maybe.withDefault "UNKNOWN" <| Maybe.map .name environment
 
 
 paginatedChunkList : (List a -> List (Html msg)) -> ChunkList a -> (Maybe a -> msg) -> Html msg

@@ -15425,19 +15425,21 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 	});
 var _user$project$ViewCommon$environmentName = F2(
 	function (environments, id) {
-		var environment = _elm_lang$core$List$head(
+		var environment = A2(
+			_elm_community$list_extra$List_Extra$find,
+			function (env) {
+				return _elm_lang$core$Native_Utils.eq(env.id, id);
+			},
+			environments);
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			'UNKNOWN',
 			A2(
-				_elm_lang$core$List$filter,
-				function (environment) {
-					return _elm_lang$core$Native_Utils.eq(environment.id, id);
+				_elm_lang$core$Maybe$map,
+				function (_) {
+					return _.name;
 				},
-				environments));
-		var _p4 = environment;
-		if (_p4.ctor === 'Just') {
-			return _p4._0.name;
-		} else {
-			return 'UNKNOWN';
-		}
+				environment));
 	});
 var _user$project$ViewCommon$fontAwesome = function (name) {
 	return A2(
