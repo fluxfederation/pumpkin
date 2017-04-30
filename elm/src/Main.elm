@@ -336,7 +336,7 @@ content model =
             [ div [ class "panel sidebar" ]
                 [ p [ class "panel-heading" ] [ text "Bug filters" ]
                 , sidebarFilters model
-                , sidebarBugs model
+                , Html.map BugListMsg (BugList.view model.bugList)
                 ]
             ]
         , div [ class "column" ] [ selectedBug model ]
@@ -397,7 +397,7 @@ currentEnvironmentsAsTags model =
                 , button [ class "delete is-small", onClick (ShowEnvironmentBugs id False) ] []
                 ]
     in
-        p [ class "panel-block", onClick ToggleMenu ]
+        p [ class "panel-block" ]
             (if List.isEmpty tags then
                 [ text "None" ]
              else
@@ -423,15 +423,3 @@ environmentMenuItem selectedEnvironmentIds environment =
         label
             [ class "panel-block" ]
             [ input [ type_ "checkbox", checked isActive, onCheck (ShowEnvironmentBugs environment.id) ] [], text environment.name ]
-
-
-sidebarBugs : Model -> Html Msg
-sidebarBugs model =
-    let
-        empty =
-            div [] []
-    in
-        if model.showMenu then
-            empty
-        else
-            Html.map BugListMsg (BugList.view model.bugList)

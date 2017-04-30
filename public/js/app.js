@@ -16696,16 +16696,6 @@ var _user$project$Main$TimeTick = function (a) {
 var _user$project$Main$BugListMsg = function (a) {
 	return {ctor: 'BugListMsg', _0: a};
 };
-var _user$project$Main$sidebarBugs = function (model) {
-	var empty = A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{ctor: '[]'});
-	return model.showMenu ? empty : A2(
-		_elm_lang$html$Html$map,
-		_user$project$Main$BugListMsg,
-		_user$project$BugList$view(model.bugList));
-};
 var _user$project$Main$FocusedBugMsg = function (a) {
 	return {ctor: 'FocusedBugMsg', _0: a};
 };
@@ -17137,11 +17127,7 @@ var _user$project$Main$currentEnvironmentsAsTags = function (model) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Attributes$class('panel-block'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleMenu),
-				_1: {ctor: '[]'}
-			}
+			_1: {ctor: '[]'}
 		},
 		_elm_lang$core$List$isEmpty(tags) ? {
 			ctor: '::',
@@ -17310,7 +17296,10 @@ var _user$project$Main$content = function (model) {
 								_0: _user$project$Main$sidebarFilters(model),
 								_1: {
 									ctor: '::',
-									_0: _user$project$Main$sidebarBugs(model),
+									_0: A2(
+										_elm_lang$html$Html$map,
+										_user$project$Main$BugListMsg,
+										_user$project$BugList$view(model.bugList)),
 									_1: {ctor: '[]'}
 								}
 							}
