@@ -14898,10 +14898,41 @@ var _user$project$ChunkList$next = function (chunks) {
 };
 var _user$project$ChunkList$update = F2(
 	function (previous, data) {
+		var newChunks = A2(
+			_elm_lang$core$Basics_ops['++'],
+			previous,
+			{
+				ctor: '::',
+				_0: data,
+				_1: {ctor: '[]'}
+			});
+		var successful = _elm_community$maybe_extra$Maybe_Extra$values(
+			A2(_elm_lang$core$List$map, _bloom$remotedata$RemoteData$toMaybe, newChunks));
+		var consolidated = function () {
+			var _p2 = _elm_community$list_extra$List_Extra$last(successful);
+			if (_p2.ctor === 'Just') {
+				return {
+					ctor: '::',
+					_0: _bloom$remotedata$RemoteData$Success(
+						{
+							items: A2(
+								_elm_lang$core$List$concatMap,
+								function (_) {
+									return _.items;
+								},
+								successful),
+							nextItem: _p2._0.nextItem
+						}),
+					_1: {ctor: '[]'}
+				};
+			} else {
+				return {ctor: '[]'};
+			}
+		}();
 		return A2(
 			_elm_lang$core$Basics_ops['++'],
-			A2(_elm_community$list_extra$List_Extra$takeWhile, _bloom$remotedata$RemoteData$isSuccess, previous),
-			{
+			consolidated,
+			_bloom$remotedata$RemoteData$isSuccess(data) ? {ctor: '[]'} : {
 				ctor: '::',
 				_0: data,
 				_1: {ctor: '[]'}
@@ -16827,50 +16858,6 @@ var _user$project$Main$sidebarSearch = function (model) {
 		});
 };
 var _user$project$Main$ToggleMenu = {ctor: 'ToggleMenu'};
-var _user$project$Main$currentEnvironmentsAsTags = function (model) {
-	var tag = function (id) {
-		return A2(
-			_elm_lang$html$Html$span,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('tag is-primary'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(
-					A2(_user$project$ViewCommon$environmentName, model.environments, id)),
-				_1: {ctor: '[]'}
-			});
-	};
-	var tags = A2(_elm_lang$core$List$map, tag, model.selectedEnvironmentIds);
-	return A2(
-		_elm_lang$html$Html$p,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('panel-block'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleMenu),
-				_1: {ctor: '[]'}
-			}
-		},
-		_elm_lang$core$List$isEmpty(tags) ? {
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('None'),
-			_1: {ctor: '[]'}
-		} : {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$p,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$List$intersperse,
-					_elm_lang$html$Html$text(' '),
-					tags)),
-			_1: {ctor: '[]'}
-		});
-};
 var _user$project$Main$ClearError = {ctor: 'ClearError'};
 var _user$project$Main$errorMessages = function (model) {
 	var _p10 = model.error;
@@ -16921,48 +16908,29 @@ var _user$project$Main$update = F2(
 						model,
 						_p11._0);
 				case 'ShowEnvironmentBugs':
+					var _p12 = _p11._0;
+					var newEnvironmentIds = _p11._1 ? A2(
+						_elm_lang$core$Basics_ops['++'],
+						model.selectedEnvironmentIds,
+						{
+							ctor: '::',
+							_0: _p12,
+							_1: {ctor: '[]'}
+						}) : A2(_elm_community$list_extra$List_Extra$remove, _p12, model.selectedEnvironmentIds);
 					var _v9 = _user$project$Main$SearchSubmit,
 						_v10 = _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							selectedEnvironmentIds: A2(
-								_elm_lang$core$Basics_ops['++'],
-								model.selectedEnvironmentIds,
-								{
-									ctor: '::',
-									_0: _p11._0,
-									_1: {ctor: '[]'}
-								})
-						});
+						{selectedEnvironmentIds: newEnvironmentIds});
 					msg = _v9;
 					model = _v10;
 					continue update;
-				case 'HideEnvironmentBugs':
-					var _p12 = _p11._0;
-					var newEnvironmentIds = A2(
-						_elm_lang$core$List$filter,
-						function (x) {
-							return !_elm_lang$core$Native_Utils.eq(x, _p12);
-						},
-						model.selectedEnvironmentIds);
-					var newFocusedBug = A2(
-						_user$project$Main$shouldHideFocusedBug,
-						model,
-						_user$project$Main$bugInEnvironment(_p12)) ? _bloom$remotedata$RemoteData$NotAsked : model.focusedBug;
+				case 'SetSelectedEnvironmentIds':
 					var _v11 = _user$project$Main$SearchSubmit,
 						_v12 = _elm_lang$core$Native_Utils.update(
 						model,
-						{selectedEnvironmentIds: newEnvironmentIds, focusedBug: newFocusedBug});
+						{selectedEnvironmentIds: _p11._0});
 					msg = _v11;
 					model = _v12;
-					continue update;
-				case 'SetSelectedEnvironmentIds':
-					var _v13 = _user$project$Main$SearchSubmit,
-						_v14 = _elm_lang$core$Native_Utils.update(
-						model,
-						{selectedEnvironmentIds: _p11._0});
-					msg = _v13;
-					model = _v14;
 					continue update;
 				case 'RequestDetails':
 					return {
@@ -17000,20 +16968,20 @@ var _user$project$Main$update = F2(
 							model,
 							{error: _elm_lang$core$Maybe$Nothing}));
 				case 'ShowClosedBugs':
+					var _v14 = _user$project$Main$SearchSubmit,
+						_v15 = _elm_lang$core$Native_Utils.update(
+						model,
+						{showClosedBugs: true});
+					msg = _v14;
+					model = _v15;
+					continue update;
+				case 'HideClosedBugs':
 					var _v16 = _user$project$Main$SearchSubmit,
 						_v17 = _elm_lang$core$Native_Utils.update(
 						model,
-						{showClosedBugs: true});
+						{showClosedBugs: false});
 					msg = _v16;
 					model = _v17;
-					continue update;
-				case 'HideClosedBugs':
-					var _v18 = _user$project$Main$SearchSubmit,
-						_v19 = _elm_lang$core$Native_Utils.update(
-						model,
-						{showClosedBugs: false});
-					msg = _v18;
-					model = _v19;
 					continue update;
 				case 'ToggleMenu':
 					return _user$project$Main$noCmd(
@@ -17176,27 +17144,79 @@ var _user$project$Main$location2messages = function (location) {
 		},
 		focusBug);
 };
-var _user$project$Main$HideEnvironmentBugs = function (a) {
-	return {ctor: 'HideEnvironmentBugs', _0: a};
-};
-var _user$project$Main$ShowEnvironmentBugs = function (a) {
-	return {ctor: 'ShowEnvironmentBugs', _0: a};
+var _user$project$Main$ShowEnvironmentBugs = F2(
+	function (a, b) {
+		return {ctor: 'ShowEnvironmentBugs', _0: a, _1: b};
+	});
+var _user$project$Main$currentEnvironmentsAsTags = function (model) {
+	var tag = function (id) {
+		return A2(
+			_elm_lang$html$Html$span,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('tag is-primary'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_user$project$ViewCommon$environmentName, model.environments, id)),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('delete is-small'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(
+									A2(_user$project$Main$ShowEnvironmentBugs, id, false)),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	};
+	var tags = A2(_elm_lang$core$List$map, tag, model.selectedEnvironmentIds);
+	return A2(
+		_elm_lang$html$Html$p,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('panel-block'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleMenu),
+				_1: {ctor: '[]'}
+			}
+		},
+		_elm_lang$core$List$isEmpty(tags) ? {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('None'),
+			_1: {ctor: '[]'}
+		} : {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$p,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$intersperse,
+					_elm_lang$html$Html$text(' '),
+					tags)),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$Main$environmentMenuItem = F2(
 	function (selectedEnvironmentIds, environment) {
 		var isActive = A2(_elm_lang$core$List$member, environment.id, selectedEnvironmentIds);
-		var toggleMsg = isActive ? _user$project$Main$HideEnvironmentBugs : _user$project$Main$ShowEnvironmentBugs;
 		return A2(
 			_elm_lang$html$Html$label,
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html_Attributes$class('panel-block'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						toggleMsg(environment.id)),
-					_1: {ctor: '[]'}
-				}
+				_1: {ctor: '[]'}
 			},
 			{
 				ctor: '::',
@@ -17207,8 +17227,13 @@ var _user$project$Main$environmentMenuItem = F2(
 						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$selected(isActive),
-							_1: {ctor: '[]'}
+							_0: _elm_lang$html$Html_Attributes$checked(isActive),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onCheck(
+									_user$project$Main$ShowEnvironmentBugs(environment.id)),
+								_1: {ctor: '[]'}
+							}
 						}
 					},
 					{ctor: '[]'}),

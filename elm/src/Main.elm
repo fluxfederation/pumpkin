@@ -22,12 +22,12 @@ import BugList
 import Http
 import Task
 import RemoteData exposing (WebData)
+import List.Extra as ListX
 
 
 type Msg
     = LoadedEnvironments (Result Http.Error (List Environment))
-    | ShowEnvironmentBugs EnvironmentID
-    | HideEnvironmentBugs EnvironmentID
+    | ShowEnvironmentBugs EnvironmentID Bool
     | SetSelectedEnvironmentIds (List EnvironmentID)
     | ShowClosedBugs
     | HideClosedBugs
@@ -213,21 +213,16 @@ update msg model =
                 model
                 result
 
-        ShowEnvironmentBugs projectName ->
-            update SearchSubmit { model | selectedEnvironmentIds = model.selectedEnvironmentIds ++ [ projectName ] }
-
-        HideEnvironmentBugs environmentId ->
+        ShowEnvironmentBugs environmentID show ->
             let
-                newFocusedBug =
-                    if shouldHideFocusedBug model (bugInEnvironment environmentId) then
-                        RemoteData.NotAsked
-                    else
-                        model.focusedBug
-
                 newEnvironmentIds =
-                    List.filter (\x -> x /= environmentId) model.selectedEnvironmentIds
+                    if show then
+                        model.selectedEnvironmentIds ++ [ environmentID ]
+                    else
+                        ListX.remove environmentID model.selectedEnvironmentIds
             in
-                update SearchSubmit { model | selectedEnvironmentIds = newEnvironmentIds, focusedBug = newFocusedBug }
+                -- TOOD: maybe hide bug details
+                update SearchSubmit { model | selectedEnvironmentIds = newEnvironmentIds }
 
         SetSelectedEnvironmentIds ids ->
             update SearchSubmit { model | selectedEnvironmentIds = ids }
@@ -404,7 +399,10 @@ currentEnvironmentsAsTags model =
             (List.map tag model.selectedEnvironmentIds)
 
         tag id =
-            span [ class "tag is-primary" ] [ text (environmentName model.environments id) ]
+            span [ class "tag is-primary" ]
+                [ text (environmentName model.environments id)
+                , button [ class "delete is-small", onClick (ShowEnvironmentBugs id False) ] []
+                ]
     in
         p [ class "panel-block", onClick ToggleMenu ]
             (if List.isEmpty tags then
@@ -428,18 +426,10 @@ environmentMenuItem selectedEnvironmentIds environment =
     let
         isActive =
             (List.member environment.id selectedEnvironmentIds)
-
-        toggleMsg =
-            if isActive then
-                HideEnvironmentBugs
-            else
-                ShowEnvironmentBugs
     in
         label
-            [ class "panel-block"
-            , onClick (toggleMsg environment.id)
-            ]
-            [ input [ type_ "checkbox", selected isActive ] [], text environment.name ]
+            [ class "panel-block" ]
+            [ input [ type_ "checkbox", checked isActive, onCheck (ShowEnvironmentBugs environment.id) ] [], text environment.name ]
 
 
 sidebarBugs : Model -> Html Msg
