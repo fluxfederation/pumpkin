@@ -117,8 +117,8 @@ selectedBugHeader : Model -> Html Msg
 selectedBugHeader model =
     div [ class "selected-bug-header" ]
         [ div [ class "selected-bug-title" ]
-            [ h1 [ class "title is-3" ] [ text (errorClass model.bug) ]
-            , p [ class "subtitle is-5" ] [ text (errorMessage model.bug) ]
+            [ h1 [ class "title is-3" ] [ text (bugErrorClass model.bug) ]
+            , p [ class "subtitle is-5" ] [ text (bugErrorMessage model.bug) ]
             ]
         , div [ class "has-text-right" ]
             [ occurrenceCount model.bug

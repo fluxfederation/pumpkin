@@ -74,21 +74,13 @@ paginatedChunkList displayItems chunkList loadMoreMessage =
             (List.map showChunk chunkList)
 
 
-
--- TODO: rename to bugErrorClass
-
-
-errorClass : Bug -> String
-errorClass bug =
+bugErrorClass : Bug -> String
+bugErrorClass bug =
     bug.message |> String.split " : " |> List.head |> Maybe.withDefault ""
 
 
-
--- TODO: rename to bugErrorMessage
-
-
-errorMessage : Bug -> String
-errorMessage bug =
+bugErrorMessage : Bug -> String
+bugErrorMessage bug =
     bug.message |> String.split " : " |> List.tail |> Maybe.withDefault [] |> String.join " : "
 
 

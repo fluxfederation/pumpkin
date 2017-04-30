@@ -171,10 +171,10 @@ sidebarBug model bug =
                 [ class "sidebar-bug-title"
                 ]
                 [ h4 [ class "title is-6" ]
-                    [ text (errorClass bug)
+                    [ text (bugErrorClass bug)
                     ]
                 , p [ class "subtitle is-6" ]
-                    [ text (errorMessage bug)
+                    [ text (bugErrorMessage bug)
                     ]
                 ]
             , div

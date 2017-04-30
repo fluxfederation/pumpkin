@@ -15330,7 +15330,7 @@ var _user$project$ViewCommon$paginatedList = F3(
 					}
 				}()));
 	});
-var _user$project$ViewCommon$errorMessage = function (bug) {
+var _user$project$ViewCommon$bugErrorMessage = function (bug) {
 	return A2(
 		_elm_lang$core$String$join,
 		' : ',
@@ -15340,7 +15340,7 @@ var _user$project$ViewCommon$errorMessage = function (bug) {
 			_elm_lang$core$List$tail(
 				A2(_elm_lang$core$String$split, ' : ', bug.message))));
 };
-var _user$project$ViewCommon$errorClass = function (bug) {
+var _user$project$ViewCommon$bugErrorClass = function (bug) {
 	return A2(
 		_elm_lang$core$Maybe$withDefault,
 		'',
@@ -15795,7 +15795,7 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(
-								_user$project$ViewCommon$errorClass(model.bug)),
+								_user$project$ViewCommon$bugErrorClass(model.bug)),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -15810,7 +15810,7 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									_user$project$ViewCommon$errorMessage(model.bug)),
+									_user$project$ViewCommon$bugErrorMessage(model.bug)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
@@ -16403,7 +16403,7 @@ var _user$project$BugList$sidebarBug = F2(
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									_user$project$ViewCommon$errorClass(bug)),
+									_user$project$ViewCommon$bugErrorClass(bug)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -16418,7 +16418,7 @@ var _user$project$BugList$sidebarBug = F2(
 								{
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(
-										_user$project$ViewCommon$errorMessage(bug)),
+										_user$project$ViewCommon$bugErrorMessage(bug)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
