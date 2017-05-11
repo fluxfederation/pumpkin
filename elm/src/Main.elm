@@ -394,7 +394,7 @@ currentEnvironmentsAsTags model =
         tag id =
             span [ class "tag is-primary" ]
                 [ text (environmentName model.environments id)
-                , button [ class "delete is-small", onClick (ShowEnvironmentBugs id False) ] []
+                , a [ class "delete is-small", onClick (ShowEnvironmentBugs id False) ] []
                 ]
     in
         p [ class "panel-block" ]
