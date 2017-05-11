@@ -16648,9 +16648,9 @@ var _user$project$Main$delta2url = F2(
 			if (_p4.ctor === 'Success') {
 				var _p5 = _p4._0.bug.id;
 				var uuid = _p5._0;
-				return A2(_elm_lang$core$Basics_ops['++'], '#', uuid.toString);
+				return A2(_elm_lang$core$Basics_ops['++'], '&bug=', uuid.toString);
 			} else {
-				return '#';
+				return '';
 			}
 		}();
 		var selectedEnvironments = A2(
@@ -17058,17 +17058,20 @@ var _user$project$Main$location2messages = function (location) {
 			return {ctor: '[]'};
 		}
 	}();
-	var focusBug = (_elm_lang$core$Native_Utils.cmp(
-		_elm_lang$core$String$length(
-			_rgrempel$elm_route_url$RouteUrl_Builder$hash(builder)),
-		0) > 0) ? {
-		ctor: '::',
-		_0: _user$project$Main$RequestDetails(
-			_user$project$Types$BugID(
-				_user$project$Types$UUID(
-					_rgrempel$elm_route_url$RouteUrl_Builder$hash(builder)))),
-		_1: {ctor: '[]'}
-	} : {ctor: '[]'};
+	var focusBug = function () {
+		var _p19 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'bug', builder);
+		if (_p19.ctor === 'Just') {
+			return {
+				ctor: '::',
+				_0: _user$project$Main$RequestDetails(
+					_user$project$Types$BugID(
+						_user$project$Types$UUID(_p19._0))),
+				_1: {ctor: '[]'}
+			};
+		} else {
+			return {ctor: '[]'};
+		}
+	}();
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		{
@@ -17342,7 +17345,7 @@ var _user$project$Main$LoadedEnvironments = function (a) {
 	return {ctor: 'LoadedEnvironments', _0: a};
 };
 var _user$project$Main$init = function () {
-	var _p19 = A2(
+	var _p20 = A2(
 		_user$project$BugList$init,
 		{
 			environmentIDs: {ctor: '[]'},
@@ -17350,8 +17353,8 @@ var _user$project$Main$init = function () {
 			search: ''
 		},
 		_elm_lang$core$Maybe$Nothing);
-	var bugList = _p19._0;
-	var bugListCmd = _p19._1;
+	var bugList = _p20._0;
+	var bugListCmd = _p20._1;
 	return {
 		ctor: '_Tuple2',
 		_0: {

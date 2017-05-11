@@ -123,10 +123,10 @@ delta2url _ model =
                         (BugID uuid) =
                             bugModel.bug.id
                     in
-                        "#" ++ uuid.toString
+                        "&bug=" ++ uuid.toString
 
                 _ ->
-                    "#"
+                    ""
     in
         Just { entry = NewEntry, url = selectedEnvironments ++ selectedBug }
 
@@ -151,10 +151,12 @@ location2messages location =
                     []
 
         focusBug =
-            if String.length (BuildUrl.hash builder) > 0 then
-                [ RequestDetails (BugID (UUID (BuildUrl.hash builder))) ]
-            else
-                []
+            case BuildUrl.getQuery "bug" builder of
+                Just id ->
+                    [ RequestDetails (BugID (UUID id)) ]
+
+                Nothing ->
+                    []
     in
         [ SetSelectedEnvironmentIds
             (List.map
