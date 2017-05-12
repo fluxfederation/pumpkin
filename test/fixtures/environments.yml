@@ -1,5 +1,5 @@
 qa:
-  name: "QA"
+  id: "QA"
 
 prod:
-  name: "Production"
+  id: "Production"

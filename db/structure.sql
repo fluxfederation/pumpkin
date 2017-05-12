@@ -2,11 +2,12 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.3
--- Dumped by pg_dump version 9.5.3
+-- Dumped from database version 9.6.3
+-- Dumped by pg_dump version 9.6.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -39,6 +40,20 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
+--
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
 SET search_path = public, pg_catalog;
@@ -96,7 +111,7 @@ CREATE TABLE occurrences (
     data json NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    environment_id uuid NOT NULL,
+    environment_id text NOT NULL,
     bug_id uuid
 );
 
@@ -125,8 +140,7 @@ CREATE VIEW bug_with_latest_details AS
 --
 
 CREATE TABLE environments (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    name text,
+    id text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -142,7 +156,7 @@ CREATE TABLE schema_migrations (
 
 
 --
--- Name: ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: ar_internal_metadata ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ar_internal_metadata
@@ -150,7 +164,7 @@ ALTER TABLE ONLY ar_internal_metadata
 
 
 --
--- Name: bugs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: bugs bugs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY bugs
@@ -158,7 +172,15 @@ ALTER TABLE ONLY bugs
 
 
 --
--- Name: events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: environments environments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY environments
+    ADD CONSTRAINT environments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: events events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY events
@@ -166,7 +188,7 @@ ALTER TABLE ONLY events
 
 
 --
--- Name: occurrences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: occurrences occurrences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY occurrences
@@ -174,15 +196,7 @@ ALTER TABLE ONLY occurrences
 
 
 --
--- Name: patches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY environments
-    ADD CONSTRAINT patches_pkey PRIMARY KEY (id);
-
-
---
--- Name: schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY schema_migrations
@@ -194,13 +208,6 @@ ALTER TABLE ONLY schema_migrations
 --
 
 CREATE INDEX index_bugs_on_primary_occurrence_id ON bugs USING btree (primary_occurrence_id);
-
-
---
--- Name: index_environments_on_name; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_environments_on_name ON environments USING btree (name);
 
 
 --
@@ -249,11 +256,19 @@ ALTER TABLE ONLY occurrences
 
 
 --
+-- Name: occurrences occurrences_environment_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY occurrences
+    ADD CONSTRAINT occurrences_environment_id_fk FOREIGN KEY (environment_id) REFERENCES environments(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
-INSERT INTO schema_migrations (version) VALUES ('20160914224317'), ('20160914233248'), ('20160914233416'), ('20160914235925'), ('20160915001629'), ('20160915022656'), ('20161019211306'), ('20161020213813'), ('20161021015303'), ('20161021020642'), ('20170419231713'), ('20170513025949');
+INSERT INTO schema_migrations (version) VALUES ('20160914224317'), ('20160914233248'), ('20160914233416'), ('20160914235925'), ('20160915001629'), ('20160915022656'), ('20161019211306'), ('20161020213813'), ('20161021015303'), ('20161021020642'), ('20170419231713'), ('20170513025949'), ('20170512080542');
 
 

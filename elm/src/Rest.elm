@@ -38,8 +38,8 @@ bugIDToParam (BugID uuid) =
 
 
 envIDToParam : EnvironmentID -> String
-envIDToParam (EnvironmentID uuid) =
-    uuid.toString
+envIDToParam (EnvironmentID id) =
+    id
 
 
 occurrenceIDToParam : OccurrenceID -> String
@@ -111,14 +111,12 @@ decodeUUID =
 
 decodeEnvironmentID : Decoder EnvironmentID
 decodeEnvironmentID =
-    map EnvironmentID decodeUUID
+    map EnvironmentID string
 
 
 decodeEnvironment : Decoder Environment
 decodeEnvironment =
-    map2 Environment
-        (field "id" decodeEnvironmentID)
-        (field "name" string)
+    map Environment (field "id" decodeEnvironmentID)
 
 
 decodeBugID : Decoder BugID

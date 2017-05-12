@@ -42,7 +42,6 @@ type alias Model =
     , showFullStackTrace : Bool
     , now : Date.Date
     , showTimeAgo : Bool
-    , environments : List Environment
     }
 
 
@@ -85,15 +84,14 @@ subscriptions model =
     Time.every Time.minute TimeTick
 
 
-init : Bug -> List Environment -> ( Model, Cmd Msg )
-init bug environments =
+init : Bug -> ( Model, Cmd Msg )
+init bug =
     ( { bug = bug
       , occurrences = [ RemoteData.NotAsked ]
       , expandedOccurrences = []
       , showFullStackTrace = False
       , now = (Date.fromTime 0)
       , showTimeAgo = True
-      , environments = environments
       }
     , Cmd.batch
         [ Task.perform TimeTick Time.now
@@ -227,7 +225,7 @@ occurrenceDisplay : Model -> Occurrence -> Html Msg
 occurrenceDisplay model occurrence =
     li [ class "occurrence panel-block" ]
         [ a [ class "occurrence-toggle", onClick (ToggleOccurrence occurrence.id) ]
-            [ text (environmentName model.environments occurrence.environmentId)
+            [ text (environmentIDToString occurrence.environmentId)
             , text " • "
             , text (date model occurrence.occurredAt)
             ]

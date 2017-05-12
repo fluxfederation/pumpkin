@@ -14844,6 +14844,10 @@ var _user$project$Types$isClosed = function (bug) {
 			},
 			bug.closedAt));
 };
+var _user$project$Types$environmentIDToString = function (_p0) {
+	var _p1 = _p0;
+	return _p1._0;
+};
 var _user$project$Types$Chunk = F2(
 	function (a, b) {
 		return {items: a, nextItem: b};
@@ -14854,10 +14858,9 @@ var _user$project$Types$Event = function (a) {
 var _user$project$Types$UUID = function (a) {
 	return {toString: a};
 };
-var _user$project$Types$Environment = F2(
-	function (a, b) {
-		return {id: a, name: b};
-	});
+var _user$project$Types$Environment = function (a) {
+	return {id: a};
+};
 var _user$project$Types$Bug = F8(
 	function (a, b, c, d, e, f, g, h) {
 		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
@@ -14996,13 +14999,12 @@ var _user$project$Rest$decodeChunk = F2(
 			toPage,
 			_elm_lang$core$Json_Decode$list(decodeItem));
 	});
-var _user$project$Rest$decodeUUID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$UUID, _elm_lang$core$Json_Decode$string);
-var _user$project$Rest$decodeEnvironmentID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$EnvironmentID, _user$project$Rest$decodeUUID);
-var _user$project$Rest$decodeEnvironment = A3(
-	_elm_lang$core$Json_Decode$map2,
+var _user$project$Rest$decodeEnvironmentID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$EnvironmentID, _elm_lang$core$Json_Decode$string);
+var _user$project$Rest$decodeEnvironment = A2(
+	_elm_lang$core$Json_Decode$map,
 	_user$project$Types$Environment,
-	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeEnvironmentID),
-	A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string));
+	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeEnvironmentID));
+var _user$project$Rest$decodeUUID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$UUID, _elm_lang$core$Json_Decode$string);
 var _user$project$Rest$decodeBugID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$BugID, _user$project$Rest$decodeUUID);
 var _user$project$Rest$decodeOccurrenceID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$OccurrenceID, _user$project$Rest$decodeUUID);
 var _user$project$Rest$decodeEnvironments = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeEnvironment);
@@ -15085,7 +15087,7 @@ var _user$project$Rest$occurrenceIDToParam = function (_p8) {
 };
 var _user$project$Rest$envIDToParam = function (_p10) {
 	var _p11 = _p10;
-	return _p11._0.toString;
+	return _p11._0;
 };
 var _user$project$Rest$bugIDToParam = function (_p12) {
 	var _p13 = _p12;
@@ -15423,24 +15425,6 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 			{ctor: '[]'},
 			A2(_elm_lang$core$List$map, showChunk, chunkList));
 	});
-var _user$project$ViewCommon$environmentName = F2(
-	function (environments, id) {
-		var environment = A2(
-			_elm_community$list_extra$List_Extra$find,
-			function (env) {
-				return _elm_lang$core$Native_Utils.eq(env.id, id);
-			},
-			environments);
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			'UNKNOWN',
-			A2(
-				_elm_lang$core$Maybe$map,
-				function (_) {
-					return _.name;
-				},
-				environment));
-	});
 var _user$project$ViewCommon$fontAwesome = function (name) {
 	return A2(
 		_elm_lang$html$Html$i,
@@ -15757,9 +15741,9 @@ var _user$project$BugDetails$occurrenceCount = function (bug) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$BugDetails$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, environments: g};
+var _user$project$BugDetails$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f};
 	});
 var _user$project$BugDetails$TimeTick = function (a) {
 	return {ctor: 'TimeTick', _0: a};
@@ -15908,7 +15892,7 @@ var _user$project$BugDetails$occurrenceDisplay = F2(
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
-							A2(_user$project$ViewCommon$environmentName, model.environments, occurrence.environmentId)),
+							_user$project$Types$environmentIDToString(occurrence.environmentId)),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(' • '),
@@ -16121,35 +16105,33 @@ var _user$project$BugDetails$update = F2(
 						}));
 		}
 	});
-var _user$project$BugDetails$init = F2(
-	function (bug, environments) {
-		return {
-			ctor: '_Tuple2',
-			_0: {
-				bug: bug,
-				occurrences: {
-					ctor: '::',
-					_0: _bloom$remotedata$RemoteData$NotAsked,
-					_1: {ctor: '[]'}
-				},
-				expandedOccurrences: {ctor: '[]'},
-				showFullStackTrace: false,
-				now: _elm_lang$core$Date$fromTime(0),
-				showTimeAgo: true,
-				environments: environments
+var _user$project$BugDetails$init = function (bug) {
+	return {
+		ctor: '_Tuple2',
+		_0: {
+			bug: bug,
+			occurrences: {
+				ctor: '::',
+				_0: _bloom$remotedata$RemoteData$NotAsked,
+				_1: {ctor: '[]'}
 			},
-			_1: _elm_lang$core$Platform_Cmd$batch(
-				{
+			expandedOccurrences: {ctor: '[]'},
+			showFullStackTrace: false,
+			now: _elm_lang$core$Date$fromTime(0),
+			showTimeAgo: true
+		},
+		_1: _elm_lang$core$Platform_Cmd$batch(
+			{
+				ctor: '::',
+				_0: A2(_elm_lang$core$Task$perform, _user$project$BugDetails$TimeTick, _elm_lang$core$Time$now),
+				_1: {
 					ctor: '::',
-					_0: A2(_elm_lang$core$Task$perform, _user$project$BugDetails$TimeTick, _elm_lang$core$Time$now),
-					_1: {
-						ctor: '::',
-						_0: A2(_user$project$BugDetails$fetchOccurrences, bug.id, _elm_lang$core$Maybe$Nothing),
-						_1: {ctor: '[]'}
-					}
-				})
-		};
-	});
+					_0: A2(_user$project$BugDetails$fetchOccurrences, bug.id, _elm_lang$core$Maybe$Nothing),
+					_1: {ctor: '[]'}
+				}
+			})
+	};
+};
 var _user$project$BugDetails$LoadMoreOccurrences = function (a) {
 	return {ctor: 'LoadMoreOccurrences', _0: a};
 };
@@ -16637,12 +16619,8 @@ var _user$project$Main$handleResult = F3(
 			return handler(_p0._0);
 		}
 	});
-var _user$project$Main$environmentIDToString = function (_p1) {
-	var _p2 = _p1;
-	return _p2._0.toString;
-};
 var _user$project$Main$delta2url = F2(
-	function (_p3, model) {
+	function (_p1, model) {
 		var selectedBug = A2(
 			_elm_lang$core$Maybe$map,
 			function (bugModel) {
@@ -16659,7 +16637,7 @@ var _user$project$Main$delta2url = F2(
 				A2(
 					_elm_lang$core$String$join,
 					',',
-					A2(_elm_lang$core$List$map, _user$project$Main$environmentIDToString, model.selectedEnvironmentIds))));
+					A2(_elm_lang$core$List$map, _user$project$Rest$envIDToParam, model.selectedEnvironmentIds))));
 		return _elm_lang$core$Maybe$Just(
 			{
 				entry: _rgrempel$elm_route_url$RouteUrl$NewEntry,
@@ -16681,27 +16659,10 @@ var _user$project$Main$delta2url = F2(
 var _user$project$Main$toFilter = function (model) {
 	return {environmentIDs: model.selectedEnvironmentIds, includeClosed: model.showClosedBugs, search: model.search};
 };
-var _user$project$Main$Model = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return {selectedEnvironmentIds: a, loadingEnvironments: b, environments: c, bugList: d, focusedBug: e, error: f, showClosedBugs: g, showMenu: h, search: i, now: j};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
+var _user$project$Main$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {selectedEnvironmentIds: a, environments: b, bugList: c, focusedBug: d, error: e, showClosedBugs: f, showMenu: g, search: h, now: i};
+	});
 var _user$project$Main$TimeTick = function (a) {
 	return {ctor: 'TimeTick', _0: a};
 };
@@ -16719,12 +16680,12 @@ var _user$project$Main$subscriptions = function (model) {
 			_1: {
 				ctor: '::',
 				_0: function () {
-					var _p4 = model.focusedBug;
-					if (_p4.ctor === 'Success') {
+					var _p2 = model.focusedBug;
+					if (_p2.ctor === 'Success') {
 						return A2(
 							_elm_lang$core$Platform_Sub$map,
 							_user$project$Main$FocusedBugMsg,
-							_user$project$BugDetails$subscriptions(_p4._0));
+							_user$project$BugDetails$subscriptions(_p2._0));
 					} else {
 						return _elm_lang$core$Platform_Sub$none;
 					}
@@ -16749,15 +16710,15 @@ var _user$project$Main$selectedBug = function (model) {
 			_1: {ctor: '[]'}
 		},
 		function () {
-			var _p5 = model.focusedBug;
-			switch (_p5.ctor) {
+			var _p3 = model.focusedBug;
+			switch (_p3.ctor) {
 				case 'Success':
 					return {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$map,
 							_user$project$Main$FocusedBugMsg,
-							_user$project$BugDetails$view(_p5._0)),
+							_user$project$BugDetails$view(_p3._0)),
 						_1: {ctor: '[]'}
 					};
 				case 'Loading':
@@ -16836,12 +16797,12 @@ var _user$project$Main$sidebarSearch = function (model) {
 var _user$project$Main$ToggleMenu = {ctor: 'ToggleMenu'};
 var _user$project$Main$ClearError = {ctor: 'ClearError'};
 var _user$project$Main$errorMessages = function (model) {
-	var _p6 = model.error;
-	if (_p6.ctor === 'Just') {
+	var _p4 = model.error;
+	if (_p4.ctor === 'Just') {
 		return A2(
 			_user$project$ViewCommon$errorNotification,
 			_elm_lang$core$Maybe$Just(_user$project$Main$ClearError),
-			_p6._0);
+			_p4._0);
 	} else {
 		return A2(
 			_elm_lang$html$Html$div,
@@ -16859,54 +16820,37 @@ var _user$project$Main$update = F2(
 	function (msg, model) {
 		update:
 		while (true) {
-			var _p7 = msg;
-			switch (_p7.ctor) {
+			var _p5 = msg;
+			switch (_p5.ctor) {
 				case 'LoadedEnvironments':
-					return A3(
-						_user$project$Main$handleResult,
-						function (environments) {
-							return _user$project$Main$noCmd(
-								_elm_lang$core$Native_Utils.update(
-									model,
-									{
-										environments: environments,
-										loadingEnvironments: false,
-										focusedBug: A2(
-											_bloom$remotedata$RemoteData$map,
-											function (b) {
-												return _elm_lang$core$Native_Utils.update(
-													b,
-													{environments: environments});
-											},
-											model.focusedBug)
-									}));
-						},
-						model,
-						_p7._0);
+					return _user$project$Main$noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{environments: _p5._0}));
 				case 'ShowEnvironmentBugs':
-					var _p8 = _p7._0;
-					var newEnvironmentIds = _p7._1 ? A2(
+					var _p6 = _p5._0;
+					var newEnvironmentIds = _p5._1 ? A2(
 						_elm_lang$core$Basics_ops['++'],
 						model.selectedEnvironmentIds,
 						{
 							ctor: '::',
-							_0: _p8,
+							_0: _p6,
 							_1: {ctor: '[]'}
-						}) : A2(_elm_community$list_extra$List_Extra$remove, _p8, model.selectedEnvironmentIds);
-					var _v6 = _user$project$Main$SearchSubmit,
-						_v7 = _elm_lang$core$Native_Utils.update(
+						}) : A2(_elm_community$list_extra$List_Extra$remove, _p6, model.selectedEnvironmentIds);
+					var _v5 = _user$project$Main$SearchSubmit,
+						_v6 = _elm_lang$core$Native_Utils.update(
 						model,
 						{selectedEnvironmentIds: newEnvironmentIds});
-					msg = _v6;
-					model = _v7;
+					msg = _v5;
+					model = _v6;
 					continue update;
 				case 'SetSelectedEnvironmentIds':
-					var _v8 = _user$project$Main$SearchSubmit,
-						_v9 = _elm_lang$core$Native_Utils.update(
+					var _v7 = _user$project$Main$SearchSubmit,
+						_v8 = _elm_lang$core$Native_Utils.update(
 						model,
-						{selectedEnvironmentIds: _p7._0});
-					msg = _v8;
-					model = _v9;
+						{selectedEnvironmentIds: _p5._0});
+					msg = _v7;
+					model = _v8;
 					continue update;
 				case 'RequestDetails':
 					return {
@@ -16915,13 +16859,10 @@ var _user$project$Main$update = F2(
 						_1: A2(
 							_user$project$Rest$fetch,
 							_user$project$Main$LoadedDetails,
-							_user$project$Rest$loadBugDetails(_p7._0))
+							_user$project$Rest$loadBugDetails(_p5._0))
 					};
 				case 'LoadedDetails':
-					var inited = A2(
-						_bloom$remotedata$RemoteData$map,
-						A2(_elm_lang$core$Basics$flip, _user$project$BugDetails$init, model.environments),
-						_p7._0);
+					var inited = A2(_bloom$remotedata$RemoteData$map, _user$project$BugDetails$init, _p5._0);
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -16930,9 +16871,9 @@ var _user$project$Main$update = F2(
 								focusedBug: A2(_bloom$remotedata$RemoteData$map, _elm_lang$core$Tuple$first, inited)
 							}),
 						_1: function () {
-							var _p9 = A2(_bloom$remotedata$RemoteData$map, _elm_lang$core$Tuple$second, inited);
-							if (_p9.ctor === 'Success') {
-								return A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, _p9._0);
+							var _p7 = A2(_bloom$remotedata$RemoteData$map, _elm_lang$core$Tuple$second, inited);
+							if (_p7.ctor === 'Success') {
+								return A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, _p7._0);
 							} else {
 								return _elm_lang$core$Platform_Cmd$none;
 							}
@@ -16944,20 +16885,20 @@ var _user$project$Main$update = F2(
 							model,
 							{error: _elm_lang$core$Maybe$Nothing}));
 				case 'ShowClosedBugs':
-					var _v11 = _user$project$Main$SearchSubmit,
-						_v12 = _elm_lang$core$Native_Utils.update(
+					var _v10 = _user$project$Main$SearchSubmit,
+						_v11 = _elm_lang$core$Native_Utils.update(
 						model,
 						{showClosedBugs: true});
-					msg = _v11;
-					model = _v12;
+					msg = _v10;
+					model = _v11;
 					continue update;
 				case 'HideClosedBugs':
-					var _v13 = _user$project$Main$SearchSubmit,
-						_v14 = _elm_lang$core$Native_Utils.update(
+					var _v12 = _user$project$Main$SearchSubmit,
+						_v13 = _elm_lang$core$Native_Utils.update(
 						model,
 						{showClosedBugs: false});
-					msg = _v13;
-					model = _v14;
+					msg = _v12;
+					model = _v13;
 					continue update;
 				case 'ToggleMenu':
 					return _user$project$Main$noCmd(
@@ -16968,24 +16909,24 @@ var _user$project$Main$update = F2(
 					return _user$project$Main$noCmd(
 						_elm_lang$core$Native_Utils.update(
 							model,
-							{search: _p7._0}));
+							{search: _p5._0}));
 				case 'SearchSubmit':
-					var _p10 = A2(
+					var _p8 = A2(
 						_user$project$BugList$init,
 						_user$project$Main$toFilter(model),
 						A2(
 							_elm_lang$core$Maybe$map,
-							function (_p11) {
+							function (_p9) {
 								return function (_) {
 									return _.id;
 								}(
 									function (_) {
 										return _.bug;
-									}(_p11));
+									}(_p9));
 							},
 							_bloom$remotedata$RemoteData$toMaybe(model.focusedBug)));
-					var bugList = _p10._0;
-					var cmd = _p10._1;
+					var bugList = _p8._0;
+					var cmd = _p8._1;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -16994,12 +16935,12 @@ var _user$project$Main$update = F2(
 						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, cmd)
 					};
 				case 'FocusedBugMsg':
-					var _p12 = A2(
+					var _p10 = A2(
 						_bloom$remotedata$RemoteData$update,
-						_user$project$BugDetails$update(_p7._0),
+						_user$project$BugDetails$update(_p5._0),
 						model.focusedBug);
-					var newBugModel = _p12._0;
-					var cmd = _p12._1;
+					var newBugModel = _p10._0;
+					var cmd = _p10._1;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -17008,10 +16949,10 @@ var _user$project$Main$update = F2(
 						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, cmd)
 					};
 				case 'BugListMsg':
-					var _p15 = _p7._0;
-					var _p13 = A2(_user$project$BugList$update, _p15, model.bugList);
-					var newBugList = _p13._0;
-					var listCmd = _p13._1;
+					var _p13 = _p5._0;
+					var _p11 = A2(_user$project$BugList$update, _p13, model.bugList);
+					var newBugList = _p11._0;
+					var listCmd = _p11._1;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -17024,12 +16965,12 @@ var _user$project$Main$update = F2(
 								_1: {
 									ctor: '::',
 									_0: function () {
-										var _p14 = _p15;
-										if ((_p14.ctor === 'SelectBug') && (_p14._0.ctor === 'Just')) {
+										var _p12 = _p13;
+										if ((_p12.ctor === 'SelectBug') && (_p12._0.ctor === 'Just')) {
 											return A2(
 												_user$project$Rest$fetch,
 												_user$project$Main$LoadedDetails,
-												_user$project$Rest$loadBugDetails(_p14._0._0));
+												_user$project$Rest$loadBugDetails(_p12._0._0));
 										} else {
 											return _elm_lang$core$Platform_Cmd$none;
 										}
@@ -17043,7 +16984,7 @@ var _user$project$Main$update = F2(
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								now: _elm_lang$core$Date$fromTime(_p7._0)
+								now: _elm_lang$core$Date$fromTime(_p5._0)
 							}));
 			}
 		}
@@ -17056,26 +16997,26 @@ var _user$project$Main$SetSelectedEnvironmentIds = function (a) {
 var _user$project$Main$location2messages = function (location) {
 	var builder = _rgrempel$elm_route_url$RouteUrl_Builder$fromUrl(location.href);
 	var selectedEnvironmentIds = function () {
-		var _p16 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
-		if (_p16.ctor === 'Just') {
+		var _p14 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
+		if (_p14.ctor === 'Just') {
 			return A2(
 				_elm_lang$core$List$filter,
-				function (_p17) {
-					return !_elm_lang$core$String$isEmpty(_p17);
+				function (_p15) {
+					return !_elm_lang$core$String$isEmpty(_p15);
 				},
-				A2(_elm_lang$core$String$split, ',', _p16._0));
+				A2(_elm_lang$core$String$split, ',', _p14._0));
 		} else {
 			return {ctor: '[]'};
 		}
 	}();
 	var focusBug = function () {
-		var _p18 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'bug', builder);
-		if (_p18.ctor === 'Just') {
+		var _p16 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'bug', builder);
+		if (_p16.ctor === 'Just') {
 			return {
 				ctor: '::',
 				_0: _user$project$Main$RequestDetails(
 					_user$project$Types$BugID(
-						_user$project$Types$UUID(_p18._0))),
+						_user$project$Types$UUID(_p16._0))),
 				_1: {ctor: '[]'}
 			};
 		} else {
@@ -17087,13 +17028,7 @@ var _user$project$Main$location2messages = function (location) {
 		{
 			ctor: '::',
 			_0: _user$project$Main$SetSelectedEnvironmentIds(
-				A2(
-					_elm_lang$core$List$map,
-					function (id) {
-						return _user$project$Types$EnvironmentID(
-							_user$project$Types$UUID(id));
-					},
-					selectedEnvironmentIds)),
+				A2(_elm_lang$core$List$map, _user$project$Types$EnvironmentID, selectedEnvironmentIds)),
 			_1: {ctor: '[]'}
 		},
 		focusBug);
@@ -17114,7 +17049,7 @@ var _user$project$Main$currentEnvironmentsAsTags = function (model) {
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html$text(
-					A2(_user$project$ViewCommon$environmentName, model.environments, id)),
+					_user$project$Types$environmentIDToString(id)),
 				_1: {
 					ctor: '::',
 					_0: A2(
@@ -17159,8 +17094,8 @@ var _user$project$Main$currentEnvironmentsAsTags = function (model) {
 		});
 };
 var _user$project$Main$environmentMenuItem = F2(
-	function (selectedEnvironmentIds, environment) {
-		var isActive = A2(_elm_lang$core$List$member, environment.id, selectedEnvironmentIds);
+	function (selectedEnvironmentIds, environmentID) {
+		var isActive = A2(_elm_lang$core$List$member, environmentID, selectedEnvironmentIds);
 		return A2(
 			_elm_lang$html$Html$label,
 			{
@@ -17181,7 +17116,7 @@ var _user$project$Main$environmentMenuItem = F2(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onCheck(
-									_user$project$Main$ShowEnvironmentBugs(environment.id)),
+									_user$project$Main$ShowEnvironmentBugs(environmentID)),
 								_1: {ctor: '[]'}
 							}
 						}
@@ -17189,19 +17124,47 @@ var _user$project$Main$environmentMenuItem = F2(
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(environment.name),
+					_0: _elm_lang$html$Html$text(
+						_user$project$Types$environmentIDToString(environmentID)),
 					_1: {ctor: '[]'}
 				}
 			});
 	});
 var _user$project$Main$sidebarMenu = function (model) {
-	return model.loadingEnvironments ? _user$project$ViewCommon$spinner : A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		A2(
-			_elm_lang$core$List$map,
-			_user$project$Main$environmentMenuItem(model.selectedEnvironmentIds),
-			model.environments));
+	var _p17 = model.environments;
+	switch (_p17.ctor) {
+		case 'Success':
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$map,
+					function (_p18) {
+						return A2(
+							_user$project$Main$environmentMenuItem,
+							model.selectedEnvironmentIds,
+							function (_) {
+								return _.id;
+							}(_p18));
+					},
+					_p17._0));
+		case 'Loading':
+			return _user$project$ViewCommon$spinner;
+		case 'Failure':
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Failed'),
+					_1: {ctor: '[]'}
+				});
+		default:
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{ctor: '[]'});
+	}
 };
 var _user$project$Main$sidebarFilters = function (model) {
 	return A2(
@@ -17369,8 +17332,7 @@ var _user$project$Main$init = function () {
 		ctor: '_Tuple2',
 		_0: {
 			selectedEnvironmentIds: {ctor: '[]'},
-			loadingEnvironments: true,
-			environments: {ctor: '[]'},
+			environments: _bloom$remotedata$RemoteData$NotAsked,
 			bugList: bugList,
 			focusedBug: _bloom$remotedata$RemoteData$NotAsked,
 			error: _elm_lang$core$Maybe$Nothing,
@@ -17382,7 +17344,7 @@ var _user$project$Main$init = function () {
 		_1: _elm_lang$core$Platform_Cmd$batch(
 			{
 				ctor: '::',
-				_0: A2(_elm_lang$http$Http$send, _user$project$Main$LoadedEnvironments, _user$project$Rest$loadEnvironments),
+				_0: A2(_user$project$Rest$fetch, _user$project$Main$LoadedEnvironments, _user$project$Rest$loadEnvironments),
 				_1: {
 					ctor: '::',
 					_0: A2(_elm_lang$core$Task$perform, _user$project$Main$TimeTick, _elm_lang$core$Time$now),

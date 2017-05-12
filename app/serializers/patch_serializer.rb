@@ -1,5 +1,5 @@
 class EnvironmentSerializer < ActiveModel::Serializer
-  attributes :id, :name
+  attributes :id
 
   has_many :bugs
 end
