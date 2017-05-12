@@ -12,7 +12,6 @@ module BugDetails
         )
 
 import Types exposing (..)
-import Http
 import RemoteData exposing (WebData)
 import ChunkList exposing (ChunkList)
 import Rest
