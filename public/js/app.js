@@ -15254,6 +15254,13 @@ var _user$project$TimeAgo$timeAgo = F2(
 		}
 	});
 
+var _user$project$ViewCommon$captureClick = function (message) {
+	return A3(
+		_elm_lang$html$Html_Events$onWithOptions,
+		'click',
+		{stopPropagation: true, preventDefault: true},
+		_elm_lang$core$Json_Decode$succeed(message));
+};
 var _user$project$ViewCommon$errorNotification = F2(
 	function (clickmsg, error) {
 		var deleteButton = function (msg) {
@@ -15395,21 +15402,28 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 									return {
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$button,
+											_elm_lang$html$Html$p,
+											{ctor: '[]'},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('button'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(
-														loadMoreMessage(
-															_elm_lang$core$Maybe$Just(_p2._0))),
-													_1: {ctor: '[]'}
-												}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Show more'),
+												_0: A2(
+													_elm_lang$html$Html$button,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('btn btn-secondary'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onClick(
+																loadMoreMessage(
+																	_elm_lang$core$Maybe$Just(_p2._0))),
+															_1: {ctor: '[]'}
+														}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Show more'),
+														_1: {ctor: '[]'}
+													}),
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
@@ -15479,11 +15493,7 @@ var _user$project$FormatData$formatFallback = F2(
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$span,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('json-other'),
-					_1: {ctor: '[]'}
-				},
+				{ctor: '[]'},
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html$text(
@@ -15502,11 +15512,7 @@ var _user$project$FormatData$formatString = function (result) {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$span,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('json-string'),
-						_1: {ctor: '[]'}
-					},
+					{ctor: '[]'},
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(str),
@@ -15555,6 +15561,16 @@ var _user$project$FormatData$formatData = F2(
 	});
 var _user$project$FormatData$formatList = F2(
 	function (blacklist, result) {
+		var formatItem = function (val) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('py-1'),
+					_1: {ctor: '[]'}
+				},
+				A2(_user$project$FormatData$formatData, blacklist, val));
+		};
 		return A2(
 			_user$project$FormatData$handleFormatError,
 			result,
@@ -15565,13 +15581,10 @@ var _user$project$FormatData$formatList = F2(
 						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('json-array'),
+							_0: _elm_lang$html$Html_Attributes$class('pl-2'),
 							_1: {ctor: '[]'}
 						},
-						A2(
-							_elm_lang$core$List$concatMap,
-							_user$project$FormatData$formatData(blacklist),
-							values)),
+						A2(_elm_lang$core$List$map, formatItem, values)),
 					_1: {ctor: '[]'}
 				};
 			});
@@ -15584,7 +15597,7 @@ var _user$project$FormatData$formatPairs = F2(
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('json-object-entry'),
+					_0: _elm_lang$html$Html_Attributes$class('py-1'),
 					_1: {ctor: '[]'}
 				},
 				A2(
@@ -15592,18 +15605,18 @@ var _user$project$FormatData$formatPairs = F2(
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$span,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('json-object-key'),
-								_1: {ctor: '[]'}
-							},
+							_elm_lang$html$Html$strong,
+							{ctor: '[]'},
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(_p2._0),
 								_1: {ctor: '[]'}
 							}),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(' '),
+							_1: {ctor: '[]'}
+						}
 					},
 					A2(_user$project$FormatData$formatData, blacklist, _p2._1)));
 		};
@@ -15626,7 +15639,7 @@ var _user$project$FormatData$formatPairs = F2(
 						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('json-object'),
+							_0: _elm_lang$html$Html_Attributes$class('pl-2'),
 							_1: {ctor: '[]'}
 						},
 						A2(
@@ -15638,6 +15651,54 @@ var _user$project$FormatData$formatPairs = F2(
 			});
 	});
 
+var _user$project$BugDetails$sectionHeader = F2(
+	function (title, buttons) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('row no-gutters align-items-center mb-2'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('col'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h3,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('h6 text-muted m-0'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(title),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('col col-auto'),
+							_1: {ctor: '[]'}
+						},
+						buttons),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
 var _user$project$BugDetails$filterStackTrace = F2(
 	function (model, stackTrace) {
 		var showLine = function (line) {
@@ -15650,22 +15711,12 @@ var _user$project$BugDetails$filterStackTrace = F2(
 			return {ctor: '[]'};
 		}
 	});
-var _user$project$BugDetails$stackTraceLine = function (line) {
-	return A2(
-		_elm_lang$html$Html$code,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text(line),
-			_1: {ctor: '[]'}
-		});
-};
 var _user$project$BugDetails$linkedIssue = function (bug) {
 	return A2(
-		_elm_lang$html$Html$a,
+		_elm_lang$html$Html$button,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('linked-issue notification'),
+			_0: _elm_lang$html$Html_Attributes$class('list-group-item list-group-item-action list-group-item-info always-on-top d-block'),
 			_1: {ctor: '[]'}
 		},
 		{
@@ -15674,19 +15725,26 @@ var _user$project$BugDetails$linkedIssue = function (bug) {
 				_elm_lang$html$Html$span,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('description'),
+					_0: _elm_lang$html$Html_Attributes$class('with-inner-icon'),
 					_1: {ctor: '[]'}
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('No linked incident.'),
-					_1: {ctor: '[]'}
+					_0: A2(
+						_elm_lang$html$Html$span,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('No linked incident.'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: _user$project$ViewCommon$fontAwesome('cog'),
+						_1: {ctor: '[]'}
+					}
 				}),
-			_1: {
-				ctor: '::',
-				_0: A2(_user$project$ViewCommon$icon, 'cog', ''),
-				_1: {ctor: '[]'}
-			}
+			_1: {ctor: '[]'}
 		});
 };
 var _user$project$BugDetails$date = F2(
@@ -15728,10 +15786,10 @@ var _user$project$BugDetails$bugTimes = function (model) {
 };
 var _user$project$BugDetails$occurrenceCount = function (bug) {
 	return A2(
-		_elm_lang$html$Html$p,
+		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('occurrence-count'),
+			_0: _elm_lang$html$Html_Attributes$class('px-2'),
 			_1: {ctor: '[]'}
 		},
 		{
@@ -15757,7 +15815,7 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('selected-bug-header'),
+			_0: _elm_lang$html$Html_Attributes$class('row no-gutters align-items-center'),
 			_1: {ctor: '[]'}
 		},
 		{
@@ -15766,7 +15824,7 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('selected-bug-title'),
+					_0: _elm_lang$html$Html_Attributes$class('col'),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -15775,7 +15833,7 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 						_elm_lang$html$Html$h1,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('title is-3'),
+							_0: _elm_lang$html$Html_Attributes$class('h3 mb-0'),
 							_1: {ctor: '[]'}
 						},
 						{
@@ -15790,7 +15848,7 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 							_elm_lang$html$Html$p,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('subtitle is-5'),
+								_0: _elm_lang$html$Html_Attributes$class('h5 text-muted mb-0'),
 								_1: {ctor: '[]'}
 							},
 							{
@@ -15808,7 +15866,7 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('has-text-right'),
+						_0: _elm_lang$html$Html_Attributes$class('text-right'),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -15817,7 +15875,7 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$p,
+								_elm_lang$html$Html$div,
 								{ctor: '[]'},
 								{
 									ctor: '::',
@@ -15825,13 +15883,13 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 										_elm_lang$html$Html$button,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('button is-primary is-inverted'),
+											_0: _elm_lang$html$Html_Attributes$class('btn btn-link px-2'),
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Attributes$classList(
 													{
 														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'is-active', _1: !model.showTimeAgo},
+														_0: {ctor: '_Tuple2', _0: 'active', _1: !model.showTimeAgo},
 														_1: {ctor: '[]'}
 													}),
 												_1: {
@@ -15869,19 +15927,15 @@ var _user$project$BugDetails$ToggleOccurrence = function (a) {
 var _user$project$BugDetails$occurrenceDisplay = F2(
 	function (model, occurrence) {
 		return A2(
-			_elm_lang$html$Html$li,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('occurrence panel-block'),
-				_1: {ctor: '[]'}
-			},
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
 			{
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$a,
+					_elm_lang$html$Html$button,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('occurrence-toggle'),
+						_0: _elm_lang$html$Html_Attributes$class('card-header d-block w-100 text-left'),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onClick(
@@ -15895,12 +15949,16 @@ var _user$project$BugDetails$occurrenceDisplay = F2(
 							_user$project$Types$environmentIDToString(occurrence.environmentId)),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(' • '),
+							_0: _elm_lang$html$Html$text(' ('),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
 									A2(_user$project$BugDetails$date, model, occurrence.occurredAt)),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(')'),
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}),
@@ -15910,7 +15968,7 @@ var _user$project$BugDetails$occurrenceDisplay = F2(
 						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('occurrence-data'),
+							_0: _elm_lang$html$Html_Attributes$class('card-block card-block-divided'),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$classList(
@@ -15918,7 +15976,7 @@ var _user$project$BugDetails$occurrenceDisplay = F2(
 										ctor: '::',
 										_0: {
 											ctor: '_Tuple2',
-											_0: 'is-hidden',
+											_0: 'd-none',
 											_1: !A2(_elm_lang$core$List$member, occurrence.id, model.expandedOccurrences)
 										},
 										_1: {ctor: '[]'}
@@ -15945,30 +16003,26 @@ var _user$project$BugDetails$stackTraceDisplay = function (model) {
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('section'),
+			_0: _elm_lang$html$Html_Attributes$class('list-group-item d-block'),
 			_1: {ctor: '[]'}
 		},
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('section-title'),
-					_1: {ctor: '[]'}
-				},
+				_user$project$BugDetails$sectionHeader,
+				'Stack Trace',
 				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$h3,
+						_elm_lang$html$Html$button,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('menu-label'),
+							_0: _elm_lang$html$Html_Attributes$class('btn btn-sm btn-link'),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Stack Trace'),
+							_0: _elm_lang$html$Html$text('Show Context'),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -15977,55 +16031,48 @@ var _user$project$BugDetails$stackTraceDisplay = function (model) {
 							_elm_lang$html$Html$button,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
-								_1: {ctor: '[]'}
+								_0: _elm_lang$html$Html_Attributes$class('btn btn-sm btn-link'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$classList(
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'active', _1: model.showFullStackTrace},
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleFullStackTrace),
+										_1: {ctor: '[]'}
+									}
+								}
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Show Context'),
+								_0: _elm_lang$html$Html$text('Full Trace'),
 								_1: {ctor: '[]'}
 							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$button,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$classList(
-											{
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showFullStackTrace},
-												_1: {ctor: '[]'}
-											}),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleFullStackTrace),
-											_1: {ctor: '[]'}
-										}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Full Trace'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
+						_1: {ctor: '[]'}
 					}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$div,
+					_elm_lang$html$Html$pre,
+					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('stack-trace notification'),
+						_0: A2(
+							_elm_lang$html$Html$code,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									A2(_elm_lang$core$String$join, '\n', lines)),
+								_1: {ctor: '[]'}
+							}),
 						_1: {ctor: '[]'}
-					},
-					A2(_elm_lang$core$List$map, _user$project$BugDetails$stackTraceLine, lines)),
+					}),
 				_1: {ctor: '[]'}
 			}
 		});
@@ -16138,28 +16185,28 @@ var _user$project$BugDetails$LoadMoreOccurrences = function (a) {
 var _user$project$BugDetails$occurrencesDisplay = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('list-group-item d-block'),
+			_1: {ctor: '[]'}
+		},
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('section-title'),
-					_1: {ctor: '[]'}
-				},
+				_user$project$BugDetails$sectionHeader,
+				'Occurrences',
 				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$h3,
+						_elm_lang$html$Html$button,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('menu-label'),
+							_0: _elm_lang$html$Html_Attributes$class('btn btn-sm btn-link'),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Occurrences'),
+							_0: _elm_lang$html$Html$text('Filter'),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -16168,12 +16215,12 @@ var _user$project$BugDetails$occurrencesDisplay = function (model) {
 							_elm_lang$html$Html$button,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
+								_0: _elm_lang$html$Html_Attributes$class('btn btn-sm btn-link'),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Filter'),
+								_0: _elm_lang$html$Html$text('Map'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -16182,40 +16229,25 @@ var _user$project$BugDetails$occurrencesDisplay = function (model) {
 								_elm_lang$html$Html$button,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
+									_0: _elm_lang$html$Html_Attributes$class('btn btn-sm btn-link'),
 									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Map'),
+									_0: _elm_lang$html$Html$text('Export JSON'),
 									_1: {ctor: '[]'}
 								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$button,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Export JSON'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
+							_1: {ctor: '[]'}
 						}
 					}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$ul,
+					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('panel'),
+						_0: _elm_lang$html$Html_Attributes$class('card'),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -16237,12 +16269,23 @@ var _user$project$BugDetails$view = function (model) {
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('box'),
+			_0: _elm_lang$html$Html_Attributes$class('list-group'),
 			_1: {ctor: '[]'}
 		},
 		{
 			ctor: '::',
-			_0: _user$project$BugDetails$selectedBugHeader(model),
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('list-group-item d-block'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _user$project$BugDetails$selectedBugHeader(model),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: _user$project$BugDetails$linkedIssue(model.bug),
@@ -16262,7 +16305,7 @@ var _user$project$BugDetails$view = function (model) {
 var _user$project$BugList$bugGroups = F2(
 	function (now, bugs) {
 		var groupFor = function (diff) {
-			return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > -1) ? 'Earlier' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > -1) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > -1) ? 'Earlier Today' : 'Past Hour'));
+			return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > -1) ? 'More than a week ago' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > -1) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > -1) ? 'Earlier Today' : 'Past Hour'));
 		};
 		var groupNames = {
 			ctor: '::',
@@ -16275,7 +16318,7 @@ var _user$project$BugList$bugGroups = F2(
 					_0: 'Past Week',
 					_1: {
 						ctor: '::',
-						_0: 'Earlier',
+						_0: 'More than a week ago',
 						_1: {ctor: '[]'}
 					}
 				}
@@ -16338,7 +16381,7 @@ var _user$project$BugList$sidebarBug = F2(
 			_elm_lang$html$Html$span,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('tag is-warning'),
+				_0: _elm_lang$html$Html_Attributes$class('badge badge-warning'),
 				_1: {ctor: '[]'}
 			},
 			{
@@ -16350,38 +16393,42 @@ var _user$project$BugList$sidebarBug = F2(
 			_elm_lang$html$Html$a,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('sidebar-bug'),
+				_0: _elm_lang$html$Html_Attributes$class('list-group-item d-block'),
 				_1: {
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$classList(
 						{
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'is-active', _1: isSelected},
+							_0: {ctor: '_Tuple2', _0: 'active', _1: isSelected},
 							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(clickMsg),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$href('javascript:'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(clickMsg),
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			},
 			{
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$div,
+					_elm_lang$html$Html$h5,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-title'),
+						_0: _elm_lang$html$Html_Attributes$class('row no-gutters m-0'),
 						_1: {ctor: '[]'}
 					},
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$h4,
+							_elm_lang$html$Html$div,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('title is-6'),
+								_0: _elm_lang$html$Html_Attributes$class('col text-ellipsis'),
 								_1: {ctor: '[]'}
 							},
 							{
@@ -16393,17 +16440,36 @@ var _user$project$BugList$sidebarBug = F2(
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$p,
+								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('subtitle is-6'),
+									_0: _elm_lang$html$Html_Attributes$class('col col-auto'),
 									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										_user$project$ViewCommon$bugErrorMessage(bug)),
-									_1: {ctor: '[]'}
+									_0: A2(
+										_elm_lang$html$Html$span,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('badge badge-default'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												_elm_lang$core$Basics$toString(bug.occurrenceCount)),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(' '),
+										_1: {
+											ctor: '::',
+											_0: issueTag,
+											_1: {ctor: '[]'}
+										}
+									}
 								}),
 							_1: {ctor: '[]'}
 						}
@@ -16412,31 +16478,12 @@ var _user$project$BugList$sidebarBug = F2(
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$div,
+						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-tags'),
+							_0: _elm_lang$html$Html$text(
+								_user$project$ViewCommon$bugErrorMessage(bug)),
 							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$span,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('tag'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										_elm_lang$core$Basics$toString(bug.occurrenceCount)),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: issueTag,
-								_1: {ctor: '[]'}
-							}
 						}),
 					_1: {ctor: '[]'}
 				}
@@ -16451,10 +16498,10 @@ var _user$project$BugList$sidebarBugGroup = F2(
 			0) > 0) ? {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$h3,
+				_elm_lang$html$Html$h6,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('menu-label'),
+					_0: _elm_lang$html$Html_Attributes$class('text-muted m-2 mt-3'),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -16465,10 +16512,10 @@ var _user$project$BugList$sidebarBugGroup = F2(
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$div,
+					_elm_lang$html$Html$ul,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('sidebar-bug-group box'),
+						_0: _elm_lang$html$Html_Attributes$class('list-group'),
 						_1: {ctor: '[]'}
 					},
 					A2(
@@ -16491,7 +16538,7 @@ var _user$project$BugList$view = function (model) {
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('sidebar-bugs menu'),
+			_0: _elm_lang$html$Html_Attributes$class('overflow-auto'),
 			_1: {ctor: '[]'}
 		},
 		{
@@ -16747,51 +16794,40 @@ var _user$project$Main$sidebarSearch = function (model) {
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('panel-block'),
+			_0: _elm_lang$html$Html_Attributes$class('with-inner-icon'),
 			_1: {ctor: '[]'}
 		},
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$p,
+				_elm_lang$html$Html$input,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('control has-icons-left'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$input,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$SearchChange),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('input is-small'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$type_('search'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value(model.search),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$placeholder('Search terms'),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}
-						},
-						{ctor: '[]'}),
+					_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$SearchChange),
 					_1: {
 						ctor: '::',
-						_0: A2(_user$project$ViewCommon$icon, 'search', 'is-left'),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$class('form-control'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('search'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$value(model.search),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$placeholder('Search ...'),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
 					}
-				}),
-			_1: {ctor: '[]'}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: _user$project$ViewCommon$fontAwesome('search'),
+				_1: {ctor: '[]'}
+			}
 		});
 };
 var _user$project$Main$ToggleMenu = {ctor: 'ToggleMenu'};
@@ -17037,13 +17073,13 @@ var _user$project$Main$ShowEnvironmentBugs = F2(
 	function (a, b) {
 		return {ctor: 'ShowEnvironmentBugs', _0: a, _1: b};
 	});
-var _user$project$Main$currentEnvironmentsAsTags = function (model) {
+var _user$project$Main$currentEnvironments = function (model) {
 	var tag = function (id) {
 		return A2(
 			_elm_lang$html$Html$span,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('tag is-primary'),
+				_0: _elm_lang$html$Html_Attributes$class('badge badge-primary'),
 				_1: {ctor: '[]'}
 			},
 			{
@@ -17053,81 +17089,76 @@ var _user$project$Main$currentEnvironmentsAsTags = function (model) {
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$a,
+						_elm_lang$html$Html$button,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('delete is-small'),
+							_0: _elm_lang$html$Html_Attributes$type_('button'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(
-									A2(_user$project$Main$ShowEnvironmentBugs, id, false)),
-								_1: {ctor: '[]'}
+								_0: _elm_lang$html$Html_Attributes$class('close'),
+								_1: {
+									ctor: '::',
+									_0: _user$project$ViewCommon$captureClick(
+										A2(_user$project$Main$ShowEnvironmentBugs, id, false)),
+									_1: {ctor: '[]'}
+								}
 							}
 						},
-						{ctor: '[]'}),
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('×'),
+							_1: {ctor: '[]'}
+						}),
 					_1: {ctor: '[]'}
 				}
 			});
 	};
 	var tags = A2(_elm_lang$core$List$map, tag, model.selectedEnvironmentIds);
 	return A2(
-		_elm_lang$html$Html$p,
+		_elm_lang$html$Html$span,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('panel-block'),
+			_0: _elm_lang$html$Html_Attributes$class('d-block'),
 			_1: {ctor: '[]'}
 		},
 		_elm_lang$core$List$isEmpty(tags) ? {
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('None'),
+			_0: _elm_lang$html$Html$text('Select environments'),
 			_1: {ctor: '[]'}
-		} : {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$p,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$List$intersperse,
-					_elm_lang$html$Html$text(' '),
-					tags)),
-			_1: {ctor: '[]'}
-		});
+		} : A2(
+			_elm_lang$core$List$intersperse,
+			_elm_lang$html$Html$text(' '),
+			tags));
 };
 var _user$project$Main$environmentMenuItem = F2(
 	function (selectedEnvironmentIds, environmentID) {
-		var isActive = A2(_elm_lang$core$List$member, environmentID, selectedEnvironmentIds);
+		var showingEnvironment = A2(_elm_lang$core$List$member, environmentID, selectedEnvironmentIds);
 		return A2(
-			_elm_lang$html$Html$label,
+			_elm_lang$html$Html$button,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('panel-block'),
-				_1: {ctor: '[]'}
+				_0: _elm_lang$html$Html_Attributes$class('btn btn-secondary'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$classList(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'active', _1: showingEnvironment},
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							A2(_user$project$Main$ShowEnvironmentBugs, environmentID, !showingEnvironment)),
+						_1: {ctor: '[]'}
+					}
+				}
 			},
 			{
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$input,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$checked(isActive),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onCheck(
-									_user$project$Main$ShowEnvironmentBugs(environmentID)),
-								_1: {ctor: '[]'}
-							}
-						}
-					},
-					{ctor: '[]'}),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(
-						_user$project$Types$environmentIDToString(environmentID)),
-					_1: {ctor: '[]'}
-				}
+				_0: _elm_lang$html$Html$text(
+					_user$project$Types$environmentIDToString(environmentID)),
+				_1: {ctor: '[]'}
 			});
 	});
 var _user$project$Main$sidebarMenu = function (model) {
@@ -17135,8 +17166,12 @@ var _user$project$Main$sidebarMenu = function (model) {
 	switch (_p17.ctor) {
 		case 'Success':
 			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
+				_elm_lang$html$Html$p,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('btn-group-vertical d-flex align-items-stretch'),
+					_1: {ctor: '[]'}
+				},
 				A2(
 					_elm_lang$core$List$map,
 					function (_p18) {
@@ -17166,6 +17201,51 @@ var _user$project$Main$sidebarMenu = function (model) {
 				{ctor: '[]'});
 	}
 };
+var _user$project$Main$sidebarEnvironments = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('btn btn-secondary btn-sm environments-btn with-inner-icon mb-2'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$classList(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'active', _1: model.showMenu},
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleMenu),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _user$project$Main$currentEnvironments(model),
+					_1: {
+						ctor: '::',
+						_0: _user$project$ViewCommon$fontAwesome('bars'),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: model.showMenu ? _user$project$Main$sidebarMenu(model) : A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$Main$sidebarFilters = function (model) {
 	return A2(
 		_elm_lang$html$Html$form,
@@ -17176,54 +17256,11 @@ var _user$project$Main$sidebarFilters = function (model) {
 		},
 		{
 			ctor: '::',
-			_0: _user$project$Main$sidebarSearch(model),
+			_0: _user$project$Main$sidebarEnvironments(model),
 			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$p,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('panel-block'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleMenu),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$classList(
-									{
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showMenu},
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
-						}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$span,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('panel-icon'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _user$project$ViewCommon$fontAwesome('cog'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Environments'),
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: model.showMenu ? _user$project$Main$sidebarMenu(model) : _user$project$Main$currentEnvironmentsAsTags(model),
-					_1: {ctor: '[]'}
-				}
+				_0: _user$project$Main$sidebarSearch(model),
+				_1: {ctor: '[]'}
 			}
 		});
 };
@@ -17232,7 +17269,7 @@ var _user$project$Main$content = function (model) {
 		_elm_lang$html$Html$main_,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('columns'),
+			_0: _elm_lang$html$Html_Attributes$class('row'),
 			_1: {ctor: '[]'}
 		},
 		{
@@ -17241,7 +17278,7 @@ var _user$project$Main$content = function (model) {
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('column is-one-third'),
+					_0: _elm_lang$html$Html_Attributes$class('col-lg-4 scrolling-section'),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -17250,37 +17287,33 @@ var _user$project$Main$content = function (model) {
 						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('panel sidebar'),
+							_0: _elm_lang$html$Html_Attributes$class('card sticky-top'),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$p,
+								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('panel-heading'),
+									_0: _elm_lang$html$Html_Attributes$class('card-block'),
 									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Bug filters'),
+									_0: _user$project$Main$sidebarFilters(model),
 									_1: {ctor: '[]'}
 								}),
-							_1: {
-								ctor: '::',
-								_0: _user$project$Main$sidebarFilters(model),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$map,
-										_user$project$Main$BugListMsg,
-										_user$project$BugList$view(model.bugList)),
-									_1: {ctor: '[]'}
-								}
-							}
+							_1: {ctor: '[]'}
 						}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$map,
+							_user$project$Main$BugListMsg,
+							_user$project$BugList$view(model.bugList)),
+						_1: {ctor: '[]'}
+					}
 				}),
 			_1: {
 				ctor: '::',
@@ -17288,7 +17321,7 @@ var _user$project$Main$content = function (model) {
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('column'),
+						_0: _elm_lang$html$Html_Attributes$class('col-lg-8 scrolling-section'),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -17303,7 +17336,11 @@ var _user$project$Main$content = function (model) {
 var _user$project$Main$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('container-fluid'),
+			_1: {ctor: '[]'}
+		},
 		{
 			ctor: '::',
 			_0: _user$project$Main$errorMessages(model),
