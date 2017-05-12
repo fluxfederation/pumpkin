@@ -23,6 +23,7 @@ import Http
 import Task
 import RemoteData exposing (WebData)
 import List.Extra as ListX
+import Maybe.Extra as MaybeX
 
 
 type Msg
@@ -114,21 +115,22 @@ delta2url : Model -> Model -> Maybe UrlChange
 delta2url _ model =
     let
         selectedEnvironments =
-            "?environments=" ++ String.join "," (List.map environmentIDToString model.selectedEnvironmentIds)
+            if List.isEmpty model.selectedEnvironmentIds then
+                Nothing
+            else
+                Just
+                    (Rest.Param
+                        "environments"
+                        (String.join "," (List.map environmentIDToString model.selectedEnvironmentIds))
+                    )
 
         selectedBug =
-            case model.focusedBug of
-                RemoteData.Success bugModel ->
-                    let
-                        (BugID uuid) =
-                            bugModel.bug.id
-                    in
-                        "&bug=" ++ uuid.toString
-
-                _ ->
-                    ""
+            Maybe.map (\bugModel -> Rest.Param "bug" (Rest.bugIDToParam bugModel.bug.id)) (RemoteData.toMaybe model.focusedBug)
     in
-        Just { entry = NewEntry, url = selectedEnvironments ++ selectedBug }
+        Just
+            { entry = NewEntry
+            , url = Rest.addParams "/" (MaybeX.values [ selectedEnvironments, selectedBug ])
+            }
 
 
 environmentIDToString : EnvironmentID -> String
