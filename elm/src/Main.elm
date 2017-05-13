@@ -147,7 +147,7 @@ location2messages location =
         selectedEnvironmentIds =
             case BuildUrl.getQuery "environments" builder of
                 Just environments ->
-                    List.filter (\s -> String.length s > 0) (String.split "," environments)
+                    List.filter (not << String.isEmpty) (String.split "," environments)
 
                 Nothing ->
                     []

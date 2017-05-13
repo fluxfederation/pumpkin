@@ -17060,10 +17060,8 @@ var _user$project$Main$location2messages = function (location) {
 		if (_p16.ctor === 'Just') {
 			return A2(
 				_elm_lang$core$List$filter,
-				function (s) {
-					return _elm_lang$core$Native_Utils.cmp(
-						_elm_lang$core$String$length(s),
-						0) > 0;
+				function (_p17) {
+					return !_elm_lang$core$String$isEmpty(_p17);
 				},
 				A2(_elm_lang$core$String$split, ',', _p16._0));
 		} else {
@@ -17071,13 +17069,13 @@ var _user$project$Main$location2messages = function (location) {
 		}
 	}();
 	var focusBug = function () {
-		var _p17 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'bug', builder);
-		if (_p17.ctor === 'Just') {
+		var _p18 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'bug', builder);
+		if (_p18.ctor === 'Just') {
 			return {
 				ctor: '::',
 				_0: _user$project$Main$RequestDetails(
 					_user$project$Types$BugID(
-						_user$project$Types$UUID(_p17._0))),
+						_user$project$Types$UUID(_p18._0))),
 				_1: {ctor: '[]'}
 			};
 		} else {
@@ -17357,7 +17355,7 @@ var _user$project$Main$LoadedEnvironments = function (a) {
 	return {ctor: 'LoadedEnvironments', _0: a};
 };
 var _user$project$Main$init = function () {
-	var _p18 = A2(
+	var _p19 = A2(
 		_user$project$BugList$init,
 		{
 			environmentIDs: {ctor: '[]'},
@@ -17365,8 +17363,8 @@ var _user$project$Main$init = function () {
 			search: ''
 		},
 		_elm_lang$core$Maybe$Nothing);
-	var bugList = _p18._0;
-	var bugListCmd = _p18._1;
+	var bugList = _p19._0;
+	var bugListCmd = _p19._1;
 	return {
 		ctor: '_Tuple2',
 		_0: {
