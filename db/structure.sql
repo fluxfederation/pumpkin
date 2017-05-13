@@ -225,11 +225,35 @@ CREATE INDEX index_occurrences_on_environment_id ON occurrences USING btree (env
 
 
 --
+-- Name: bugs bugs_primary_occurrence_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY bugs
+    ADD CONSTRAINT bugs_primary_occurrence_id_fkey FOREIGN KEY (primary_occurrence_id) REFERENCES occurrences(id);
+
+
+--
+-- Name: events events_bug_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY events
+    ADD CONSTRAINT events_bug_id_fkey FOREIGN KEY (bug_id) REFERENCES bugs(id);
+
+
+--
+-- Name: occurrences occurrences_bug_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY occurrences
+    ADD CONSTRAINT occurrences_bug_id_fkey FOREIGN KEY (bug_id) REFERENCES bugs(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
-INSERT INTO schema_migrations (version) VALUES ('20160914224317'), ('20160914233248'), ('20160914233416'), ('20160914235925'), ('20160915001629'), ('20160915022656'), ('20161019211306'), ('20161020213813'), ('20161021015303'), ('20161021020642'), ('20170419231713');
+INSERT INTO schema_migrations (version) VALUES ('20160914224317'), ('20160914233248'), ('20160914233416'), ('20160914235925'), ('20160915001629'), ('20160915022656'), ('20161019211306'), ('20161020213813'), ('20161021015303'), ('20161021020642'), ('20170419231713'), ('20170513025949');
 
 
