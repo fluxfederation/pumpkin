@@ -11,6 +11,7 @@ import ChunkList exposing (ChunkList)
 import RemoteData
 import Maybe.Extra as MaybeX
 import List.Extra as ListX
+import Json.Decode as JD
 
 
 formatDate : Bool -> Date.Date -> Date -> String
@@ -51,7 +52,7 @@ paginatedChunkList displayItems chunkList loadMoreMessage =
                         ((displayItems chunk.items)
                             ++ case chunk.nextItem of
                                 Just next ->
-                                    [ button [ class "button", onClick (loadMoreMessage (Just next)) ] [ text "Show more" ] ]
+                                    [ p [] [ button [ class "btn btn-secondary", onClick (loadMoreMessage (Just next)) ] [ text "Show more" ] ] ]
 
                                 Nothing ->
                                     []
@@ -98,3 +99,8 @@ errorNotification clickmsg error =
         div [ class "notification is-danger" ] <|
             MaybeX.toList (Maybe.map deleteButton clickmsg)
                 ++ [ text error ]
+
+
+captureClick : msg -> Attribute msg
+captureClick message =
+    onWithOptions "click" { stopPropagation = True, preventDefault = True } (JD.succeed message)

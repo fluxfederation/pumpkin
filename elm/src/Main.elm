@@ -300,7 +300,7 @@ shouldHideFocusedBug model f =
 
 view : Model -> Html Msg
 view model =
-    div [] [ errorMessages model, content model ]
+    div [ class "container-fluid" ] [ errorMessages model, content model ]
 
 
 errorMessages : Model -> Html Msg
@@ -315,30 +315,24 @@ errorMessages model =
 
 content : Model -> Html Msg
 content model =
-    main_ [ class "columns" ]
-        [ div [ class "column is-one-third" ]
-            [ div [ class "panel sidebar" ]
-                [ p [ class "panel-heading" ] [ text "Bug filters" ]
-                , sidebarFilters model
-                , Html.map BugListMsg (BugList.view model.bugList)
+    main_ [ class "row" ]
+        [ div [ class "col-lg-4 scrolling-section" ]
+            [ div [ class "card sticky-top" ]
+                [ div [ class "card-block" ]
+                    [ sidebarFilters model
+                    ]
                 ]
+            , Html.map BugListMsg (BugList.view model.bugList)
             ]
-        , div [ class "column" ] [ selectedBug model ]
+        , div [ class "col-lg-8 scrolling-section" ] [ selectedBug model ]
         ]
 
 
 sidebarFilters : Model -> Html Msg
 sidebarFilters model =
     Html.form [ onSubmit SearchSubmit ]
-        [ sidebarSearch model
-        , p [ class "panel-block", onClick ToggleMenu, classList [ ( "is-active", model.showMenu ) ] ]
-            [ span [ class "panel-icon" ] [ fontAwesome "cog" ]
-            , text "Environments"
-            ]
-        , if model.showMenu then
-            sidebarMenu model
-          else
-            currentEnvironmentsAsTags model
+        [ sidebarEnvironments model
+        , sidebarSearch model
         ]
 
 
@@ -361,31 +355,45 @@ selectedBug model =
 
 sidebarSearch : Model -> Html Msg
 sidebarSearch model =
-    div [ class "panel-block" ]
-        [ p [ class "control has-icons-left" ]
-            [ input [ onInput SearchChange, class "input is-small", type_ "search", value model.search, placeholder "Search terms" ] []
-            , icon "search" "is-left"
-            ]
+    div [ class "with-inner-icon" ]
+        [ input [ onInput SearchChange, class "form-control", type_ "search", value model.search, placeholder "Search ..." ] []
+        , fontAwesome "search"
         ]
 
 
-currentEnvironmentsAsTags : Model -> Html Msg
-currentEnvironmentsAsTags model =
+sidebarEnvironments : Model -> Html Msg
+sidebarEnvironments model =
+    div []
+        [ button
+            [ class "btn btn-secondary btn-sm environments-btn with-inner-icon mb-2"
+            , classList [ ( "active", model.showMenu ) ]
+            , onClick ToggleMenu
+            ]
+            [ currentEnvironments model, fontAwesome "bars" ]
+        , if model.showMenu then
+            sidebarMenu model
+          else
+            div [] []
+        ]
+
+
+currentEnvironments : Model -> Html Msg
+currentEnvironments model =
     let
         tags =
             (List.map tag model.selectedEnvironmentIds)
 
         tag id =
-            span [ class "tag is-primary" ]
+            span [ class "badge badge-primary" ]
                 [ text (environmentIDToString id)
-                , a [ class "delete is-small", onClick (ShowEnvironmentBugs id False) ] []
+                , button [ type_ "button", class "close", captureClick (ShowEnvironmentBugs id False) ] [ text "×" ]
                 ]
     in
-        p [ class "panel-block" ]
+        span [ class "d-block" ]
             (if List.isEmpty tags then
-                [ text "None" ]
+                [ text "Select environments" ]
              else
-                [ p [] (List.intersperse (text " ") tags) ]
+                List.intersperse (text " ") tags
             )
 
 
@@ -393,7 +401,8 @@ sidebarMenu : Model -> Html Msg
 sidebarMenu model =
     case model.environments of
         RemoteData.Success envs ->
-            div [] (List.map (environmentMenuItem model.selectedEnvironmentIds << .id) envs)
+            p [ class "btn-group-vertical d-flex align-items-stretch" ]
+                (List.map (environmentMenuItem model.selectedEnvironmentIds << .id) envs)
 
         RemoteData.Loading ->
             spinner
@@ -408,16 +417,12 @@ sidebarMenu model =
 environmentMenuItem : List EnvironmentID -> EnvironmentID -> Html Msg
 environmentMenuItem selectedEnvironmentIds environmentID =
     let
-        isActive =
+        showingEnvironment =
             List.member environmentID selectedEnvironmentIds
     in
-        label
-            [ class "panel-block" ]
-            [ input
-                [ type_ "checkbox"
-                , checked isActive
-                , onCheck (ShowEnvironmentBugs environmentID)
-                ]
-                []
-            , text (environmentIDToString environmentID)
+        button
+            [ class "btn btn-secondary"
+            , classList [ ( "active", showingEnvironment ) ]
+            , onClick (ShowEnvironmentBugs environmentID (not showingEnvironment))
             ]
+            [ text (environmentIDToString environmentID) ]
