@@ -26,11 +26,16 @@ type alias UUID =
 
 
 type EnvironmentID
-    = EnvironmentID UUID
+    = EnvironmentID String
+
+
+environmentIDToString : EnvironmentID -> String
+environmentIDToString (EnvironmentID name) =
+    name
 
 
 type alias Environment =
-    { id : EnvironmentID, name : String }
+    { id : EnvironmentID }
 
 
 type BugID

@@ -1,45 +1,45 @@
 qa_normal:
-  environment: qa
+  environment_id: "QA"
   bug: qa_normal
   occurred_at: "2016-01-01"
   message: "Strictly testing normal occurrence"
   data: {"admin_id":5}
 
 prod_normal:
-  environment: prod
+  environment_id: "Production"
   bug: prod_normal
   occurred_at: "2016-01-01"
   message: "Very normal occurrence"
   data: {"admin_id":5}
 
 prod_normal_unassigned:
-  environment: prod
+  environment_id: "Production"
   occurred_at: "2016-01-02"
   message: "Very normal occurrence"
   data: {"admin_id":5}
 
 prod_new_unassigned:
-  environment: prod
+  environment_id: "Production"
   occurred_at: "2016-01-02"
   message: "It's a whole new world"
   data: {"admin_id":5}
 
 prod_twice1:
-  environment: prod
+  environment_id: "Production"
   bug: prod_twice
   occurred_at: "2016-01-01"
   message: "Pumpkin"
   data: {"admin_id":6}
 
 prod_twice2:
-  environment: prod
+  environment_id: "Production"
   bug: prod_twice
   occurred_at: "2016-01-02"
   message: "Pumpkin"
   data: {"admin_id":1}
 
 prod_closed:
-  environment: prod
+  environment_id: "Production"
   bug: prod_closed
   occurred_at: "2015-12-31"
   message: "Very closed occurrence"

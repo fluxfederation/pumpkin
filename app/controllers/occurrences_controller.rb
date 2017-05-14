@@ -9,7 +9,7 @@ class OccurrencesController < ApplicationController
   end
 
   def create
-    environment = Environment.find_or_create_by!(name: params[:occurrence][:environment])
+    environment = Environment.find_or_create_by!(id: params[:occurrence][:environment])
 
     occurrence = environment.occurrences.new(occurrence_params)
     occurrence.data = params[:occurrence][:data]

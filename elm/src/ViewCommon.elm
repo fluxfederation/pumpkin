@@ -32,15 +32,6 @@ fontAwesome name =
     i [ class ("fa fa-" ++ name) ] []
 
 
-environmentName : List Environment -> EnvironmentID -> String
-environmentName environments id =
-    let
-        environment =
-            ListX.find (\env -> env.id == id) environments
-    in
-        Maybe.withDefault "UNKNOWN" <| Maybe.map .name environment
-
-
 paginatedChunkList : (List a -> List (Html msg)) -> ChunkList a -> (Maybe a -> msg) -> Html msg
 paginatedChunkList displayItems chunkList loadMoreMessage =
     let

@@ -27,7 +27,7 @@ import Maybe.Extra as MaybeX
 
 
 type Msg
-    = LoadedEnvironments (Result Http.Error (List Environment))
+    = LoadedEnvironments (WebData (List Environment))
     | ShowEnvironmentBugs EnvironmentID Bool
     | SetSelectedEnvironmentIds (List EnvironmentID)
     | ShowClosedBugs
@@ -45,8 +45,7 @@ type Msg
 
 type alias Model =
     { selectedEnvironmentIds : List EnvironmentID
-    , loadingEnvironments : Bool
-    , environments : List Environment
+    , environments : WebData (List Environment)
     , bugList : BugList.Model
     , focusedBug : WebData BugDetails.Model
     , error : Maybe String
@@ -69,8 +68,7 @@ init =
                 Nothing
     in
         ( { selectedEnvironmentIds = []
-          , loadingEnvironments = True
-          , environments = []
+          , environments = RemoteData.NotAsked
           , bugList = bugList
           , focusedBug = RemoteData.NotAsked
           , error = Nothing
@@ -80,7 +78,7 @@ init =
           , now = (Date.fromTime 0)
           }
         , Cmd.batch
-            [ Http.send LoadedEnvironments Rest.loadEnvironments
+            [ Rest.fetch LoadedEnvironments Rest.loadEnvironments
             , Task.perform TimeTick Time.now
             , Cmd.map BugListMsg bugListCmd
             ]
@@ -121,7 +119,7 @@ delta2url _ model =
                 Just
                     (Rest.Param
                         "environments"
-                        (String.join "," (List.map environmentIDToString model.selectedEnvironmentIds))
+                        (String.join "," (List.map Rest.envIDToParam model.selectedEnvironmentIds))
                     )
 
         selectedBug =
@@ -131,11 +129,6 @@ delta2url _ model =
             { entry = NewEntry
             , url = Rest.addParams "/" (MaybeX.values [ selectedEnvironments, selectedBug ])
             }
-
-
-environmentIDToString : EnvironmentID -> String
-environmentIDToString (EnvironmentID uuid) =
-    uuid.toString
 
 
 location2messages : Location -> List Msg
@@ -161,10 +154,7 @@ location2messages location =
                     []
     in
         [ SetSelectedEnvironmentIds
-            (List.map
-                (\id -> EnvironmentID (UUID id))
-                selectedEnvironmentIds
-            )
+            (List.map EnvironmentID selectedEnvironmentIds)
         ]
             ++ focusBug
 
@@ -204,18 +194,8 @@ handleResult handler model result =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadedEnvironments result ->
-            handleResult
-                (\environments ->
-                    noCmd
-                        { model
-                            | environments = environments
-                            , loadingEnvironments = False
-                            , focusedBug = RemoteData.map (\b -> { b | environments = environments }) model.focusedBug
-                        }
-                )
-                model
-                result
+        LoadedEnvironments environments ->
+            noCmd { model | environments = environments }
 
         ShowEnvironmentBugs environmentID show ->
             let
@@ -239,7 +219,7 @@ update msg model =
         LoadedDetails result ->
             let
                 inited =
-                    RemoteData.map (flip BugDetails.init model.environments) result
+                    RemoteData.map BugDetails.init result
             in
                 ( { model | focusedBug = RemoteData.map Tuple.first inited }
                 , case RemoteData.map Tuple.second inited of
@@ -397,7 +377,7 @@ currentEnvironmentsAsTags model =
 
         tag id =
             span [ class "tag is-primary" ]
-                [ text (environmentName model.environments id)
+                [ text (environmentIDToString id)
                 , a [ class "delete is-small", onClick (ShowEnvironmentBugs id False) ] []
                 ]
     in
@@ -411,19 +391,33 @@ currentEnvironmentsAsTags model =
 
 sidebarMenu : Model -> Html Msg
 sidebarMenu model =
-    if model.loadingEnvironments then
-        spinner
-    else
-        div []
-            (List.map (environmentMenuItem model.selectedEnvironmentIds) model.environments)
+    case model.environments of
+        RemoteData.Success envs ->
+            div [] (List.map (environmentMenuItem model.selectedEnvironmentIds << .id) envs)
+
+        RemoteData.Loading ->
+            spinner
+
+        RemoteData.Failure _ ->
+            div [] [ text "Failed" ]
+
+        RemoteData.NotAsked ->
+            div [] []
 
 
-environmentMenuItem : List EnvironmentID -> Environment -> Html Msg
-environmentMenuItem selectedEnvironmentIds environment =
+environmentMenuItem : List EnvironmentID -> EnvironmentID -> Html Msg
+environmentMenuItem selectedEnvironmentIds environmentID =
     let
         isActive =
-            (List.member environment.id selectedEnvironmentIds)
+            List.member environmentID selectedEnvironmentIds
     in
         label
             [ class "panel-block" ]
-            [ input [ type_ "checkbox", checked isActive, onCheck (ShowEnvironmentBugs environment.id) ] [], text environment.name ]
+            [ input
+                [ type_ "checkbox"
+                , checked isActive
+                , onCheck (ShowEnvironmentBugs environmentID)
+                ]
+                []
+            , text (environmentIDToString environmentID)
+            ]
