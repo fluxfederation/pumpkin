@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock '3.6.1'
 
-set :application, 'hq-test-pumpkin'
+set :application, 'pumpkin'
 
 set :pty, true
 set :shell, "/bin/bash"
