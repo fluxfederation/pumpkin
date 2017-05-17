@@ -25,7 +25,7 @@ realclean: clean clean-deps
 watch:
 	@make js || true
 	@echo "Watching for changes..."
-	@fswatch elm/src/ | grep -v '.\#' | while read changed; do date; echo "MODIFIED: $$changed"; make js || true; done
+	@fswatch elm/src/ | grep --line-buffered -v '.\#' | while read -r changed; do date; echo "MODIFIED: $$changed"; make js || true; done
 
 .PHONY: js
 .PHONY: realclean
