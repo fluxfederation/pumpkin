@@ -1,18 +1,18 @@
 # config valid only for current version of Capistrano
 lock '3.6.1'
 
-set :application, 'com-test-pumpkin'
+set :application, 'hq-test-pumpkin'
 
 set :pty, true
 set :shell, "/bin/bash"
 set :use_sudo, false
 set :scm, :git
 set :repo_url, 'git@git.powershop.co.nz:pumpkin/api.git'
-# set :passenger_restart_/with_sudo, true
+set :passenger_restart_with_sudo, true
 
 set :bundle_without, [:development, :test, :deployment]
 
-set(:deploy_to) { "/apps/com-test-pumpkin" }
+set(:deploy_to) { "/apps/#{fetch(:application)}" }
 
 set(:linked_dirs) { %w(log) }
 
@@ -24,7 +24,7 @@ before "deploy:migrate",  "deploy:link_global_app_env"
 namespace :deploy do
   task :fix_permissions do
     on roles(:app) do
-      execute :sudo, "/usr/local/bin/fix_deploy_permissions.sh com-test-pumpkin"
+      execute :sudo, "/usr/local/bin/fix_deploy_permissions.sh #{fetch(:application)}"
     end
   end
 
