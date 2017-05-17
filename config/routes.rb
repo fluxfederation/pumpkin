@@ -10,4 +10,6 @@ Rails.application.routes.draw do
 
     resources :occurrences, only: [:index]
   end
+
+  get '/monitoring/heartbeat', to: 'heartbeat#index'
 end
