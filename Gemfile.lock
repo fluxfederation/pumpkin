@@ -1,3 +1,10 @@
+GIT
+  remote: git://github.com/bagedevimo/simple_google_auth.git
+  revision: 2bc14ae49db4646ae79f6e86f58c2be5502ba921
+  specs:
+    simple_google_auth (0.2.1)
+      rails (>= 3.2.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -168,9 +175,10 @@ DEPENDENCIES
   puma (~> 3.0)
   rack-cors
   rails (~> 5.0.0, >= 5.0.0.1)
+  simple_google_auth!
   spring
   spring-watcher-listen (~> 2.0.0)
   tzinfo-data
 
 BUNDLED WITH
-   1.13.1
+   1.14.6

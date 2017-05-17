@@ -24,5 +24,18 @@ module Pumpkin
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore
+
+    SimpleGoogleAuth.configure do |config|
+      config.client_id      = Rails.application.secrets.google_auth_client_id
+      config.client_secret  = Rails.application.secrets.google_auth_client_secret
+      config.redirect_uri   = Rails.application.secrets.google_auth_client_callback
+
+      config.authenticate = lambda do |data|
+        data.email.ends_with?("@#{Rails.application.secrets.google_auth_required_domain}")
+      end
+    end
   end
 end
