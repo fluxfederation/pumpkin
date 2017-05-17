@@ -12,7 +12,7 @@ class OccurrencesController < ApplicationController
     environment = Environment.find_or_create_by!(id: params[:occurrence][:environment])
 
     occurrence = environment.occurrences.new(occurrence_params)
-    occurrence.data = params[:occurrence][:data]
+    occurrence.data = params[:occurrence].fetch(:data, {})
     occurrence.save!
 
     AssignBugsJob.perform_later(occurrence)

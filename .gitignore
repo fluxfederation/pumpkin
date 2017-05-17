@@ -16,3 +16,6 @@
 # Ignore Byebug command history file.
 .byebug_history
 /db/schema.rb
+
+# Ignore structure.sql, run migrations instead:
+/db/structure.sql
