@@ -1,7 +1,9 @@
-class AssignBugsJob < ApplicationJob
+class AssignBug < ApplicationJob
   queue_as :default
 
-  def perform(occurrence)
+  def perform(occurrence_id)
+    occurrence = Occurrence.find(occurrence_id)
+
     occurrence.with_lock do
       occurrence.bug = Bug.joins(:primary_occurrence).merge(Occurrence.where(environment_id: occurrence.environment, message: occurrence.message)).first
       if occurrence.bug.nil?

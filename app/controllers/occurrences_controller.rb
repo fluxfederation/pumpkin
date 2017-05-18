@@ -16,7 +16,7 @@ class OccurrencesController < ApplicationController
     occurrence.data = params[:occurrence].fetch(:data, {})
     occurrence.save!
 
-    AssignBugsJob.perform_later(occurrence)
+    AssignBug.perform_later(occurrence.id)
 
     render json: occurrence, include: [:environment]
   end

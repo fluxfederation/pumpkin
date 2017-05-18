@@ -101,7 +101,7 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create_issue" do
-    assert_enqueued_with(job: CreateBugIssue) do
+    assert_enqueued_with(job: CreateIssue) do
       post create_issue_bug_path(bugs(:prod_normal))
     end
     assert_response :success
