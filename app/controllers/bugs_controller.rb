@@ -24,7 +24,7 @@ class BugsController < ApplicationController
 
   def create_issue
     bug = fetch_bug
-    Resque.enqueue(CreateIssue, bug)
+    CreateIssue.perform_later(bug)
     render json: fetch_bug, serializer: FullBugSerializer
   end
 

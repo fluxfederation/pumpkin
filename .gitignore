@@ -21,3 +21,6 @@
 /db/structure.sql
 
 .ruby-gemset
+
+# Ingore redis files:
+dump.rdb

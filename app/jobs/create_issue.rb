@@ -1,7 +1,7 @@
-class CreateIssue
-  @queue = :default
+class CreateIssue < ActiveJob::Base
+  queue_as = :default
 
-  def self.perform(bug)
+  def perform(bug)
     bug.update_attributes! issue_url: "https://jira.powershophq.com/browse/FAKE-#{bug.id}"
   end
 end

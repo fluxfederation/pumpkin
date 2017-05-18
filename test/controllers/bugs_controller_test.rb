@@ -102,7 +102,6 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
 
   test "create_issue" do
     assert_enqueued_with(job: CreateIssue) do
-      skip "switching to resque, need to write a spec that doesn't rely on ActiveJob"
       post create_issue_bug_path(bugs(:prod_normal))
     end
     assert_response :success

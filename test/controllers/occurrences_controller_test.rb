@@ -30,7 +30,6 @@ class OccurrencesControllerTest < ActionDispatch::IntegrationTest
   test "create" do
     assert_difference 'Occurrence.count', 1 do
       assert_enqueued_with(job: AssignBug) do
-        skip "switching to resque, need to write a spec that doesn't rely on ActiveJob"
         post occurrences_path, headers: {"Authorization" => "TOKEN #{Rails.application.secrets.auth_token}"}, params: {occurrence: {environment:"Normal", message:"Extremely normal", occurred_at:"2011-01-01"}}
       end
     end
