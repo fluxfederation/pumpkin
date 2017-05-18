@@ -19,3 +19,5 @@
 
 # Ignore structure.sql, run migrations instead:
 /db/structure.sql
+
+.ruby-gemset
