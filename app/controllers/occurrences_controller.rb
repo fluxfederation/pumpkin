@@ -16,7 +16,7 @@ class OccurrencesController < ApplicationController
     occurrence.data = params[:occurrence].fetch(:data, {})
     occurrence.save!
 
-    AssignBugsJob.perform_later(occurrence)
+    Resque.enqueue(AssignBug, occurrence)
 
     render json: occurrence, include: [:environment]
   end

@@ -22,6 +22,8 @@ gem 'json_schema'
 
 gem 'dotenv-rails'
 
+gem 'resque'
+
 gem 'simple_google_auth', github: 'bagedevimo/simple_google_auth'
 
 group :development, :test do

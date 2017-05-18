@@ -1,10 +1,10 @@
 require 'test_helper'
 
-class AssignBugsJobTest < ActiveJob::TestCase
+class AssignBugTest < ActiveJob::TestCase
   test "existing bug assignment" do
     occurrence = occurrences(:prod_normal_unassigned)
     assert_no_difference 'Bug.count' do
-      AssignBugsJob.perform_now(occurrence)
+      AssignBug.perform(occurrence)
     end
     assert_equal bugs(:prod_normal), occurrence.bug
   end
@@ -12,7 +12,7 @@ class AssignBugsJobTest < ActiveJob::TestCase
   test "new bug assignment" do
     occurrence = occurrences(:prod_new_unassigned)
     assert_difference 'Bug.count', 1 do
-      AssignBugsJob.perform_now(occurrence)
+      AssignBug.perform(occurrence)
     end
     bug = occurrence.bug
     assert_equal 'created', bug.events.first!.name
