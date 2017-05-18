@@ -1,4 +1,4 @@
-class CreateIssue < ActiveJob::Base
+class CreateIssue < ApplicationJob
   queue_as = :default
 
   def perform(bug)

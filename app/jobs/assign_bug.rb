@@ -1,4 +1,4 @@
-class AssignBug < ActiveJob::Base
+class AssignBug < ApplicationJob
   queue_as :default
 
   def perform(occurrence)
