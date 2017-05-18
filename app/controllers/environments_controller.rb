@@ -1,5 +1,5 @@
 class EnvironmentsController < ApplicationController
   def index
-    render json: Environment.all, include: []
+    render json: Environment.by_recent_activity, include: []
   end
 end

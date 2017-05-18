@@ -12,4 +12,11 @@ class Environment < ApplicationRecord
     format: { without: /[\-\.]\z/, message: "cannot end with a hyphen or dot" }
   validates :id,
     format: { with: /\A[a-zA-Z0-9\.\-]+\z/, message: "must only contain letters, numbers, hyphens or periods" }
+
+  scope :by_recent_activity, ->() { from(<<-end_sql) }
+    (SELECT e.*, last_occurred_at FROM environments e
+      JOIN (SELECT environment_id, MAX(occurred_at) AS last_occurred_at
+              FROM occurrences GROUP BY environment_id) l ON l.environment_id = e.id
+     ORDER BY last_occurred_at DESC) AS environments
+  end_sql
 end
