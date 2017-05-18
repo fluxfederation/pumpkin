@@ -19,7 +19,6 @@ import Date exposing (Date)
 import Types exposing (..)
 import BugDetails
 import BugList
-import Http
 import Task
 import RemoteData exposing (WebData)
 import List.Extra as ListX
