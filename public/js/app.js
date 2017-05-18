@@ -14861,9 +14861,9 @@ var _user$project$Types$UUID = function (a) {
 var _user$project$Types$Environment = function (a) {
 	return {id: a};
 };
-var _user$project$Types$Bug = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
+var _user$project$Types$Bug = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, issueUrl: h, stackTrace: i};
 	});
 var _user$project$Types$Occurrence = F5(
 	function (a, b, c, d, e) {
@@ -15020,19 +15020,29 @@ var _user$project$Rest$date = function () {
 	};
 	return A2(_elm_lang$core$Json_Decode$andThen, decodeDateFromString, _elm_lang$core$Json_Decode$string);
 }();
-var _user$project$Rest$decodeBug = A9(
-	_elm_lang$core$Json_Decode$map8,
-	_user$project$Types$Bug,
-	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeBugID),
-	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _user$project$Rest$decodeEnvironmentID),
-	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'first_occurred_at', _user$project$Rest$date),
-	A2(_elm_lang$core$Json_Decode$field, 'last_occurred_at', _user$project$Rest$date),
-	A2(_elm_lang$core$Json_Decode$field, 'occurrence_count', _elm_lang$core$Json_Decode$int),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'closed_at',
-		_elm_lang$core$Json_Decode$maybe(_user$project$Rest$date)),
+var _user$project$Rest$decodeBug = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (rest, stack) {
+			return rest(stack);
+		}),
+	A9(
+		_elm_lang$core$Json_Decode$map8,
+		_user$project$Types$Bug,
+		A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeBugID),
+		A2(_elm_lang$core$Json_Decode$field, 'environment_id', _user$project$Rest$decodeEnvironmentID),
+		A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
+		A2(_elm_lang$core$Json_Decode$field, 'first_occurred_at', _user$project$Rest$date),
+		A2(_elm_lang$core$Json_Decode$field, 'last_occurred_at', _user$project$Rest$date),
+		A2(_elm_lang$core$Json_Decode$field, 'occurrence_count', _elm_lang$core$Json_Decode$int),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'closed_at',
+			_elm_lang$core$Json_Decode$maybe(_user$project$Rest$date)),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'issue_url',
+			_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string))),
 	_user$project$Rest$stacktrace);
 var _user$project$Rest$closeBug = function (bugId) {
 	return A3(
@@ -15666,7 +15676,12 @@ var _user$project$BugDetails$linkedIssue = function (bug) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Attributes$class('linked-issue notification'),
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$href(
+					A2(_elm_lang$core$Maybe$withDefault, '#', bug.issueUrl)),
+				_1: {ctor: '[]'}
+			}
 		},
 		{
 			ctor: '::',
@@ -15679,7 +15694,7 @@ var _user$project$BugDetails$linkedIssue = function (bug) {
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('No linked incident.'),
+					_0: _elm_lang$html$Html$text('Link to issue'),
 					_1: {ctor: '[]'}
 				}),
 			_1: {

@@ -157,8 +157,8 @@ date model date =
 
 linkedIssue : Bug -> Html Msg
 linkedIssue bug =
-    a [ class "linked-issue notification" ]
-        [ span [ class "description" ] [ text "No linked incident." ]
+    a [ class "linked-issue notification", href (Maybe.withDefault "#" bug.issueUrl) ]
+        [ span [ class "description" ] [ text "Link to issue" ]
         , icon "cog" ""
         ]
 

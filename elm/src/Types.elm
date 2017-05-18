@@ -50,6 +50,7 @@ type alias Bug =
     , lastOccurredAt : Date.Date
     , occurrenceCount : Int
     , closedAt : Maybe Date.Date
+    , issueUrl : Maybe String
     , stackTrace : Maybe (List String)
     }
 
