@@ -15,6 +15,6 @@ class BugSearch
 
     @bugs = @bugs.not_newer_than_bug(start) if start
 
-    @bugs = closed ? bugs.closed : bugs.open
+    @bugs = bugs.open unless closed
   end
 end
