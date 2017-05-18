@@ -121,9 +121,9 @@ allBugs model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "overflow-auto" ]
+    div [ class "sidebar-bugs menu" ]
         [ case List.head model.bugs of
-            Just (RemoteData.Loading) ->
+            Just RemoteData.Loading ->
                 spinner
 
             _ ->
@@ -139,8 +139,8 @@ sidebarBugGroups model bugs =
 sidebarBugGroup : Model -> ( String, List Bug ) -> List (Html Msg)
 sidebarBugGroup model ( label, bugs ) =
     if List.length bugs > 0 then
-        [ h6 [ class "text-muted m-2 mt-3" ] [ text label ]
-        , ul [ class "list-group" ] (List.map (sidebarBug model) bugs)
+        [ h3 [ class "menu-label" ] [ text label ]
+        , div [ class "sidebar-bug-group box" ] (List.map (sidebarBug model) bugs)
         ]
     else
         []
@@ -150,7 +150,7 @@ sidebarBug : Model -> Bug -> Html Msg
 sidebarBug model bug =
     let
         issueTag =
-            span [ class "badge badge-warning" ] [ text "CI-000" ]
+            span [ class "tag is-warning" ] [ text "CI-000" ]
 
         isSelected =
             model.selected == Just bug.id
@@ -159,26 +159,34 @@ sidebarBug model bug =
             SelectBug (Just bug.id)
     in
         a
-            [ class "list-group-item d-block"
+            [ class "sidebar-bug"
             , classList
-                [ ( "active"
+                [ ( "is-active"
                   , isSelected
                   )
                 ]
-            , href "javascript:"
             , onClick clickMsg
             ]
-            [ h5
-                [ class "row no-gutters m-0"
+            [ div
+                [ class "sidebar-bug-title"
                 ]
-                [ div [ class "col text-ellipsis" ] [ text (bugErrorClass bug) ]
-                , div [ class "col col-auto" ]
-                    [ span [ class "badge badge-default" ] [ text (toString bug.occurrenceCount) ]
-                    , text " "
-                    , issueTag
+                [ h4 [ class "title is-6" ]
+                    [ text (bugErrorClass bug)
+                    ]
+                , p [ class "subtitle is-6" ]
+                    [ text (bugErrorMessage bug)
                     ]
                 ]
-            , div [] [ text (bugErrorMessage bug) ]
+            , div
+                [ class
+                    "sidebar-bug-tags"
+                ]
+                [ span [ class "tag" ]
+                    [ text
+                        (toString bug.occurrenceCount)
+                    ]
+                , issueTag
+                ]
             ]
 
 
@@ -189,11 +197,11 @@ bugGroups now bugs =
             Period.diff now bug.lastOccurredAt
 
         groupNames =
-            [ "Past Hour", "Past Day", "Past Week", "More than a week ago" ]
+            [ "Past Hour", "Past Day", "Past Week", "Earlier" ]
 
         groupFor diff =
             if diff.week >= 1 then
-                "More than a week ago"
+                "Earlier"
             else if diff.day >= 1 then
                 "Past Week"
             else if diff.hour >= 1 then

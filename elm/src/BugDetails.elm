@@ -102,8 +102,8 @@ init bug =
 
 view : Model -> Html Msg
 view model =
-    div [ class "list-group" ]
-        [ div [ class "list-group-item d-block" ] [ selectedBugHeader model ]
+    div [ class "box" ]
+        [ selectedBugHeader model
         , linkedIssue model.bug
         , stackTraceDisplay model
         , occurrencesDisplay model
@@ -112,17 +112,17 @@ view model =
 
 selectedBugHeader : Model -> Html Msg
 selectedBugHeader model =
-    div [ class "row no-gutters align-items-center" ]
-        [ div [ class "col" ]
-            [ h1 [ class "h3 mb-0" ] [ text (bugErrorClass model.bug) ]
-            , p [ class "h5 text-muted mb-0" ] [ text (bugErrorMessage model.bug) ]
+    div [ class "selected-bug-header" ]
+        [ div [ class "selected-bug-title" ]
+            [ h1 [ class "title is-3" ] [ text (bugErrorClass model.bug) ]
+            , p [ class "subtitle is-5" ] [ text (bugErrorMessage model.bug) ]
             ]
-        , div [ class "text-right" ]
+        , div [ class "has-text-right" ]
             [ occurrenceCount model.bug
-            , div []
+            , p []
                 [ button
-                    [ class "btn btn-link px-2"
-                    , classList [ ( "active", not model.showTimeAgo ) ]
+                    [ class "button is-primary is-inverted"
+                    , classList [ ( "is-active", not model.showTimeAgo ) ]
                     , onClick ToggleTimeFormat
                     ]
                     [ icon "clock-o" ""
@@ -136,7 +136,7 @@ selectedBugHeader model =
 
 occurrenceCount : Bug -> Html Msg
 occurrenceCount bug =
-    div [ class "px-2" ]
+    p [ class "occurrence-count" ]
         [ text (pluralize "occurrence" "occurrences" bug.occurrenceCount) ]
 
 
@@ -157,9 +157,9 @@ date model date =
 
 linkedIssue : Bug -> Html Msg
 linkedIssue bug =
-    button [ class "list-group-item list-group-item-action list-group-item-info always-on-top d-block" ]
-        [ span [ class "with-inner-icon" ]
-            [ span [] [ text "No linked incident." ], fontAwesome "cog" ]
+    a [ class "linked-issue notification" ]
+        [ span [ class "description" ] [ text "No linked incident." ]
+        , icon "cog" ""
         ]
 
 
@@ -169,18 +169,24 @@ stackTraceDisplay model =
         lines =
             filterStackTrace model model.bug.stackTrace
     in
-        div [ class "list-group-item d-block" ]
-            [ sectionHeader "Stack Trace"
-                [ button [ class "btn btn-sm btn-link" ] [ text "Show Context" ]
+        div [ class "section" ]
+            [ div [ class "section-title" ]
+                [ h3 [ class "menu-label" ] [ text "Stack Trace" ]
+                , button [ class "button is-small is-primary is-inverted" ] [ text "Show Context" ]
                 , button
-                    [ class "btn btn-sm btn-link"
-                    , classList [ ( "active", model.showFullStackTrace ) ]
+                    [ class "button is-small is-primary is-inverted"
+                    , classList [ ( "is-active", model.showFullStackTrace ) ]
                     , onClick ToggleFullStackTrace
                     ]
                     [ text "Full Trace" ]
                 ]
-            , pre [] [ code [] [ text (String.join "\n" lines) ] ]
+            , div [ class "stack-trace notification" ] (List.map stackTraceLine lines)
             ]
+
+
+stackTraceLine : String -> Html Msg
+stackTraceLine line =
+    code [] [ text line ]
 
 
 filterStackTrace : Model -> Maybe (List String) -> List String
@@ -202,13 +208,14 @@ filterStackTrace model stackTrace =
 
 occurrencesDisplay : Model -> Html Msg
 occurrencesDisplay model =
-    div [ class "list-group-item d-block" ]
-        [ sectionHeader "Occurrences"
-            [ button [ class "btn btn-sm btn-link" ] [ text "Filter" ]
-            , button [ class "btn btn-sm btn-link" ] [ text "Map" ]
-            , button [ class "btn btn-sm btn-link" ] [ text "Export JSON" ]
+    div []
+        [ div [ class "section-title" ]
+            [ h3 [ class "menu-label" ] [ text "Occurrences" ]
+            , button [ class "button is-small is-primary is-inverted" ] [ text "Filter" ]
+            , button [ class "button is-small is-primary is-inverted" ] [ text "Map" ]
+            , button [ class "button is-small is-primary is-inverted" ] [ text "Export JSON" ]
             ]
-        , div [ class "card" ]
+        , ul [ class "panel" ]
             [ paginatedChunkList (List.map (occurrenceDisplay model)) model.occurrences LoadMoreOccurrences
             ]
         ]
@@ -216,21 +223,12 @@ occurrencesDisplay model =
 
 occurrenceDisplay : Model -> Occurrence -> Html Msg
 occurrenceDisplay model occurrence =
-    div []
-        [ button [ class "card-header d-block w-100 text-left", onClick (ToggleOccurrence occurrence.id) ]
+    li [ class "occurrence panel-block" ]
+        [ a [ class "occurrence-toggle", onClick (ToggleOccurrence occurrence.id) ]
             [ text (environmentIDToString occurrence.environmentId)
-            , text " ("
+            , text " • "
             , text (date model occurrence.occurredAt)
-            , text ")"
             ]
-        , div [ class "card-block card-block-divided", classList [ ( "d-none", not (List.member occurrence.id model.expandedOccurrences) ) ] ]
+        , div [ class "occurrence-data", classList [ ( "is-hidden", not (List.member occurrence.id model.expandedOccurrences) ) ] ]
             (formatData [ "backtrace" ] occurrence.data)
-        ]
-
-
-sectionHeader : String -> List (Html Msg) -> Html Msg
-sectionHeader title buttons =
-    div [ class "row no-gutters align-items-center mb-2" ]
-        [ div [ class "col" ] [ h3 [ class "h6 text-muted m-0" ] [ text title ] ]
-        , div [ class "col col-auto" ] buttons
         ]

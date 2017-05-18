@@ -26,18 +26,14 @@ formatData blacklist val =
 formatString : Result String String -> List (Html msg)
 formatString result =
     handleFormatError result <|
-        \str -> [ span [] [ text str ] ]
+        \str -> [ span [ class "json-string" ] [ text str ] ]
 
 
 formatList : List String -> Result String (List Value) -> List (Html msg)
 formatList blacklist result =
-    let
-        formatItem val =
-            div [ class "py-1" ] (formatData blacklist val)
-    in
-        handleFormatError result <|
-            \values ->
-                [ div [ class "pl-2" ] (List.map formatItem values) ]
+    handleFormatError result <|
+        \values ->
+            [ div [ class "json-array" ] (List.concatMap (formatData blacklist) values) ]
 
 
 formatPairs : List String -> Result String (List ( String, Value )) -> List (Html msg)
@@ -47,14 +43,14 @@ formatPairs blacklist result =
             List.filter (\( key, _ ) -> not (List.member key blacklist)) pairs
 
         formatPair ( key, value ) =
-            div [ class "py-1" ]
-                ([ strong [] [ text key ], text " " ]
+            div [ class "json-object-entry" ]
+                ([ span [ class "json-object-key" ] [ text key ] ]
                     ++ formatData blacklist value
                 )
     in
         handleFormatError result <|
             \pairs ->
-                [ div [ class "pl-2" ] (List.map formatPair (filteredPairs pairs)) ]
+                [ div [ class "json-object" ] (List.map formatPair (filteredPairs pairs)) ]
 
 
 formatFallback : List Bool -> Value -> List (Html msg)
@@ -66,7 +62,7 @@ formatFallback results val =
         if anySuccess then
             []
         else
-            [ span [] [ text (toString val) ] ]
+            [ span [ class "json-other" ] [ text (toString val) ] ]
 
 
 handleFormatError : Result String a -> (a -> List (Html msg)) -> List (Html msg)
