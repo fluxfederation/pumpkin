@@ -48,22 +48,6 @@ html {
   top: 12rem;
 }
 
-.sidebar-bugs:empty {
-  background-image: url(/images/patches-this-way.svg);
-  background-position: center 7rem;
-  background-repeat: no-repeat;
-  background-size: 20rem;
-  opacity: 0.3;
-}
-
-.sidebar-bug-group {
-  padding: 0;
-
-  /* Fix cut-off borders */
-  margin-left: 1px;
-  margin-right: 1px;
-}
-
 .sidebar-bug {
   display: flex;
   flex-direction: row;
