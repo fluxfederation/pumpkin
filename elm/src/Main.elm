@@ -330,7 +330,7 @@ sidebarFilters : Model -> Html Msg
 sidebarFilters model =
     Html.form [ onSubmit SearchSubmit ]
         [ sidebarSearch model
-        , p [ class "panel-block", onClick ToggleMenu, classList [ ( "is-active", model.showMenu ) ] ]
+        , a [ class "panel-block", onClick ToggleMenu, classList [ ( "is-active", model.showMenu ) ] ]
             [ span [ class "panel-icon" ] [ fontAwesome "cog" ]
             , text "Environments"
             ]
