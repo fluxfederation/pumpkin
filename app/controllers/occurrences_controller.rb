@@ -1,5 +1,5 @@
 class OccurrencesController < ApplicationController
-  skip_before_action :redirect_if_not_google_authenticated, only: :create
+  skip_before_action :redirect_if_not_google_authenticated, only: :create if Rails.env.production?
   before_action :authenticate!, only: :create
 
   def index
