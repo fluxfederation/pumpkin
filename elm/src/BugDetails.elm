@@ -33,6 +33,7 @@ type Msg
     | ToggleOccurrence OccurrenceID
     | ToggleTimeFormat
     | TimeTick Time.Time
+    | ToggleLinkIssueForm
 
 
 type alias Model =
@@ -42,6 +43,7 @@ type alias Model =
     , showFullStackTrace : Bool
     , now : Date.Date
     , showTimeAgo : Bool
+    , showLinkIssueForm : Bool
     }
 
 
@@ -73,6 +75,9 @@ update msg model =
             TimeTick time ->
                 noCmd { model | now = (Date.fromTime time) }
 
+            ToggleLinkIssueForm ->
+                noCmd { model | showLinkIssueForm = not model.showLinkIssueForm }
+
 
 fetchOccurrences : BugID -> Maybe Occurrence -> Cmd Msg
 fetchOccurrences bugId occ =
@@ -92,6 +97,7 @@ init bug =
       , showFullStackTrace = False
       , now = (Date.fromTime 0)
       , showTimeAgo = True
+      , showLinkIssueForm = False
       }
     , Cmd.batch
         [ Task.perform TimeTick Time.now
@@ -105,9 +111,15 @@ view model =
     div [ class "box" ]
         [ selectedBugHeader model
         , linkedIssues model.bug
+        , linkIssueForm model
         , stackTraceDisplay model
         , occurrencesDisplay model
         ]
+
+
+linkIssueForm : Model -> Html Msg
+linkIssueForm model =
+    a [ class "tag", onClick ToggleLinkIssueForm ] [ text "+" ]
 
 
 selectedBugHeader : Model -> Html Msg
@@ -162,7 +174,7 @@ linkedIssues bug =
 
 issueHref : Issue -> Html Msg
 issueHref issue =
-    a [ class "linked-issue notification", href issue.url ] [ text issue.url ]
+    a [ class "is-warning tag is-warning", href issue.url ] [ text (issueTitle issue) ]
 
 
 stackTraceDisplay : Model -> Html Msg

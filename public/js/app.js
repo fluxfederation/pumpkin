@@ -15278,6 +15278,20 @@ var _user$project$TimeAgo$timeAgo = F2(
 		}
 	});
 
+var _user$project$ViewCommon$issueTitle = function (issue) {
+	var match = _elm_lang$core$List$head(
+		A3(
+			_elm_lang$core$Regex$find,
+			_elm_lang$core$Regex$AtMost(1),
+			_elm_lang$core$Regex$regex('[0-9a-zA-Z-]+$'),
+			issue.url));
+	var _p0 = match;
+	if (_p0.ctor === 'Just') {
+		return _p0._0.match;
+	} else {
+		return 'Issue';
+	}
+};
 var _user$project$ViewCommon$errorNotification = F2(
 	function (clickmsg, error) {
 		var deleteButton = function (msg) {
@@ -15328,8 +15342,8 @@ var _user$project$ViewCommon$paginatedList = F3(
 				_elm_lang$core$Basics_ops['++'],
 				displayItems(page.items),
 				function () {
-					var _p0 = page.nextItem;
-					if (_p0.ctor === 'Just') {
+					var _p1 = page.nextItem;
+					if (_p1.ctor === 'Just') {
 						return {
 							ctor: '::',
 							_0: A2(
@@ -15340,7 +15354,7 @@ var _user$project$ViewCommon$paginatedList = F3(
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onClick(
-											loadMoreMessage(_p0._0)),
+											loadMoreMessage(_p1._0)),
 										_1: {ctor: '[]'}
 									}
 								},
@@ -15376,8 +15390,8 @@ var _user$project$ViewCommon$bugErrorClass = function (bug) {
 var _user$project$ViewCommon$paginatedChunkList = F3(
 	function (displayItems, chunkList, loadMoreMessage) {
 		var showChunk = function (remoteChunk) {
-			var _p1 = remoteChunk;
-			switch (_p1.ctor) {
+			var _p2 = remoteChunk;
+			switch (_p2.ctor) {
 				case 'NotAsked':
 					return A2(
 						_elm_lang$html$Html$div,
@@ -15406,16 +15420,16 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 							_1: {ctor: '[]'}
 						});
 				default:
-					var _p3 = _p1._0;
+					var _p4 = _p2._0;
 					return A2(
 						_elm_lang$html$Html$div,
 						{ctor: '[]'},
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							displayItems(_p3.items),
+							displayItems(_p4.items),
 							function () {
-								var _p2 = _p3.nextItem;
-								if (_p2.ctor === 'Just') {
+								var _p3 = _p4.nextItem;
+								if (_p3.ctor === 'Just') {
 									return {
 										ctor: '::',
 										_0: A2(
@@ -15427,7 +15441,7 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 													ctor: '::',
 													_0: _elm_lang$html$Html_Events$onClick(
 														loadMoreMessage(
-															_elm_lang$core$Maybe$Just(_p2._0))),
+															_elm_lang$core$Maybe$Just(_p3._0))),
 													_1: {ctor: '[]'}
 												}
 											},
@@ -15689,7 +15703,7 @@ var _user$project$BugDetails$issueHref = function (issue) {
 		_elm_lang$html$Html$a,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('linked-issue notification'),
+			_0: _elm_lang$html$Html_Attributes$class('is-warning tag is-warning'),
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Attributes$href(issue.url),
@@ -15698,7 +15712,8 @@ var _user$project$BugDetails$issueHref = function (issue) {
 		},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(issue.url),
+			_0: _elm_lang$html$Html$text(
+				_user$project$ViewCommon$issueTitle(issue)),
 			_1: {ctor: '[]'}
 		});
 };
@@ -15764,10 +15779,29 @@ var _user$project$BugDetails$occurrenceCount = function (bug) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$BugDetails$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f};
+var _user$project$BugDetails$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, showLinkIssueForm: g};
 	});
+var _user$project$BugDetails$ToggleLinkIssueForm = {ctor: 'ToggleLinkIssueForm'};
+var _user$project$BugDetails$linkIssueForm = function (model) {
+	return A2(
+		_elm_lang$html$Html$a,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('tag'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleLinkIssueForm),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('+'),
+			_1: {ctor: '[]'}
+		});
+};
 var _user$project$BugDetails$TimeTick = function (a) {
 	return {ctor: 'TimeTick', _0: a};
 };
@@ -16104,13 +16138,18 @@ var _user$project$BugDetails$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{showTimeAgo: !model.showTimeAgo}));
-			default:
+			case 'TimeTick':
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
 							now: _elm_lang$core$Date$fromTime(_p1._0)
 						}));
+			default:
+				return noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showLinkIssueForm: !model.showLinkIssueForm}));
 		}
 	});
 var _user$project$BugDetails$init = function (bug) {
@@ -16126,7 +16165,8 @@ var _user$project$BugDetails$init = function (bug) {
 			expandedOccurrences: {ctor: '[]'},
 			showFullStackTrace: false,
 			now: _elm_lang$core$Date$fromTime(0),
-			showTimeAgo: true
+			showTimeAgo: true,
+			showLinkIssueForm: false
 		},
 		_1: _elm_lang$core$Platform_Cmd$batch(
 			{
@@ -16256,11 +16296,15 @@ var _user$project$BugDetails$view = function (model) {
 				_0: _user$project$BugDetails$linkedIssues(model.bug),
 				_1: {
 					ctor: '::',
-					_0: _user$project$BugDetails$stackTraceDisplay(model),
+					_0: _user$project$BugDetails$linkIssueForm(model),
 					_1: {
 						ctor: '::',
-						_0: _user$project$BugDetails$occurrencesDisplay(model),
-						_1: {ctor: '[]'}
+						_0: _user$project$BugDetails$stackTraceDisplay(model),
+						_1: {
+							ctor: '::',
+							_0: _user$project$BugDetails$occurrencesDisplay(model),
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
@@ -16309,20 +16353,6 @@ var _user$project$BugList$bugGroups = F2(
 		};
 		return A2(_elm_lang$core$List$map, group, groupNames);
 	});
-var _user$project$BugList$issueTitle = function (issue) {
-	var match = _elm_lang$core$List$head(
-		A3(
-			_elm_lang$core$Regex$find,
-			_elm_lang$core$Regex$AtMost(1),
-			_elm_lang$core$Regex$regex('[0-9a-zA-Z-]+$'),
-			issue.url));
-	var _p0 = match;
-	if (_p0.ctor === 'Just') {
-		return _p0._0.match;
-	} else {
-		return issue.url;
-	}
-};
 var _user$project$BugList$issueHref = function (issue) {
 	return A2(
 		_elm_lang$html$Html$a,
@@ -16338,7 +16368,7 @@ var _user$project$BugList$issueHref = function (issue) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html$text(
-				_user$project$BugList$issueTitle(issue)),
+				_user$project$ViewCommon$issueTitle(issue)),
 			_1: {ctor: '[]'}
 		});
 };
@@ -16479,11 +16509,11 @@ var _user$project$BugList$sidebarBug = F2(
 			});
 	});
 var _user$project$BugList$sidebarBugGroup = F2(
-	function (model, _p1) {
-		var _p2 = _p1;
-		var _p3 = _p2._1;
+	function (model, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1._1;
 		return (_elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$List$length(_p3),
+			_elm_lang$core$List$length(_p2),
 			0) > 0) ? {
 			ctor: '::',
 			_0: A2(
@@ -16495,7 +16525,7 @@ var _user$project$BugList$sidebarBugGroup = F2(
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p2._0),
+					_0: _elm_lang$html$Html$text(_p1._0),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -16510,7 +16540,7 @@ var _user$project$BugList$sidebarBugGroup = F2(
 					A2(
 						_elm_lang$core$List$map,
 						_user$project$BugList$sidebarBug(model),
-						_p3)),
+						_p2)),
 				_1: {ctor: '[]'}
 			}
 		} : {ctor: '[]'};
@@ -16533,8 +16563,8 @@ var _user$project$BugList$view = function (model) {
 		{
 			ctor: '::',
 			_0: function () {
-				var _p4 = _elm_lang$core$List$head(model.bugs);
-				if ((_p4.ctor === 'Just') && (_p4._0.ctor === 'Loading')) {
+				var _p3 = _elm_lang$core$List$head(model.bugs);
+				if ((_p3.ctor === 'Just') && (_p3._0.ctor === 'Loading')) {
 					return _user$project$ViewCommon$spinner;
 				} else {
 					return A3(
@@ -16591,33 +16621,33 @@ var _user$project$BugList$init = F2(
 	});
 var _user$project$BugList$update = F2(
 	function (msg, model) {
-		var _p5 = msg;
-		switch (_p5.ctor) {
+		var _p4 = msg;
+		switch (_p4.ctor) {
 			case 'LoadedBugs':
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							bugs: A2(_user$project$ChunkList$update, model.bugs, _p5._0)
+							bugs: A2(_user$project$ChunkList$update, model.bugs, _p4._0)
 						}));
 			case 'LoadMoreBugs':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_user$project$BugList$fetchBugs, model.filter, _p5._0)
+					_1: A2(_user$project$BugList$fetchBugs, model.filter, _p4._0)
 				};
 			case 'TimeTick':
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							now: _elm_lang$core$Date$fromTime(_p5._0)
+							now: _elm_lang$core$Date$fromTime(_p4._0)
 						}));
 			default:
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selected: _p5._0}));
+						{selected: _p4._0}));
 		}
 	});
 

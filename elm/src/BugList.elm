@@ -25,7 +25,6 @@ import Date.Extra.Period as Period
 import ChunkList exposing (ChunkList)
 import RemoteData exposing (WebData)
 import Task
-import Regex exposing (..)
 
 
 type Msg
@@ -154,20 +153,6 @@ linkedIssues bug =
 issueHref : Issue -> Html Msg
 issueHref issue =
     a [ href issue.url, class "is-warning tag" ] [ text (issueTitle issue) ]
-
-
-issueTitle : Issue -> String
-issueTitle issue =
-    let
-        match =
-            List.head (find (AtMost 1) (regex "[0-9a-zA-Z-]+$") issue.url)
-    in
-        case match of
-            Just m ->
-                m.match
-
-            Nothing ->
-                issue.url
 
 
 sidebarBug : Model -> Bug -> Html Msg
