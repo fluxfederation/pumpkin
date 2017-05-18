@@ -15641,7 +15641,7 @@ var _user$project$FormatData$formatPairs = F2(
 var _user$project$BugDetails$filterStackTrace = F2(
 	function (model, stackTrace) {
 		var showLine = function (line) {
-			return model.showFullStackTrace ? true : (!A2(_elm_lang$core$String$contains, '/lib/ruby/gems', line));
+			return model.showFullStackTrace ? true : (!A2(_elm_lang$core$String$contains, '/gems/', line));
 		};
 		var _p0 = stackTrace;
 		if (_p0.ctor === 'Just') {
@@ -15978,42 +15978,27 @@ var _user$project$BugDetails$stackTraceDisplay = function (model) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$classList(
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showFullStackTrace},
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleFullStackTrace),
+										_1: {ctor: '[]'}
+									}
+								}
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Show Context'),
+								_0: _elm_lang$html$Html$text('Full Trace'),
 								_1: {ctor: '[]'}
 							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$button,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$classList(
-											{
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showFullStackTrace},
-												_1: {ctor: '[]'}
-											}),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleFullStackTrace),
-											_1: {ctor: '[]'}
-										}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Full Trace'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
+						_1: {ctor: '[]'}
 					}
 				}),
 			_1: {

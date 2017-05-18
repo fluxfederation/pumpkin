@@ -172,7 +172,6 @@ stackTraceDisplay model =
         div [ class "section" ]
             [ div [ class "section-title" ]
                 [ h3 [ class "menu-label" ] [ text "Stack Trace" ]
-                , button [ class "button is-small is-primary is-inverted" ] [ text "Show Context" ]
                 , button
                     [ class "button is-small is-primary is-inverted"
                     , classList [ ( "is-active", model.showFullStackTrace ) ]
@@ -196,7 +195,7 @@ filterStackTrace model stackTrace =
             if model.showFullStackTrace then
                 True
             else
-                not (String.contains "/lib/ruby/gems" line)
+                not (String.contains "/gems/" line)
     in
         case stackTrace of
             Just lines ->
