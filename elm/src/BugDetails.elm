@@ -119,6 +119,7 @@ selectedBugHeader model =
             ]
         , div [ class "has-text-right" ]
             [ occurrenceCount model.bug
+            , closedLabel model.bug
             , p []
                 [ button
                     [ class "button is-primary is-inverted"
@@ -132,6 +133,18 @@ selectedBugHeader model =
                 ]
             ]
         ]
+
+
+closedLabel : Bug -> Html Msg
+closedLabel bug =
+    let
+        blankTag =
+            span [] []
+
+        closedTag =
+            span [ class "tag is-danger" ] [ text "Closed" ]
+    in
+        Maybe.withDefault blankTag <| Maybe.map (\x -> closedTag) bug.closedAt
 
 
 occurrenceCount : Bug -> Html Msg

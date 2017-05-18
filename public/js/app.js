@@ -15145,8 +15145,9 @@ var _user$project$Rest$loadOccurrences = F2(
 			A3(_user$project$Rest$occurrencesUrl, bugId, _user$project$Rest$defaultPageSize, start),
 			A2(_user$project$Rest$decodeChunk, _user$project$Rest$defaultPageSize, _user$project$Rest$decodeOccurrence));
 	});
-var _user$project$Rest$openBugsUrl = F4(
-	function (environmentIds, limit, startFrom, search) {
+var _user$project$Rest$bugsUrl = F5(
+	function (environmentIds, includeClosedBugs, limit, startFrom, search) {
+		var closedParam = includeClosedBugs ? 'true' : 'false';
 		return A2(
 			_user$project$Rest$addParams,
 			'/bugs',
@@ -15154,7 +15155,7 @@ var _user$project$Rest$openBugsUrl = F4(
 				_elm_lang$core$Basics_ops['++'],
 				{
 					ctor: '::',
-					_0: A2(_user$project$Rest$Param, 'closed', 'false'),
+					_0: A2(_user$project$Rest$Param, 'closed', closedParam),
 					_1: {
 						ctor: '::',
 						_0: A2(_user$project$Rest$Param, 'search', search),
@@ -15171,24 +15172,10 @@ var _user$project$Rest$openBugsUrl = F4(
 						},
 						A2(_elm_lang$core$List$map, _user$project$Rest$envIDToParam, environmentIds)))));
 	});
-var _user$project$Rest$allBugsUrl = F3(
-	function (limit, startFrom, search) {
-		return A2(
-			_user$project$Rest$addParams,
-			'/bugs',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				A3(_user$project$Rest$pageParams, _user$project$Rest$bugIDToParam, limit, startFrom),
-				{
-					ctor: '::',
-					_0: A2(_user$project$Rest$Param, 'search', search),
-					_1: {ctor: '[]'}
-				}));
-	});
 var _user$project$Rest$loadBugs = F4(
 	function (environmentIds, includeClosedBugs, startFrom, search) {
 		var pageSize = _user$project$Rest$defaultPageSize;
-		var url = includeClosedBugs ? A3(_user$project$Rest$allBugsUrl, pageSize + 1, startFrom, search) : A4(_user$project$Rest$openBugsUrl, environmentIds, pageSize + 1, startFrom, search);
+		var url = A5(_user$project$Rest$bugsUrl, environmentIds, includeClosedBugs, pageSize + 1, startFrom, search);
 		return A2(
 			_elm_lang$http$Http$get,
 			url,
@@ -15741,6 +15728,33 @@ var _user$project$BugDetails$occurrenceCount = function (bug) {
 			_1: {ctor: '[]'}
 		});
 };
+var _user$project$BugDetails$closedLabel = function (bug) {
+	var closedTag = A2(
+		_elm_lang$html$Html$span,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('tag is-danger'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Closed'),
+			_1: {ctor: '[]'}
+		});
+	var blankTag = A2(
+		_elm_lang$html$Html$span,
+		{ctor: '[]'},
+		{ctor: '[]'});
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		blankTag,
+		A2(
+			_elm_lang$core$Maybe$map,
+			function (x) {
+				return closedTag;
+			},
+			bug.closedAt));
+};
 var _user$project$BugDetails$Model = F6(
 	function (a, b, c, d, e, f) {
 		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f};
@@ -15816,47 +15830,51 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 						_0: _user$project$BugDetails$occurrenceCount(model.bug),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$p,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$button,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('button is-primary is-inverted'),
-											_1: {
+							_0: _user$project$BugDetails$closedLabel(model.bug),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$p,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$button,
+											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$classList(
-													{
+												_0: _elm_lang$html$Html_Attributes$class('button is-primary is-inverted'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$classList(
+														{
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'is-active', _1: !model.showTimeAgo},
+															_1: {ctor: '[]'}
+														}),
+													_1: {
 														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'is-active', _1: !model.showTimeAgo},
+														_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleTimeFormat),
 														_1: {ctor: '[]'}
-													}),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleTimeFormat),
-													_1: {ctor: '[]'}
+													}
 												}
-											}
-										},
-										{
-											ctor: '::',
-											_0: A2(_user$project$ViewCommon$icon, 'clock-o', ''),
-											_1: {
+											},
+											{
 												ctor: '::',
-												_0: _elm_lang$html$Html$text(' '),
+												_0: A2(_user$project$ViewCommon$icon, 'clock-o', ''),
 												_1: {
 													ctor: '::',
-													_0: _user$project$BugDetails$bugTimes(model),
-													_1: {ctor: '[]'}
+													_0: _elm_lang$html$Html$text(' '),
+													_1: {
+														ctor: '::',
+														_0: _user$project$BugDetails$bugTimes(model),
+														_1: {ctor: '[]'}
+													}
 												}
-											}
-										}),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
 						}
 					}),
 				_1: {ctor: '[]'}
@@ -16606,6 +16624,10 @@ var _user$project$Main$handleResult = F3(
 	});
 var _user$project$Main$delta2url = F2(
 	function (_p1, model) {
+		var showClosedBugs = A2(
+			_user$project$Rest$Param,
+			'showClosedBugs',
+			model.showClosedBugs ? 'true' : 'false');
 		var selectedBug = A2(
 			_elm_lang$core$Maybe$map,
 			function (bugModel) {
@@ -16629,15 +16651,22 @@ var _user$project$Main$delta2url = F2(
 				url: A2(
 					_user$project$Rest$addParams,
 					'/',
-					_elm_community$maybe_extra$Maybe_Extra$values(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_community$maybe_extra$Maybe_Extra$values(
+							{
+								ctor: '::',
+								_0: selectedEnvironments,
+								_1: {
+									ctor: '::',
+									_0: selectedBug,
+									_1: {ctor: '[]'}
+								}
+							}),
 						{
 							ctor: '::',
-							_0: selectedEnvironments,
-							_1: {
-								ctor: '::',
-								_0: selectedBug,
-								_1: {ctor: '[]'}
-							}
+							_0: showClosedBugs,
+							_1: {ctor: '[]'}
 						}))
 			});
 	});
@@ -16780,6 +16809,7 @@ var _user$project$Main$sidebarSearch = function (model) {
 		});
 };
 var _user$project$Main$ToggleMenu = {ctor: 'ToggleMenu'};
+var _user$project$Main$ToggleShowClosedBugs = {ctor: 'ToggleShowClosedBugs'};
 var _user$project$Main$ClearError = {ctor: 'ClearError'};
 var _user$project$Main$errorMessages = function (model) {
 	var _p4 = model.error;
@@ -16869,21 +16899,13 @@ var _user$project$Main$update = F2(
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{error: _elm_lang$core$Maybe$Nothing}));
-				case 'ShowClosedBugs':
+				case 'ToggleShowClosedBugs':
 					var _v10 = _user$project$Main$SearchSubmit,
 						_v11 = _elm_lang$core$Native_Utils.update(
 						model,
-						{showClosedBugs: true});
+						{showClosedBugs: !model.showClosedBugs});
 					msg = _v10;
 					model = _v11;
-					continue update;
-				case 'HideClosedBugs':
-					var _v12 = _user$project$Main$SearchSubmit,
-						_v13 = _elm_lang$core$Native_Utils.update(
-						model,
-						{showClosedBugs: false});
-					msg = _v12;
-					model = _v13;
 					continue update;
 				case 'ToggleMenu':
 					return _user$project$Main$noCmd(
@@ -16974,8 +16996,6 @@ var _user$project$Main$update = F2(
 			}
 		}
 	});
-var _user$project$Main$HideClosedBugs = {ctor: 'HideClosedBugs'};
-var _user$project$Main$ShowClosedBugs = {ctor: 'ShowClosedBugs'};
 var _user$project$Main$SetSelectedEnvironmentIds = function (a) {
 	return {ctor: 'SetSelectedEnvironmentIds', _0: a};
 };
@@ -17171,13 +17191,13 @@ var _user$project$Main$sidebarFilters = function (model) {
 						_0: _elm_lang$html$Html_Attributes$class('panel-block'),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleMenu),
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleShowClosedBugs),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$classList(
 									{
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showMenu},
+										_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showClosedBugs},
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
@@ -17195,19 +17215,62 @@ var _user$project$Main$sidebarFilters = function (model) {
 							},
 							{
 								ctor: '::',
-								_0: _user$project$ViewCommon$fontAwesome('cog'),
+								_0: _user$project$ViewCommon$fontAwesome('eye'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Environments'),
+							_0: _elm_lang$html$Html$text('Show Closed Bugs'),
 							_1: {ctor: '[]'}
 						}
 					}),
 				_1: {
 					ctor: '::',
-					_0: model.showMenu ? _user$project$Main$sidebarMenu(model) : _user$project$Main$currentEnvironmentsAsTags(model),
-					_1: {ctor: '[]'}
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('panel-block'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleMenu),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$classList(
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showMenu},
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$span,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('panel-icon'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _user$project$ViewCommon$fontAwesome('cog'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Environments'),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: model.showMenu ? _user$project$Main$sidebarMenu(model) : _user$project$Main$currentEnvironmentsAsTags(model),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});

@@ -29,11 +29,10 @@ type Msg
     = LoadedEnvironments (WebData (List Environment))
     | ShowEnvironmentBugs EnvironmentID Bool
     | SetSelectedEnvironmentIds (List EnvironmentID)
-    | ShowClosedBugs
-    | HideClosedBugs
     | LoadedDetails (WebData Bug)
     | RequestDetails BugID
     | ClearError
+    | ToggleShowClosedBugs
     | ToggleMenu
     | SearchChange String
     | SearchSubmit
@@ -123,10 +122,17 @@ delta2url _ model =
 
         selectedBug =
             Maybe.map (\bugModel -> Rest.Param "bug" (Rest.bugIDToParam bugModel.bug.id)) (RemoteData.toMaybe model.focusedBug)
+
+        showClosedBugs =
+            Rest.Param "showClosedBugs" <|
+                if model.showClosedBugs then
+                    "true"
+                else
+                    "false"
     in
         Just
             { entry = NewEntry
-            , url = Rest.addParams "/" (MaybeX.values [ selectedEnvironments, selectedBug ])
+            , url = Rest.addParams "/" <| (MaybeX.values [ selectedEnvironments, selectedBug ]) ++ [ showClosedBugs ]
             }
 
 
@@ -232,11 +238,8 @@ update msg model =
         ClearError ->
             noCmd { model | error = Nothing }
 
-        ShowClosedBugs ->
-            update SearchSubmit { model | showClosedBugs = True }
-
-        HideClosedBugs ->
-            update SearchSubmit { model | showClosedBugs = False }
+        ToggleShowClosedBugs ->
+            update SearchSubmit { model | showClosedBugs = not model.showClosedBugs }
 
         ToggleMenu ->
             noCmd { model | showMenu = not model.showMenu }
@@ -330,6 +333,10 @@ sidebarFilters : Model -> Html Msg
 sidebarFilters model =
     Html.form [ onSubmit SearchSubmit ]
         [ sidebarSearch model
+        , a [ class "panel-block", onClick ToggleShowClosedBugs, classList [ ( "is-active", model.showClosedBugs ) ] ]
+            [ span [ class "panel-icon" ] [ fontAwesome "eye" ]
+            , text "Show Closed Bugs"
+            ]
         , a [ class "panel-block", onClick ToggleMenu, classList [ ( "is-active", model.showMenu ) ] ]
             [ span [ class "panel-icon" ] [ fontAwesome "cog" ]
             , text "Environments"
