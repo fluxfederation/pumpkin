@@ -16309,6 +16309,45 @@ var _user$project$BugList$bugGroups = F2(
 		};
 		return A2(_elm_lang$core$List$map, group, groupNames);
 	});
+var _user$project$BugList$issueTitle = function (issue) {
+	var match = _elm_lang$core$List$head(
+		A3(
+			_elm_lang$core$Regex$find,
+			_elm_lang$core$Regex$AtMost(1),
+			_elm_lang$core$Regex$regex('[0-9a-zA-Z-]+$'),
+			issue.url));
+	var _p0 = match;
+	if (_p0.ctor === 'Just') {
+		return _p0._0.match;
+	} else {
+		return issue.url;
+	}
+};
+var _user$project$BugList$issueHref = function (issue) {
+	return A2(
+		_elm_lang$html$Html$a,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$href(issue.url),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('is-warning tag'),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(
+				_user$project$BugList$issueTitle(issue)),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$BugList$linkedIssues = function (bug) {
+	return A2(
+		_elm_lang$html$Html$span,
+		{ctor: '[]'},
+		A2(_elm_lang$core$List$map, _user$project$BugList$issueHref, bug.issues));
+};
 var _user$project$BugList$allBugs = function (model) {
 	return _user$project$ChunkList$items(model.bugs);
 };
@@ -16342,18 +16381,7 @@ var _user$project$BugList$sidebarBug = F2(
 		var isSelected = _elm_lang$core$Native_Utils.eq(
 			model.selected,
 			_elm_lang$core$Maybe$Just(bug.id));
-		var issueTag = A2(
-			_elm_lang$html$Html$span,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('tag is-warning'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('CI-000'),
-				_1: {ctor: '[]'}
-			});
+		var issueTag = _user$project$BugList$linkedIssues(bug);
 		return A2(
 			_elm_lang$html$Html$a,
 			{
@@ -16451,11 +16479,11 @@ var _user$project$BugList$sidebarBug = F2(
 			});
 	});
 var _user$project$BugList$sidebarBugGroup = F2(
-	function (model, _p0) {
-		var _p1 = _p0;
-		var _p2 = _p1._1;
+	function (model, _p1) {
+		var _p2 = _p1;
+		var _p3 = _p2._1;
 		return (_elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$List$length(_p2),
+			_elm_lang$core$List$length(_p3),
 			0) > 0) ? {
 			ctor: '::',
 			_0: A2(
@@ -16467,7 +16495,7 @@ var _user$project$BugList$sidebarBugGroup = F2(
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p1._0),
+					_0: _elm_lang$html$Html$text(_p2._0),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -16482,7 +16510,7 @@ var _user$project$BugList$sidebarBugGroup = F2(
 					A2(
 						_elm_lang$core$List$map,
 						_user$project$BugList$sidebarBug(model),
-						_p2)),
+						_p3)),
 				_1: {ctor: '[]'}
 			}
 		} : {ctor: '[]'};
@@ -16505,8 +16533,8 @@ var _user$project$BugList$view = function (model) {
 		{
 			ctor: '::',
 			_0: function () {
-				var _p3 = _elm_lang$core$List$head(model.bugs);
-				if ((_p3.ctor === 'Just') && (_p3._0.ctor === 'Loading')) {
+				var _p4 = _elm_lang$core$List$head(model.bugs);
+				if ((_p4.ctor === 'Just') && (_p4._0.ctor === 'Loading')) {
 					return _user$project$ViewCommon$spinner;
 				} else {
 					return A3(
@@ -16563,33 +16591,33 @@ var _user$project$BugList$init = F2(
 	});
 var _user$project$BugList$update = F2(
 	function (msg, model) {
-		var _p4 = msg;
-		switch (_p4.ctor) {
+		var _p5 = msg;
+		switch (_p5.ctor) {
 			case 'LoadedBugs':
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							bugs: A2(_user$project$ChunkList$update, model.bugs, _p4._0)
+							bugs: A2(_user$project$ChunkList$update, model.bugs, _p5._0)
 						}));
 			case 'LoadMoreBugs':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_user$project$BugList$fetchBugs, model.filter, _p4._0)
+					_1: A2(_user$project$BugList$fetchBugs, model.filter, _p5._0)
 				};
 			case 'TimeTick':
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							now: _elm_lang$core$Date$fromTime(_p4._0)
+							now: _elm_lang$core$Date$fromTime(_p5._0)
 						}));
 			default:
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selected: _p4._0}));
+						{selected: _p5._0}));
 		}
 	});
 

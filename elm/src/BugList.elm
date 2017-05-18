@@ -22,10 +22,10 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra.Period as Period
-import Types exposing (..)
 import ChunkList exposing (ChunkList)
 import RemoteData exposing (WebData)
 import Task
+import Regex exposing (..)
 
 
 type Msg
@@ -146,11 +146,35 @@ sidebarBugGroup model ( label, bugs ) =
         []
 
 
+linkedIssues : Bug -> Html Msg
+linkedIssues bug =
+    span [] (List.map issueHref bug.issues)
+
+
+issueHref : Issue -> Html Msg
+issueHref issue =
+    a [ href issue.url, class "is-warning tag" ] [ text (issueTitle issue) ]
+
+
+issueTitle : Issue -> String
+issueTitle issue =
+    let
+        match =
+            List.head (find (AtMost 1) (regex "[0-9a-zA-Z-]+$") issue.url)
+    in
+        case match of
+            Just m ->
+                m.match
+
+            Nothing ->
+                issue.url
+
+
 sidebarBug : Model -> Bug -> Html Msg
 sidebarBug model bug =
     let
         issueTag =
-            span [ class "tag is-warning" ] [ text "CI-000" ]
+            linkedIssues bug
 
         isSelected =
             model.selected == Just bug.id
