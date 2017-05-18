@@ -2,6 +2,7 @@ class Bug < ApplicationRecord
   belongs_to :primary_occurrence, class_name: 'Occurrence'
   has_many :events
   has_many :occurrences
+  has_many :issues
 
   belongs_to :latest_event, class_name: 'Event', optional: true
 
