@@ -135,7 +135,7 @@ decodeBug =
             (field "last_occurred_at" date)
             (field "occurrence_count" int)
             (field "closed_at" (maybe date))
-            (field "issue_url" (maybe string))
+            (field "issues" (list decodeIssue))
         )
         stacktrace
 
@@ -171,6 +171,19 @@ decodeOccurrence =
 stacktrace : Decoder (Maybe (List String))
 stacktrace =
     maybe <| at [ "data", "exception", "backtrace" ] (list string)
+
+
+decodeIssue : Decoder Issue
+decodeIssue =
+    map3 Issue
+        (field "id" decodeIssueID)
+        (field "bug_id" decodeBugID)
+        (field "url" string)
+
+
+decodeIssueID : Decoder IssueID
+decodeIssueID =
+    map IssueID decodeUUID
 
 
 event : Decoder Event

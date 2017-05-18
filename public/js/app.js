@@ -14863,11 +14863,15 @@ var _user$project$Types$Environment = function (a) {
 };
 var _user$project$Types$Bug = F9(
 	function (a, b, c, d, e, f, g, h, i) {
-		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, issueUrl: h, stackTrace: i};
+		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, issues: h, stackTrace: i};
 	});
 var _user$project$Types$Occurrence = F5(
 	function (a, b, c, d, e) {
 		return {id: a, environmentId: b, message: c, occurredAt: d, data: e};
+	});
+var _user$project$Types$Issue = F3(
+	function (a, b, c) {
+		return {id: a, bug_id: b, url: c};
 	});
 var _user$project$Types$EnvironmentID = function (a) {
 	return {ctor: 'EnvironmentID', _0: a};
@@ -14877,6 +14881,9 @@ var _user$project$Types$BugID = function (a) {
 };
 var _user$project$Types$OccurrenceID = function (a) {
 	return {ctor: 'OccurrenceID', _0: a};
+};
+var _user$project$Types$IssueID = function (a) {
+	return {ctor: 'IssueID', _0: a};
 };
 
 var _user$project$ChunkList$items = function (chunks) {
@@ -15007,6 +15014,13 @@ var _user$project$Rest$decodeEnvironment = A2(
 var _user$project$Rest$decodeUUID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$UUID, _elm_lang$core$Json_Decode$string);
 var _user$project$Rest$decodeBugID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$BugID, _user$project$Rest$decodeUUID);
 var _user$project$Rest$decodeOccurrenceID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$OccurrenceID, _user$project$Rest$decodeUUID);
+var _user$project$Rest$decodeIssueID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$IssueID, _user$project$Rest$decodeUUID);
+var _user$project$Rest$decodeIssue = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_user$project$Types$Issue,
+	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeIssueID),
+	A2(_elm_lang$core$Json_Decode$field, 'bug_id', _user$project$Rest$decodeBugID),
+	A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string));
 var _user$project$Rest$decodeEnvironments = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeEnvironment);
 var _user$project$Rest$date = function () {
 	var decodeDateFromString = function (s) {
@@ -15041,8 +15055,8 @@ var _user$project$Rest$decodeBug = A3(
 			_elm_lang$core$Json_Decode$maybe(_user$project$Rest$date)),
 		A2(
 			_elm_lang$core$Json_Decode$field,
-			'issue_url',
-			_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string))),
+			'issues',
+			_elm_lang$core$Json_Decode$list(_user$project$Rest$decodeIssue))),
 	_user$project$Rest$stacktrace);
 var _user$project$Rest$closeBug = function (bugId) {
 	return A3(
@@ -15670,7 +15684,7 @@ var _user$project$BugDetails$stackTraceLine = function (line) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$BugDetails$linkedIssue = function (bug) {
+var _user$project$BugDetails$issueHref = function (issue) {
 	return A2(
 		_elm_lang$html$Html$a,
 		{
@@ -15678,31 +15692,25 @@ var _user$project$BugDetails$linkedIssue = function (bug) {
 			_0: _elm_lang$html$Html_Attributes$class('linked-issue notification'),
 			_1: {
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$href(
-					A2(_elm_lang$core$Maybe$withDefault, '#', bug.issueUrl)),
+				_0: _elm_lang$html$Html_Attributes$href(issue.url),
 				_1: {ctor: '[]'}
 			}
 		},
 		{
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$span,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('description'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Link to issue'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(_user$project$ViewCommon$icon, 'cog', ''),
-				_1: {ctor: '[]'}
-			}
+			_0: _elm_lang$html$Html$text(issue.url),
+			_1: {ctor: '[]'}
 		});
+};
+var _user$project$BugDetails$linkedIssues = function (bug) {
+	return A2(
+		_elm_lang$html$Html$span,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('linked-issues'),
+			_1: {ctor: '[]'}
+		},
+		A2(_elm_lang$core$List$map, _user$project$BugDetails$issueHref, bug.issues));
 };
 var _user$project$BugDetails$date = F2(
 	function (model, date) {
@@ -16245,7 +16253,7 @@ var _user$project$BugDetails$view = function (model) {
 			_0: _user$project$BugDetails$selectedBugHeader(model),
 			_1: {
 				ctor: '::',
-				_0: _user$project$BugDetails$linkedIssue(model.bug),
+				_0: _user$project$BugDetails$linkedIssues(model.bug),
 				_1: {
 					ctor: '::',
 					_0: _user$project$BugDetails$stackTraceDisplay(model),
@@ -16950,7 +16958,10 @@ var _user$project$Main$update = F2(
 					};
 				case 'BugListMsg':
 					var _p13 = _p5._0;
-					var _p11 = A2(_user$project$BugList$update, _p13, model.bugList);
+					var _p11 = A2(
+						_elm_lang$core$Debug$log,
+						'message handling',
+						A2(_user$project$BugList$update, _p13, model.bugList));
 					var newBugList = _p11._0;
 					var listCmd = _p11._1;
 					return {

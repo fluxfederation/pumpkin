@@ -8,7 +8,7 @@ class BugsController < ApplicationController
       limit: params[:limit],
       start: params[:start]
     )
-    render json: search.bugs, include: []
+    render json: search.bugs, include: [:issues]
   end
 
   def show

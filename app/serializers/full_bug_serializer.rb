@@ -1,6 +1,4 @@
 class FullBugSerializer < BugSerializer
-  has_many :issues
-
   attributes :data
 
   def data

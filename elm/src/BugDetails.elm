@@ -104,7 +104,7 @@ view : Model -> Html Msg
 view model =
     div [ class "box" ]
         [ selectedBugHeader model
-        , linkedIssue model.bug
+        , linkedIssues model.bug
         , stackTraceDisplay model
         , occurrencesDisplay model
         ]
@@ -155,12 +155,14 @@ date model date =
     formatDate model.showTimeAgo model.now date
 
 
-linkedIssue : Bug -> Html Msg
-linkedIssue bug =
-    a [ class "linked-issue notification", href (Maybe.withDefault "#" bug.issueUrl) ]
-        [ span [ class "description" ] [ text "Link to issue" ]
-        , icon "cog" ""
-        ]
+linkedIssues : Bug -> Html Msg
+linkedIssues bug =
+    span [ class "linked-issues" ] (List.map issueHref bug.issues)
+
+
+issueHref : Issue -> Html Msg
+issueHref issue =
+    a [ class "linked-issue notification", href issue.url ] [ text issue.url ]
 
 
 stackTraceDisplay : Model -> Html Msg
