@@ -24,6 +24,12 @@ prod_new_unassigned:
   message: "It's a whole new world"
   data: {"admin_id":5}
 
+qa_new_unassigned:
+  environment_id: "QA"
+  occurred_at: "2016-01-01"
+  message: "It's a whole new world"
+  data: {"admin_id":5}
+
 prod_twice1:
   environment_id: "Production"
   bug: prod_twice
