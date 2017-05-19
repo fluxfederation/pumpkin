@@ -14977,7 +14977,7 @@ var _user$project$Rest$unlinkIssueUrl = F2(
 					'/issues/',
 					A2(_elm_lang$core$Basics_ops['++'], _p3._0.toString, '/unlink'))));
 	});
-var _user$project$Rest$linkIssueUrl = F2(
+var _user$project$Rest$createIssueUrl = F2(
 	function (_p4, issueUrl) {
 		var _p5 = _p4;
 		return A2(
@@ -14986,7 +14986,7 @@ var _user$project$Rest$linkIssueUrl = F2(
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				_p5._0.toString,
-				A2(_elm_lang$core$Basics_ops['++'], '/issues/link', issueUrl)));
+				A2(_elm_lang$core$Basics_ops['++'], '/create_issue?url=', issueUrl)));
 	});
 var _user$project$Rest$closeBugUrl = function (_p6) {
 	var _p7 = _p6;
@@ -15091,11 +15091,11 @@ var _user$project$Rest$closeBug = function (bugId) {
 		_elm_lang$http$Http$emptyBody,
 		_user$project$Rest$decodeBug);
 };
-var _user$project$Rest$linkIssue = F2(
+var _user$project$Rest$createIssue = F2(
 	function (bugId, url) {
 		return A3(
 			_elm_lang$http$Http$post,
-			A2(_user$project$Rest$linkIssueUrl, bugId, url),
+			A2(_user$project$Rest$createIssueUrl, bugId, url),
 			_elm_lang$http$Http$emptyBody,
 			_user$project$Rest$decodeBug);
 	});
@@ -15786,7 +15786,7 @@ var _user$project$BugDetails$occurrenceCount = function (bug) {
 };
 var _user$project$BugDetails$Model = F8(
 	function (a, b, c, d, e, f, g, h) {
-		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, showLinkIssueForm: g, issueToLink: h};
+		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, showCreateIssueForm: g, issueToLink: h};
 	});
 var _user$project$BugDetails$UpdateIssueUrl = function (a) {
 	return {ctor: 'UpdateIssueUrl', _0: a};
@@ -15794,15 +15794,15 @@ var _user$project$BugDetails$UpdateIssueUrl = function (a) {
 var _user$project$BugDetails$LinkedIssue = function (a) {
 	return {ctor: 'LinkedIssue', _0: a};
 };
-var _user$project$BugDetails$linkIssue = F2(
+var _user$project$BugDetails$createIssue = F2(
 	function (bugId, issueUrl) {
 		return A2(
 			_user$project$Rest$fetch,
 			_user$project$BugDetails$LinkedIssue,
-			A2(_user$project$Rest$linkIssue, bugId, issueUrl));
+			A2(_user$project$Rest$createIssue, bugId, issueUrl));
 	});
-var _user$project$BugDetails$UnlinkIssue = function (a) {
-	return {ctor: 'UnlinkIssue', _0: a};
+var _user$project$BugDetails$DeleteIssue = function (a) {
+	return {ctor: 'DeleteIssue', _0: a};
 };
 var _user$project$BugDetails$issueHref = function (issue) {
 	return A2(
@@ -15827,7 +15827,7 @@ var _user$project$BugDetails$issueHref = function (issue) {
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(
-							_user$project$BugDetails$UnlinkIssue(issue)),
+							_user$project$BugDetails$DeleteIssue(issue)),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -15853,8 +15853,8 @@ var _user$project$BugDetails$LinkIssue = function (a) {
 	return {ctor: 'LinkIssue', _0: a};
 };
 var _user$project$BugDetails$ToggleLinkIssueForm = {ctor: 'ToggleLinkIssueForm'};
-var _user$project$BugDetails$linkIssueForm = function (model) {
-	return model.showLinkIssueForm ? A2(
+var _user$project$BugDetails$createIssueForm = function (model) {
+	return model.showCreateIssueForm ? A2(
 		_elm_lang$html$Html$input,
 		{
 			ctor: '::',
@@ -16234,7 +16234,7 @@ var _user$project$BugDetails$update = F2(
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{showLinkIssueForm: !model.showLinkIssueForm}));
+						{showCreateIssueForm: !model.showCreateIssueForm}));
 			case 'UpdateIssueUrl':
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
@@ -16244,7 +16244,7 @@ var _user$project$BugDetails$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_user$project$BugDetails$linkIssue, model.bug.id, _p1._0)
+					_1: A2(_user$project$BugDetails$createIssue, model.bug.id, _p1._0)
 				};
 			case 'LinkedIssue':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
@@ -16266,7 +16266,7 @@ var _user$project$BugDetails$init = function (bug) {
 			showFullStackTrace: false,
 			now: _elm_lang$core$Date$fromTime(0),
 			showTimeAgo: true,
-			showLinkIssueForm: false,
+			showCreateIssueForm: false,
 			issueToLink: ''
 		},
 		_1: _elm_lang$core$Platform_Cmd$batch(
@@ -16397,7 +16397,7 @@ var _user$project$BugDetails$view = function (model) {
 				_0: _user$project$BugDetails$linkedIssues(model.bug),
 				_1: {
 					ctor: '::',
-					_0: _user$project$BugDetails$linkIssueForm(model),
+					_0: _user$project$BugDetails$createIssueForm(model),
 					_1: {
 						ctor: '::',
 						_0: _user$project$BugDetails$stackTraceDisplay(model),

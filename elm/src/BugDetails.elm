@@ -35,7 +35,7 @@ type Msg
     | TimeTick Time.Time
     | ToggleLinkIssueForm
     | LinkIssue String
-    | UnlinkIssue Issue
+    | DeleteIssue Issue
     | LinkedIssue (WebData Bug)
     | UpdateIssueUrl String
 
@@ -47,7 +47,7 @@ type alias Model =
     , showFullStackTrace : Bool
     , now : Date.Date
     , showTimeAgo : Bool
-    , showLinkIssueForm : Bool
+    , showCreateIssueForm : Bool
     , issueToLink : String
     }
 
@@ -81,18 +81,18 @@ update msg model =
                 noCmd { model | now = (Date.fromTime time) }
 
             ToggleLinkIssueForm ->
-                noCmd { model | showLinkIssueForm = not model.showLinkIssueForm }
+                noCmd { model | showCreateIssueForm = not model.showCreateIssueForm }
 
             UpdateIssueUrl issue ->
                 noCmd { model | issueToLink = issue }
 
             LinkIssue issueUrl ->
-                ( model, linkIssue model.bug.id issueUrl )
+                ( model, createIssue model.bug.id issueUrl )
 
             LinkedIssue bug ->
                 ( model, Cmd.none )
 
-            UnlinkIssue issue ->
+            DeleteIssue issue ->
                 ( model, Cmd.none )
 
 
@@ -101,9 +101,9 @@ fetchOccurrences bugId occ =
     Rest.fetch LoadedOccurrences (Rest.loadOccurrences bugId (Maybe.map .id occ))
 
 
-linkIssue : BugID -> String -> Cmd Msg
-linkIssue bugId issueUrl =
-    Rest.fetch LinkedIssue (Rest.linkIssue bugId issueUrl)
+createIssue : BugID -> String -> Cmd Msg
+createIssue bugId issueUrl =
+    Rest.fetch LinkedIssue (Rest.createIssue bugId issueUrl)
 
 
 subscriptions : Model -> Sub Msg
@@ -119,7 +119,7 @@ init bug =
       , showFullStackTrace = False
       , now = (Date.fromTime 0)
       , showTimeAgo = True
-      , showLinkIssueForm = False
+      , showCreateIssueForm = False
       , issueToLink = ""
       }
     , Cmd.batch
@@ -134,15 +134,15 @@ view model =
     div [ class "box" ]
         [ selectedBugHeader model
         , linkedIssues model.bug
-        , linkIssueForm model
+        , createIssueForm model
         , stackTraceDisplay model
         , occurrencesDisplay model
         ]
 
 
-linkIssueForm : Model -> Html Msg
-linkIssueForm model =
-    if model.showLinkIssueForm then
+createIssueForm : Model -> Html Msg
+createIssueForm model =
+    if model.showCreateIssueForm then
         input [ onInput UpdateIssueUrl, onSubmit (LinkIssue model.issueToLink), placeholder "https://issue-tracker.com/issue-id" ] []
     else
         a [ class "tag", onClick ToggleLinkIssueForm ] [ text "+" ]
@@ -202,7 +202,7 @@ issueHref : Issue -> Html Msg
 issueHref issue =
     a [ class "is-warning tag is-warning", href issue.url ]
         [ text (issueTitle issue)
-        , a [ onClick (UnlinkIssue issue) ] [ fontAwesome "close" ]
+        , a [ onClick (DeleteIssue issue) ] [ fontAwesome "close" ]
         ]
 
 

@@ -24,7 +24,7 @@ class BugsController < ApplicationController
 
   def create_issue
     bug = fetch_bug
-    CreateIssue.perform_later(bug.id)
+    bug.issues.create!(url: params[:url])
     render json: fetch_bug, serializer: FullBugSerializer
   end
 

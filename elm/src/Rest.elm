@@ -196,9 +196,9 @@ closeBugUrl (BugID uuid) =
     "/bugs/" ++ uuid.toString ++ "/close"
 
 
-linkIssueUrl : BugID -> String -> String
-linkIssueUrl (BugID bugId) issueUrl =
-    "/bugs/" ++ bugId.toString ++ "/issues/link" ++ issueUrl
+createIssueUrl : BugID -> String -> String
+createIssueUrl (BugID bugId) issueUrl =
+    "/bugs/" ++ bugId.toString ++ "/create_issue?url=" ++ issueUrl
 
 
 unlinkIssueUrl : BugID -> IssueID -> String
@@ -232,9 +232,9 @@ closeBug bugId =
     Http.post (closeBugUrl bugId) Http.emptyBody decodeBug
 
 
-linkIssue : BugID -> String -> Http.Request Bug
-linkIssue bugId url =
-    Http.post (linkIssueUrl bugId url) Http.emptyBody decodeBug
+createIssue : BugID -> String -> Http.Request Bug
+createIssue bugId url =
+    Http.post (createIssueUrl bugId url) Http.emptyBody decodeBug
 
 
 loadEnvironments : Http.Request (List Environment)
