@@ -109,7 +109,10 @@ issueTitle issue =
     in
         case match of
             Just m ->
-                m.match
+                if String.contains "gotoassist" issue.url then
+                    "B#" ++ m.match
+                else
+                    m.match
 
             Nothing ->
                 "Issue"
