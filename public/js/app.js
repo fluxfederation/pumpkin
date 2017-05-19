@@ -15779,13 +15779,35 @@ var _user$project$BugDetails$occurrenceCount = function (bug) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$BugDetails$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, showLinkIssueForm: g};
+var _user$project$BugDetails$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, showLinkIssueForm: g, issueToLink: h};
 	});
+var _user$project$BugDetails$UpdateIssue = function (a) {
+	return {ctor: 'UpdateIssue', _0: a};
+};
+var _user$project$BugDetails$LinkIssue = function (a) {
+	return {ctor: 'LinkIssue', _0: a};
+};
 var _user$project$BugDetails$ToggleLinkIssueForm = {ctor: 'ToggleLinkIssueForm'};
 var _user$project$BugDetails$linkIssueForm = function (model) {
-	return A2(
+	return model.showLinkIssueForm ? A2(
+		_elm_lang$html$Html$input,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onInput(_user$project$BugDetails$UpdateIssue),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onSubmit(
+					_user$project$BugDetails$LinkIssue(model.issueToLink)),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$placeholder('https://issue-tracker.com/issue-id'),
+					_1: {ctor: '[]'}
+				}
+			}
+		},
+		{ctor: '[]'}) : A2(
 		_elm_lang$html$Html$a,
 		{
 			ctor: '::',
@@ -16145,11 +16167,18 @@ var _user$project$BugDetails$update = F2(
 						{
 							now: _elm_lang$core$Date$fromTime(_p1._0)
 						}));
-			default:
+			case 'ToggleLinkIssueForm':
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{showLinkIssueForm: !model.showLinkIssueForm}));
+			case 'UpdateIssue':
+				return noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{issueToLink: _p1._0}));
+			default:
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
 	});
 var _user$project$BugDetails$init = function (bug) {
@@ -16166,7 +16195,8 @@ var _user$project$BugDetails$init = function (bug) {
 			showFullStackTrace: false,
 			now: _elm_lang$core$Date$fromTime(0),
 			showTimeAgo: true,
-			showLinkIssueForm: false
+			showLinkIssueForm: false,
+			issueToLink: ''
 		},
 		_1: _elm_lang$core$Platform_Cmd$batch(
 			{
@@ -17016,10 +17046,7 @@ var _user$project$Main$update = F2(
 					};
 				case 'BugListMsg':
 					var _p13 = _p5._0;
-					var _p11 = A2(
-						_elm_lang$core$Debug$log,
-						'message handling',
-						A2(_user$project$BugList$update, _p13, model.bugList));
+					var _p11 = A2(_user$project$BugList$update, _p13, model.bugList);
 					var newBugList = _p11._0;
 					var listCmd = _p11._1;
 					return {

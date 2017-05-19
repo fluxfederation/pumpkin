@@ -264,8 +264,7 @@ update msg model =
         BugListMsg m ->
             let
                 ( newBugList, listCmd ) =
-                    Debug.log "message handling"
-                        (BugList.update m model.bugList)
+                    (BugList.update m model.bugList)
             in
                 ( { model | bugList = newBugList }
                 , Cmd.batch

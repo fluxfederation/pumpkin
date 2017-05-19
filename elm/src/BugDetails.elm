@@ -34,6 +34,8 @@ type Msg
     | ToggleTimeFormat
     | TimeTick Time.Time
     | ToggleLinkIssueForm
+    | LinkIssue String
+    | UpdateIssue String
 
 
 type alias Model =
@@ -44,6 +46,7 @@ type alias Model =
     , now : Date.Date
     , showTimeAgo : Bool
     , showLinkIssueForm : Bool
+    , issueToLink : String
     }
 
 
@@ -78,6 +81,12 @@ update msg model =
             ToggleLinkIssueForm ->
                 noCmd { model | showLinkIssueForm = not model.showLinkIssueForm }
 
+            UpdateIssue issue ->
+                noCmd { model | issueToLink = issue }
+
+            LinkIssue linkIssue ->
+                ( model, Cmd.none )
+
 
 fetchOccurrences : BugID -> Maybe Occurrence -> Cmd Msg
 fetchOccurrences bugId occ =
@@ -98,6 +107,7 @@ init bug =
       , now = (Date.fromTime 0)
       , showTimeAgo = True
       , showLinkIssueForm = False
+      , issueToLink = ""
       }
     , Cmd.batch
         [ Task.perform TimeTick Time.now
@@ -119,7 +129,10 @@ view model =
 
 linkIssueForm : Model -> Html Msg
 linkIssueForm model =
-    a [ class "tag", onClick ToggleLinkIssueForm ] [ text "+" ]
+    if model.showLinkIssueForm then
+        input [ onInput UpdateIssue, onSubmit (LinkIssue model.issueToLink), placeholder "https://issue-tracker.com/issue-id" ] []
+    else
+        a [ class "tag", onClick ToggleLinkIssueForm ] [ text "+" ]
 
 
 selectedBugHeader : Model -> Html Msg
