@@ -14962,7 +14962,7 @@ var _user$project$Rest$fetch = F2(
 				_elm_lang$http$Http$toTask(req)));
 	});
 var _user$project$Rest$defaultPageSize = 100;
-var _user$project$Rest$unlinkIssueUrl = F2(
+var _user$project$Rest$deleteIssueUrl = F2(
 	function (_p1, _p0) {
 		var _p2 = _p1;
 		var _p3 = _p0;
@@ -14972,10 +14972,7 @@ var _user$project$Rest$unlinkIssueUrl = F2(
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				_p2._0.toString,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'/issues/',
-					A2(_elm_lang$core$Basics_ops['++'], _p3._0.toString, '/unlink'))));
+				A2(_elm_lang$core$Basics_ops['++'], '/delete_issue?issue_id=', _p3._0.toString)));
 	});
 var _user$project$Rest$createIssueUrl = F2(
 	function (_p4, issueUrl) {
@@ -15096,6 +15093,14 @@ var _user$project$Rest$createIssue = F2(
 		return A3(
 			_elm_lang$http$Http$post,
 			A2(_user$project$Rest$createIssueUrl, bugId, url),
+			_elm_lang$http$Http$emptyBody,
+			_user$project$Rest$decodeBug);
+	});
+var _user$project$Rest$deleteIssue = F2(
+	function (bugId, issueId) {
+		return A3(
+			_elm_lang$http$Http$post,
+			A2(_user$project$Rest$deleteIssueUrl, bugId, issueId),
 			_elm_lang$http$Http$emptyBody,
 			_user$project$Rest$decodeBug);
 	});
@@ -15778,16 +15783,6 @@ var _user$project$BugDetails$Model = F9(
 var _user$project$BugDetails$UpdateIssueUrl = function (a) {
 	return {ctor: 'UpdateIssueUrl', _0: a};
 };
-var _user$project$BugDetails$LinkedIssue = function (a) {
-	return {ctor: 'LinkedIssue', _0: a};
-};
-var _user$project$BugDetails$createIssue = F2(
-	function (bugId, issueUrl) {
-		return A2(
-			_user$project$Rest$fetch,
-			_user$project$BugDetails$LinkedIssue,
-			A2(_user$project$Rest$createIssue, bugId, issueUrl));
-	});
 var _user$project$BugDetails$DeleteIssue = function (a) {
 	return {ctor: 'DeleteIssue', _0: a};
 };
@@ -15836,12 +15831,23 @@ var _user$project$BugDetails$issueHref = function (issue) {
 var _user$project$BugDetails$linkedIssues = function (bug) {
 	return A2(
 		_elm_lang$html$Html$span,
+		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('linked-issues'),
-			_1: {ctor: '[]'}
-		},
-		A2(_elm_lang$core$List$map, _user$project$BugDetails$issueHref, bug.issues));
+			_0: _elm_lang$html$Html$text('Issues: '),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('linked-issues'),
+						_1: {ctor: '[]'}
+					},
+					A2(_elm_lang$core$List$map, _user$project$BugDetails$issueHref, bug.issues)),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _user$project$BugDetails$LinkIssue = function (a) {
 	return {ctor: 'LinkIssue', _0: a};
@@ -15849,26 +15855,33 @@ var _user$project$BugDetails$LinkIssue = function (a) {
 var _user$project$BugDetails$ToggleLinkIssueForm = {ctor: 'ToggleLinkIssueForm'};
 var _user$project$BugDetails$createIssueForm = function (model) {
 	return model.showCreateIssueForm ? A2(
-		_elm_lang$html$Html$input,
+		_elm_lang$html$Html$form,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Events$onInput(_user$project$BugDetails$UpdateIssueUrl),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onSubmit(
-					_user$project$BugDetails$LinkIssue(model.issueToLink)),
-				_1: {
+			_0: _elm_lang$html$Html_Events$onSubmit(
+				_user$project$BugDetails$LinkIssue(model.issueToLink)),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$placeholder('https://issue-tracker.com/issue-id'),
+					_0: _elm_lang$html$Html_Events$onInput(_user$project$BugDetails$UpdateIssueUrl),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('input'),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$placeholder('https://issue-tracker.com/issue-id'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('input'),
+							_1: {ctor: '[]'}
+						}
 					}
-				}
-			}
-		},
-		{ctor: '[]'}) : A2(
+				},
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		}) : A2(
 		_elm_lang$html$Html$a,
 		{
 			ctor: '::',
@@ -16372,12 +16385,20 @@ var _user$project$BugDetails$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_user$project$BugDetails$createIssue, model.bug.id, _p3._0)
+					_1: A2(
+						_user$project$Rest$fetch,
+						_user$project$BugDetails$ReloadBug,
+						A2(_user$project$Rest$createIssue, model.bug.id, _p3._0))
 				};
-			case 'LinkedIssue':
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			default:
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(
+						_user$project$Rest$fetch,
+						_user$project$BugDetails$ReloadBug,
+						A2(_user$project$Rest$deleteIssue, model.bug.id, _p3._0.id))
+				};
 		}
 	});
 var _user$project$BugDetails$init = function (bug) {

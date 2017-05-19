@@ -28,6 +28,12 @@ class BugsController < ApplicationController
     render json: fetch_bug, serializer: FullBugSerializer
   end
 
+  def delete_issue
+    bug = fetch_bug
+    bug.issues.find(params[:issue_id]).destroy
+    render json: fetch_bug, serializer: FullBugSerializer
+  end
+
   private
   def fetch_bug
     Bug.with_latest_details.find(params[:id])

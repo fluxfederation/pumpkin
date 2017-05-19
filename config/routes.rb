@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     member do
       post :close
       post :create_issue
+      post :delete_issue
     end
 
     resources :occurrences, only: [:index]

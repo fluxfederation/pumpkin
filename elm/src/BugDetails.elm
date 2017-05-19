@@ -40,7 +40,6 @@ type Msg
     | ToggleLinkIssueForm
     | LinkIssue String
     | DeleteIssue Issue
-    | LinkedIssue (WebData Bug)
     | UpdateIssueUrl String
 
 
@@ -109,23 +108,15 @@ update msg model =
                 noCmd { model | issueToLink = issue }
 
             LinkIssue issueUrl ->
-                ( model, createIssue model.bug.id issueUrl )
-
-            LinkedIssue bug ->
-                ( model, Cmd.none )
+                ( model, Rest.fetch ReloadBug (Rest.createIssue model.bug.id issueUrl) )
 
             DeleteIssue issue ->
-                ( model, Cmd.none )
+                ( model, Rest.fetch ReloadBug (Rest.deleteIssue model.bug.id issue.id) )
 
 
 fetchOccurrences : BugID -> Maybe Occurrence -> Cmd Msg
 fetchOccurrences bugId occ =
     Rest.fetch LoadedOccurrences (Rest.loadOccurrences bugId (Maybe.map .id occ))
-
-
-createIssue : BugID -> String -> Cmd Msg
-createIssue bugId issueUrl =
-    Rest.fetch LinkedIssue (Rest.createIssue bugId issueUrl)
 
 
 subscriptions : Model -> Sub Msg
@@ -166,7 +157,9 @@ view model =
 createIssueForm : Model -> Html Msg
 createIssueForm model =
     if model.showCreateIssueForm then
-        input [ onInput UpdateIssueUrl, onSubmit (LinkIssue model.issueToLink), placeholder "https://issue-tracker.com/issue-id", class "input" ] []
+        Html.form [ onSubmit (LinkIssue model.issueToLink) ]
+            [ input [ onInput UpdateIssueUrl, placeholder "https://issue-tracker.com/issue-id", class "input" ] []
+            ]
     else
         a [ class "tag", onClick ToggleLinkIssueForm ] [ text "+" ]
 
@@ -244,7 +237,10 @@ date model date =
 
 linkedIssues : Bug -> Html Msg
 linkedIssues bug =
-    span [ class "linked-issues" ] (List.map issueHref bug.issues)
+    span []
+        [ text "Issues: "
+        , span [ class "linked-issues" ] (List.map issueHref bug.issues)
+        ]
 
 
 issueHref : Issue -> Html Msg
