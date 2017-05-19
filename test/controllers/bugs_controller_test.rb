@@ -54,12 +54,25 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
     get bugs_path, params: {environment_ids: @default_environment_ids, closed: "true"}
     assert_response :success
     assert_response_schema "bugs/index.json"
+
+    json = JSON.parse(@response.body)
+    ids = json.collect {|bug| bug["id"]}
+
+    # We include both open and closed when closed is enabled
+    assert_includes(ids, bugs(:prod_normal).id)
+    assert_includes(ids, bugs(:prod_closed).id)
   end
 
   test "index with not closed filtering" do
     get bugs_path, params: {environment_ids: @default_environment_ids, closed: "false"}
     assert_response :success
     assert_response_schema "bugs/index.json"
+
+    json = JSON.parse(@response.body)
+    ids = json.collect {|bug| bug["id"]}
+
+    assert_includes(ids, bugs(:prod_normal).id)
+    assert_not_includes(ids, bugs(:prod_closed).id)
   end
 
   test "index with matching search clauses" do

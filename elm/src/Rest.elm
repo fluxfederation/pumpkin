@@ -56,18 +56,20 @@ addParams path params =
             "?" ++ String.join "&" (List.map (\(Param k v) -> k ++ "=" ++ v) params)
 
 
-openBugsUrl : List EnvironmentID -> Int -> Maybe BugID -> String -> String
-openBugsUrl environmentIds limit startFrom search =
-    addParams "/bugs"
-        ([ Param "closed" "false", Param "search" search ]
-            ++ (pageParams bugIDToParam limit startFrom)
-            ++ (List.map (\id -> Param "environment_ids[]" id) (List.map envIDToParam environmentIds))
-        )
-
-
-allBugsUrl : Int -> Maybe BugID -> String -> String
-allBugsUrl limit startFrom search =
-    addParams "/bugs" (pageParams bugIDToParam limit startFrom ++ [ (Param "search" search) ])
+bugsUrl : List EnvironmentID -> Bool -> Int -> Maybe BugID -> String -> String
+bugsUrl environmentIds includeClosedBugs limit startFrom search =
+    let
+        closedParam =
+            if includeClosedBugs then
+                "true"
+            else
+                "false"
+    in
+        addParams "/bugs"
+            ([ Param "closed" closedParam, Param "search" search ]
+                ++ (pageParams bugIDToParam limit startFrom)
+                ++ (List.map (\id -> Param "environment_ids[]" id) (List.map envIDToParam environmentIds))
+            )
 
 
 detailsUrl : BugID -> String
@@ -249,10 +251,7 @@ loadBugs environmentIds includeClosedBugs startFrom search =
             defaultPageSize
 
         url =
-            if includeClosedBugs then
-                allBugsUrl (pageSize + 1) startFrom search
-            else
-                openBugsUrl environmentIds (pageSize + 1) startFrom search
+            bugsUrl environmentIds includeClosedBugs (pageSize + 1) startFrom search
     in
         Http.get url (decodeChunk pageSize decodeBug)
 

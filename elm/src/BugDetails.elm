@@ -4,7 +4,7 @@
 module BugDetails
     exposing
         ( Model
-        , Msg
+        , Msg(..)
         , init
         , subscriptions
         , update
@@ -12,7 +12,7 @@ module BugDetails
         )
 
 import Types exposing (..)
-import RemoteData exposing (WebData)
+import RemoteData exposing (RemoteData, WebData)
 import ChunkList exposing (ChunkList)
 import Rest
 import Date exposing (Date)
@@ -32,6 +32,10 @@ type Msg
     | ToggleFullStackTrace
     | ToggleOccurrence OccurrenceID
     | ToggleTimeFormat
+    | ShowCloseButton
+    | HideCloseButton
+    | CloseBug
+    | ReloadBug (WebData Bug)
     | TimeTick Time.Time
     | ToggleLinkIssueForm
     | LinkIssue String
@@ -49,6 +53,7 @@ type alias Model =
     , showTimeAgo : Bool
     , showCreateIssueForm : Bool
     , issueToLink : String
+    , showCloseButton : Bool
     }
 
 
@@ -76,6 +81,23 @@ update msg model =
 
             ToggleTimeFormat ->
                 noCmd { model | showTimeAgo = not model.showTimeAgo }
+
+            ShowCloseButton ->
+                noCmd { model | showCloseButton = True }
+
+            HideCloseButton ->
+                noCmd { model | showCloseButton = False }
+
+            CloseBug ->
+                ( model, Rest.fetch ReloadBug (Rest.closeBug model.bug.id) )
+
+            ReloadBug result ->
+                case result of
+                    RemoteData.Success b ->
+                        noCmd { model | bug = b }
+
+                    _ ->
+                        noCmd model
 
             TimeTick time ->
                 noCmd { model | now = (Date.fromTime time) }
@@ -121,6 +143,7 @@ init bug =
       , showTimeAgo = True
       , showCreateIssueForm = False
       , issueToLink = ""
+      , showCloseButton = False
       }
     , Cmd.batch
         [ Task.perform TimeTick Time.now
@@ -168,8 +191,34 @@ selectedBugHeader model =
                     , bugTimes model
                     ]
                 ]
+            , p [] [ bugClosingSection model ]
             ]
         ]
+
+
+bugClosingSection : Model -> Html Msg
+bugClosingSection model =
+    let
+        closedLabel =
+            span [ class "tag is-danger" ] [ text "Closed" ]
+
+        closeButtons =
+            case model.showCloseButton of
+                True ->
+                    div []
+                        [ button [ class "button is-danger is-small", onClick CloseBug ] [ text "Yep - close it!" ]
+                        , button [ class "button is-white is-small", onClick HideCloseButton ] [ fontAwesome "times-circle-o" ]
+                        ]
+
+                False ->
+                    button [ class "button is-white is-small", onClick ShowCloseButton ] [ fontAwesome "trash" ]
+    in
+        case model.bug.closedAt of
+            Just time ->
+                closedLabel
+
+            _ ->
+                closeButtons
 
 
 occurrenceCount : Bug -> Html Msg

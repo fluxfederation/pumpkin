@@ -15203,8 +15203,9 @@ var _user$project$Rest$loadOccurrences = F2(
 			A3(_user$project$Rest$occurrencesUrl, bugId, _user$project$Rest$defaultPageSize, start),
 			A2(_user$project$Rest$decodeChunk, _user$project$Rest$defaultPageSize, _user$project$Rest$decodeOccurrence));
 	});
-var _user$project$Rest$openBugsUrl = F4(
-	function (environmentIds, limit, startFrom, search) {
+var _user$project$Rest$bugsUrl = F5(
+	function (environmentIds, includeClosedBugs, limit, startFrom, search) {
+		var closedParam = includeClosedBugs ? 'true' : 'false';
 		return A2(
 			_user$project$Rest$addParams,
 			'/bugs',
@@ -15212,7 +15213,7 @@ var _user$project$Rest$openBugsUrl = F4(
 				_elm_lang$core$Basics_ops['++'],
 				{
 					ctor: '::',
-					_0: A2(_user$project$Rest$Param, 'closed', 'false'),
+					_0: A2(_user$project$Rest$Param, 'closed', closedParam),
 					_1: {
 						ctor: '::',
 						_0: A2(_user$project$Rest$Param, 'search', search),
@@ -15229,24 +15230,10 @@ var _user$project$Rest$openBugsUrl = F4(
 						},
 						A2(_elm_lang$core$List$map, _user$project$Rest$envIDToParam, environmentIds)))));
 	});
-var _user$project$Rest$allBugsUrl = F3(
-	function (limit, startFrom, search) {
-		return A2(
-			_user$project$Rest$addParams,
-			'/bugs',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				A3(_user$project$Rest$pageParams, _user$project$Rest$bugIDToParam, limit, startFrom),
-				{
-					ctor: '::',
-					_0: A2(_user$project$Rest$Param, 'search', search),
-					_1: {ctor: '[]'}
-				}));
-	});
 var _user$project$Rest$loadBugs = F4(
 	function (environmentIds, includeClosedBugs, startFrom, search) {
 		var pageSize = _user$project$Rest$defaultPageSize;
-		var url = includeClosedBugs ? A3(_user$project$Rest$allBugsUrl, pageSize + 1, startFrom, search) : A4(_user$project$Rest$openBugsUrl, environmentIds, pageSize + 1, startFrom, search);
+		var url = A5(_user$project$Rest$bugsUrl, environmentIds, includeClosedBugs, pageSize + 1, startFrom, search);
 		return A2(
 			_elm_lang$http$Http$get,
 			url,
@@ -15784,9 +15771,9 @@ var _user$project$BugDetails$occurrenceCount = function (bug) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$BugDetails$Model = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, showCreateIssueForm: g, issueToLink: h};
+var _user$project$BugDetails$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, showCreateIssueForm: g, issueToLink: h, showCloseButton: i};
 	});
 var _user$project$BugDetails$UpdateIssueUrl = function (a) {
 	return {ctor: 'UpdateIssueUrl', _0: a};
@@ -15904,6 +15891,96 @@ var _user$project$BugDetails$TimeTick = function (a) {
 var _user$project$BugDetails$subscriptions = function (model) {
 	return A2(_elm_lang$core$Time$every, _elm_lang$core$Time$minute, _user$project$BugDetails$TimeTick);
 };
+var _user$project$BugDetails$ReloadBug = function (a) {
+	return {ctor: 'ReloadBug', _0: a};
+};
+var _user$project$BugDetails$CloseBug = {ctor: 'CloseBug'};
+var _user$project$BugDetails$HideCloseButton = {ctor: 'HideCloseButton'};
+var _user$project$BugDetails$ShowCloseButton = {ctor: 'ShowCloseButton'};
+var _user$project$BugDetails$bugClosingSection = function (model) {
+	var closeButtons = function () {
+		var _p1 = model.showCloseButton;
+		if (_p1 === true) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('button is-danger is-small'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$CloseBug),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Yep - close it!'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('button is-white is-small'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$HideCloseButton),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _user$project$ViewCommon$fontAwesome('times-circle-o'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				});
+		} else {
+			return A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('button is-white is-small'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ShowCloseButton),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _user$project$ViewCommon$fontAwesome('trash'),
+					_1: {ctor: '[]'}
+				});
+		}
+	}();
+	var closedLabel = A2(
+		_elm_lang$html$Html$span,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('tag is-danger'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Closed'),
+			_1: {ctor: '[]'}
+		});
+	var _p2 = model.bug.closedAt;
+	if (_p2.ctor === 'Just') {
+		return closedLabel;
+	} else {
+		return closeButtons;
+	}
+};
 var _user$project$BugDetails$ToggleTimeFormat = {ctor: 'ToggleTimeFormat'};
 var _user$project$BugDetails$selectedBugHeader = function (model) {
 	return A2(
@@ -16009,7 +16086,18 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 										}),
 									_1: {ctor: '[]'}
 								}),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$p,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _user$project$BugDetails$bugClosingSection(model),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
 						}
 					}),
 				_1: {ctor: '[]'}
@@ -16191,8 +16279,8 @@ var _user$project$BugDetails$update = F2(
 		var noCmd = function (m) {
 			return {ctor: '_Tuple2', _0: m, _1: _elm_lang$core$Platform_Cmd$none};
 		};
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'LoadMoreOccurrences':
 				return {
 					ctor: '_Tuple2',
@@ -16204,7 +16292,7 @@ var _user$project$BugDetails$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							occurrences: A2(_user$project$ChunkList$update, model.occurrences, _p1._0)
+							occurrences: A2(_user$project$ChunkList$update, model.occurrences, _p3._0)
 						}));
 			case 'ToggleFullStackTrace':
 				return noCmd(
@@ -16212,34 +16300,63 @@ var _user$project$BugDetails$update = F2(
 						model,
 						{showFullStackTrace: !model.showFullStackTrace}));
 			case 'ToggleOccurrence':
-				var _p2 = _p1._0;
-				return A2(_elm_lang$core$List$member, _p2, model.expandedOccurrences) ? noCmd(
+				var _p4 = _p3._0;
+				return A2(_elm_lang$core$List$member, _p4, model.expandedOccurrences) ? noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
 							expandedOccurrences: A2(
 								_elm_lang$core$List$filter,
 								function (oId) {
-									return !_elm_lang$core$Native_Utils.eq(oId, _p2);
+									return !_elm_lang$core$Native_Utils.eq(oId, _p4);
 								},
 								model.expandedOccurrences)
 						})) : noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							expandedOccurrences: {ctor: '::', _0: _p2, _1: model.expandedOccurrences}
+							expandedOccurrences: {ctor: '::', _0: _p4, _1: model.expandedOccurrences}
 						}));
 			case 'ToggleTimeFormat':
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{showTimeAgo: !model.showTimeAgo}));
+			case 'ShowCloseButton':
+				return noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showCloseButton: true}));
+			case 'HideCloseButton':
+				return noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showCloseButton: false}));
+			case 'CloseBug':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(
+						_user$project$Rest$fetch,
+						_user$project$BugDetails$ReloadBug,
+						_user$project$Rest$closeBug(model.bug.id))
+				};
+			case 'ReloadBug':
+				var _p5 = _p3._0;
+				if (_p5.ctor === 'Success') {
+					return noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{bug: _p5._0}));
+				} else {
+					return noCmd(model);
+				}
 			case 'TimeTick':
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							now: _elm_lang$core$Date$fromTime(_p1._0)
+							now: _elm_lang$core$Date$fromTime(_p3._0)
 						}));
 			case 'ToggleLinkIssueForm':
 				return noCmd(
@@ -16250,12 +16367,12 @@ var _user$project$BugDetails$update = F2(
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{issueToLink: _p1._0}));
+						{issueToLink: _p3._0}));
 			case 'LinkIssue':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_user$project$BugDetails$createIssue, model.bug.id, _p1._0)
+					_1: A2(_user$project$BugDetails$createIssue, model.bug.id, _p3._0)
 				};
 			case 'LinkedIssue':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
@@ -16278,7 +16395,8 @@ var _user$project$BugDetails$init = function (bug) {
 			now: _elm_lang$core$Date$fromTime(0),
 			showTimeAgo: true,
 			showCreateIssueForm: false,
-			issueToLink: ''
+			issueToLink: '',
+			showCloseButton: false
 		},
 		_1: _elm_lang$core$Platform_Cmd$batch(
 			{
@@ -16518,6 +16636,35 @@ var _user$project$BugList$SelectBug = function (a) {
 };
 var _user$project$BugList$sidebarBug = F2(
 	function (model, bug) {
+		var bugIsClosed = A2(
+			_elm_lang$core$Maybe$withDefault,
+			false,
+			A2(
+				_elm_lang$core$Maybe$map,
+				_elm_lang$core$Basics$always(true),
+				bug.closedAt));
+		var occurrenceCountTag = A2(
+			_elm_lang$html$Html$span,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('tag'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$classList(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'is-danger', _1: bugIsClosed},
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					_elm_lang$core$Basics$toString(bug.occurrenceCount)),
+				_1: {ctor: '[]'}
+			});
 		var clickMsg = _user$project$BugList$SelectBug(
 			_elm_lang$core$Maybe$Just(bug.id));
 		var isSelected = _elm_lang$core$Native_Utils.eq(
@@ -16597,19 +16744,7 @@ var _user$project$BugList$sidebarBug = F2(
 						},
 						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$span,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('tag'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										_elm_lang$core$Basics$toString(bug.occurrenceCount)),
-									_1: {ctor: '[]'}
-								}),
+							_0: occurrenceCountTag,
 							_1: {
 								ctor: '::',
 								_0: issueTag,
@@ -16799,6 +16934,10 @@ var _user$project$Main$handleResult = F3(
 	});
 var _user$project$Main$delta2url = F2(
 	function (_p1, model) {
+		var showClosedBugs = A2(
+			_user$project$Rest$Param,
+			'showClosedBugs',
+			model.showClosedBugs ? 'true' : 'false');
 		var selectedBug = A2(
 			_elm_lang$core$Maybe$map,
 			function (bugModel) {
@@ -16822,15 +16961,22 @@ var _user$project$Main$delta2url = F2(
 				url: A2(
 					_user$project$Rest$addParams,
 					'/',
-					_elm_community$maybe_extra$Maybe_Extra$values(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_community$maybe_extra$Maybe_Extra$values(
+							{
+								ctor: '::',
+								_0: selectedEnvironments,
+								_1: {
+									ctor: '::',
+									_0: selectedBug,
+									_1: {ctor: '[]'}
+								}
+							}),
 						{
 							ctor: '::',
-							_0: selectedEnvironments,
-							_1: {
-								ctor: '::',
-								_0: selectedBug,
-								_1: {ctor: '[]'}
-							}
+							_0: showClosedBugs,
+							_1: {ctor: '[]'}
 						}))
 			});
 	});
@@ -16973,6 +17119,7 @@ var _user$project$Main$sidebarSearch = function (model) {
 		});
 };
 var _user$project$Main$ToggleMenu = {ctor: 'ToggleMenu'};
+var _user$project$Main$ToggleShowClosedBugs = {ctor: 'ToggleShowClosedBugs'};
 var _user$project$Main$ClearError = {ctor: 'ClearError'};
 var _user$project$Main$errorMessages = function (model) {
 	var _p4 = model.error;
@@ -17062,21 +17209,13 @@ var _user$project$Main$update = F2(
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{error: _elm_lang$core$Maybe$Nothing}));
-				case 'ShowClosedBugs':
+				case 'ToggleShowClosedBugs':
 					var _v10 = _user$project$Main$SearchSubmit,
 						_v11 = _elm_lang$core$Native_Utils.update(
 						model,
-						{showClosedBugs: true});
+						{showClosedBugs: !model.showClosedBugs});
 					msg = _v10;
 					model = _v11;
-					continue update;
-				case 'HideClosedBugs':
-					var _v12 = _user$project$Main$SearchSubmit,
-						_v13 = _elm_lang$core$Native_Utils.update(
-						model,
-						{showClosedBugs: false});
-					msg = _v12;
-					model = _v13;
 					continue update;
 				case 'ToggleMenu':
 					return _user$project$Main$noCmd(
@@ -17113,24 +17252,44 @@ var _user$project$Main$update = F2(
 						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, cmd)
 					};
 				case 'FocusedBugMsg':
-					var _p10 = A2(
+					var _p13 = _p5._0;
+					var _p10 = function () {
+						var _p11 = _p13;
+						if ((_p11.ctor === 'ReloadBug') && (_p11._0.ctor === 'Success')) {
+							return A2(_user$project$Main$update, _user$project$Main$SearchSubmit, model);
+						} else {
+							return _user$project$Main$noCmd(model);
+						}
+					}();
+					var newModel = _p10._0;
+					var blcmd = _p10._1;
+					var _p12 = A2(
 						_bloom$remotedata$RemoteData$update,
-						_user$project$BugDetails$update(_p5._0),
+						_user$project$BugDetails$update(_p13),
 						model.focusedBug);
-					var newBugModel = _p10._0;
-					var cmd = _p10._1;
+					var newBugModel = _p12._0;
+					var cmd = _p12._1;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
-							model,
+							newModel,
 							{focusedBug: newBugModel}),
-						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, cmd)
+						_1: _elm_lang$core$Platform_Cmd$batch(
+							{
+								ctor: '::',
+								_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, cmd),
+								_1: {
+									ctor: '::',
+									_0: blcmd,
+									_1: {ctor: '[]'}
+								}
+							})
 					};
 				case 'BugListMsg':
-					var _p13 = _p5._0;
-					var _p11 = A2(_user$project$BugList$update, _p13, model.bugList);
-					var newBugList = _p11._0;
-					var listCmd = _p11._1;
+					var _p16 = _p5._0;
+					var _p14 = A2(_user$project$BugList$update, _p16, model.bugList);
+					var newBugList = _p14._0;
+					var listCmd = _p14._1;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -17143,12 +17302,12 @@ var _user$project$Main$update = F2(
 								_1: {
 									ctor: '::',
 									_0: function () {
-										var _p12 = _p13;
-										if ((_p12.ctor === 'SelectBug') && (_p12._0.ctor === 'Just')) {
+										var _p15 = _p16;
+										if ((_p15.ctor === 'SelectBug') && (_p15._0.ctor === 'Just')) {
 											return A2(
 												_user$project$Rest$fetch,
 												_user$project$Main$LoadedDetails,
-												_user$project$Rest$loadBugDetails(_p12._0._0));
+												_user$project$Rest$loadBugDetails(_p15._0._0));
 										} else {
 											return _elm_lang$core$Platform_Cmd$none;
 										}
@@ -17167,34 +17326,32 @@ var _user$project$Main$update = F2(
 			}
 		}
 	});
-var _user$project$Main$HideClosedBugs = {ctor: 'HideClosedBugs'};
-var _user$project$Main$ShowClosedBugs = {ctor: 'ShowClosedBugs'};
 var _user$project$Main$SetSelectedEnvironmentIds = function (a) {
 	return {ctor: 'SetSelectedEnvironmentIds', _0: a};
 };
 var _user$project$Main$location2messages = function (location) {
 	var builder = _rgrempel$elm_route_url$RouteUrl_Builder$fromUrl(location.href);
 	var selectedEnvironmentIds = function () {
-		var _p14 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
-		if (_p14.ctor === 'Just') {
+		var _p17 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
+		if (_p17.ctor === 'Just') {
 			return A2(
 				_elm_lang$core$List$filter,
-				function (_p15) {
-					return !_elm_lang$core$String$isEmpty(_p15);
+				function (_p18) {
+					return !_elm_lang$core$String$isEmpty(_p18);
 				},
-				A2(_elm_lang$core$String$split, ',', _p14._0));
+				A2(_elm_lang$core$String$split, ',', _p17._0));
 		} else {
 			return {ctor: '[]'};
 		}
 	}();
 	var focusBug = function () {
-		var _p16 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'bug', builder);
-		if (_p16.ctor === 'Just') {
+		var _p19 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'bug', builder);
+		if (_p19.ctor === 'Just') {
 			return {
 				ctor: '::',
 				_0: _user$project$Main$RequestDetails(
 					_user$project$Types$BugID(
-						_user$project$Types$UUID(_p16._0))),
+						_user$project$Types$UUID(_p19._0))),
 				_1: {ctor: '[]'}
 			};
 		} else {
@@ -17309,23 +17466,23 @@ var _user$project$Main$environmentMenuItem = F2(
 			});
 	});
 var _user$project$Main$sidebarMenu = function (model) {
-	var _p17 = model.environments;
-	switch (_p17.ctor) {
+	var _p20 = model.environments;
+	switch (_p20.ctor) {
 		case 'Success':
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
 				A2(
 					_elm_lang$core$List$map,
-					function (_p18) {
+					function (_p21) {
 						return A2(
 							_user$project$Main$environmentMenuItem,
 							model.selectedEnvironmentIds,
 							function (_) {
 								return _.id;
-							}(_p18));
+							}(_p21));
 					},
-					_p17._0));
+					_p20._0));
 		case 'Loading':
 			return _user$project$ViewCommon$spinner;
 		case 'Failure':
@@ -17364,13 +17521,13 @@ var _user$project$Main$sidebarFilters = function (model) {
 						_0: _elm_lang$html$Html_Attributes$class('panel-block'),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleMenu),
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleShowClosedBugs),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$classList(
 									{
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showMenu},
+										_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showClosedBugs},
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
@@ -17388,19 +17545,62 @@ var _user$project$Main$sidebarFilters = function (model) {
 							},
 							{
 								ctor: '::',
-								_0: _user$project$ViewCommon$fontAwesome('cog'),
+								_0: _user$project$ViewCommon$fontAwesome('eye'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Environments'),
+							_0: _elm_lang$html$Html$text('Show Closed Bugs'),
 							_1: {ctor: '[]'}
 						}
 					}),
 				_1: {
 					ctor: '::',
-					_0: model.showMenu ? _user$project$Main$sidebarMenu(model) : _user$project$Main$currentEnvironmentsAsTags(model),
-					_1: {ctor: '[]'}
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('panel-block'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleMenu),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$classList(
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showMenu},
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$span,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('panel-icon'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _user$project$ViewCommon$fontAwesome('cog'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Environments'),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: model.showMenu ? _user$project$Main$sidebarMenu(model) : _user$project$Main$currentEnvironmentsAsTags(model),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
@@ -17496,7 +17696,7 @@ var _user$project$Main$LoadedEnvironments = function (a) {
 	return {ctor: 'LoadedEnvironments', _0: a};
 };
 var _user$project$Main$init = function () {
-	var _p19 = A2(
+	var _p22 = A2(
 		_user$project$BugList$init,
 		{
 			environmentIDs: {ctor: '[]'},
@@ -17504,8 +17704,8 @@ var _user$project$Main$init = function () {
 			search: ''
 		},
 		_elm_lang$core$Maybe$Nothing);
-	var bugList = _p19._0;
-	var bugListCmd = _p19._1;
+	var bugList = _p22._0;
+	var bugListCmd = _p22._1;
 	return {
 		ctor: '_Tuple2',
 		_0: {
