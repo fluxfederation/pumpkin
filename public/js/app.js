@@ -16406,6 +16406,35 @@ var _user$project$BugList$SelectBug = function (a) {
 };
 var _user$project$BugList$sidebarBug = F2(
 	function (model, bug) {
+		var bugIsClosed = A2(
+			_elm_lang$core$Maybe$withDefault,
+			false,
+			A2(
+				_elm_lang$core$Maybe$map,
+				_elm_lang$core$Basics$always(true),
+				bug.closedAt));
+		var occurrenceCountTag = A2(
+			_elm_lang$html$Html$span,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('tag'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$classList(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'is-danger', _1: bugIsClosed},
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					_elm_lang$core$Basics$toString(bug.occurrenceCount)),
+				_1: {ctor: '[]'}
+			});
 		var clickMsg = _user$project$BugList$SelectBug(
 			_elm_lang$core$Maybe$Just(bug.id));
 		var isSelected = _elm_lang$core$Native_Utils.eq(
@@ -16496,19 +16525,7 @@ var _user$project$BugList$sidebarBug = F2(
 						},
 						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$span,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('tag'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										_elm_lang$core$Basics$toString(bug.occurrenceCount)),
-									_1: {ctor: '[]'}
-								}),
+							_0: occurrenceCountTag,
 							_1: {
 								ctor: '::',
 								_0: issueTag,
