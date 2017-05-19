@@ -15313,7 +15313,8 @@ var _user$project$ViewCommon$issueTitle = function (issue) {
 			issue.url));
 	var _p0 = match;
 	if (_p0.ctor === 'Just') {
-		return _p0._0.match;
+		var _p1 = _p0._0;
+		return A2(_elm_lang$core$String$contains, 'gotoassist', issue.url) ? A2(_elm_lang$core$Basics_ops['++'], 'B#', _p1.match) : _p1.match;
 	} else {
 		return 'Issue';
 	}
@@ -15368,8 +15369,8 @@ var _user$project$ViewCommon$paginatedList = F3(
 				_elm_lang$core$Basics_ops['++'],
 				displayItems(page.items),
 				function () {
-					var _p1 = page.nextItem;
-					if (_p1.ctor === 'Just') {
+					var _p2 = page.nextItem;
+					if (_p2.ctor === 'Just') {
 						return {
 							ctor: '::',
 							_0: A2(
@@ -15380,7 +15381,7 @@ var _user$project$ViewCommon$paginatedList = F3(
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onClick(
-											loadMoreMessage(_p1._0)),
+											loadMoreMessage(_p2._0)),
 										_1: {ctor: '[]'}
 									}
 								},
@@ -15416,8 +15417,8 @@ var _user$project$ViewCommon$bugErrorClass = function (bug) {
 var _user$project$ViewCommon$paginatedChunkList = F3(
 	function (displayItems, chunkList, loadMoreMessage) {
 		var showChunk = function (remoteChunk) {
-			var _p2 = remoteChunk;
-			switch (_p2.ctor) {
+			var _p3 = remoteChunk;
+			switch (_p3.ctor) {
 				case 'NotAsked':
 					return A2(
 						_elm_lang$html$Html$div,
@@ -15446,16 +15447,16 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 							_1: {ctor: '[]'}
 						});
 				default:
-					var _p4 = _p2._0;
+					var _p5 = _p3._0;
 					return A2(
 						_elm_lang$html$Html$div,
 						{ctor: '[]'},
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							displayItems(_p4.items),
+							displayItems(_p5.items),
 							function () {
-								var _p3 = _p4.nextItem;
-								if (_p3.ctor === 'Just') {
+								var _p4 = _p5.nextItem;
+								if (_p4.ctor === 'Just') {
 									return {
 										ctor: '::',
 										_0: A2(
@@ -15467,7 +15468,7 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 													ctor: '::',
 													_0: _elm_lang$html$Html_Events$onClick(
 														loadMoreMessage(
-															_elm_lang$core$Maybe$Just(_p3._0))),
+															_elm_lang$core$Maybe$Just(_p4._0))),
 													_1: {ctor: '[]'}
 												}
 											},
@@ -15801,7 +15802,11 @@ var _user$project$BugDetails$issueHref = function (issue) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$href(issue.url),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$target('_blank'),
+						_1: {ctor: '[]'}
+					}
 				},
 				{
 					ctor: '::',
