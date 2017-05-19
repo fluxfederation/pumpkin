@@ -143,7 +143,7 @@ view model =
 createIssueForm : Model -> Html Msg
 createIssueForm model =
     if model.showCreateIssueForm then
-        input [ onInput UpdateIssueUrl, onSubmit (LinkIssue model.issueToLink), placeholder "https://issue-tracker.com/issue-id" ] []
+        input [ onInput UpdateIssueUrl, onSubmit (LinkIssue model.issueToLink), placeholder "https://issue-tracker.com/issue-id", class "input" ] []
     else
         a [ class "tag", onClick ToggleLinkIssueForm ] [ text "+" ]
 

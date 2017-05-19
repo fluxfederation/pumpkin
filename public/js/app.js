@@ -15873,7 +15873,11 @@ var _user$project$BugDetails$createIssueForm = function (model) {
 				_1: {
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$placeholder('https://issue-tracker.com/issue-id'),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('input'),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		},
