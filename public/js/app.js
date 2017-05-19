@@ -15806,20 +15806,27 @@ var _user$project$BugDetails$DeleteIssue = function (a) {
 };
 var _user$project$BugDetails$issueHref = function (issue) {
 	return A2(
-		_elm_lang$html$Html$a,
+		_elm_lang$html$Html$span,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('is-warning tag is-warning'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$href(issue.url),
-				_1: {ctor: '[]'}
-			}
+			_0: _elm_lang$html$Html_Attributes$class('is-warning tag'),
+			_1: {ctor: '[]'}
 		},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(
-				_user$project$ViewCommon$issueTitle(issue)),
+			_0: A2(
+				_elm_lang$html$Html$a,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$href(issue.url),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						_user$project$ViewCommon$issueTitle(issue)),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
@@ -15828,13 +15835,13 @@ var _user$project$BugDetails$issueHref = function (issue) {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(
 							_user$project$BugDetails$DeleteIssue(issue)),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('delete is-small'),
+							_1: {ctor: '[]'}
+						}
 					},
-					{
-						ctor: '::',
-						_0: _user$project$ViewCommon$fontAwesome('close'),
-						_1: {ctor: '[]'}
-					}),
+					{ctor: '[]'}),
 				_1: {ctor: '[]'}
 			}
 		});

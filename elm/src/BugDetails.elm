@@ -200,9 +200,9 @@ linkedIssues bug =
 
 issueHref : Issue -> Html Msg
 issueHref issue =
-    a [ class "is-warning tag is-warning", href issue.url ]
-        [ text (issueTitle issue)
-        , a [ onClick (DeleteIssue issue) ] [ fontAwesome "close" ]
+    span [ class "is-warning tag" ]
+        [ a [ href issue.url ] [ text (issueTitle issue) ]
+        , a [ onClick (DeleteIssue issue), class "delete is-small" ] []
         ]
 
 
