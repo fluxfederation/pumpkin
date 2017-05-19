@@ -196,6 +196,16 @@ closeBugUrl (BugID uuid) =
     "/bugs/" ++ uuid.toString ++ "/close"
 
 
+linkIssueUrl : BugID -> String -> String
+linkIssueUrl (BugID bugId) issueUrl =
+    "/bugs/" ++ bugId.toString ++ "/issues/link" ++ issueUrl
+
+
+unlinkIssueUrl : BugID -> IssueID -> String
+unlinkIssueUrl (BugID bugId) (IssueID issueId) =
+    "/bugs/" ++ bugId.toString ++ "/issues/" ++ issueId.toString ++ "/unlink"
+
+
 
 -- Web Requests
 
@@ -220,6 +230,11 @@ loadOccurrences bugId start =
 closeBug : BugID -> Http.Request Bug
 closeBug bugId =
     Http.post (closeBugUrl bugId) Http.emptyBody decodeBug
+
+
+linkIssue : BugID -> String -> Http.Request Bug
+linkIssue bugId url =
+    Http.post (linkIssueUrl bugId url) Http.emptyBody decodeBug
 
 
 loadEnvironments : Http.Request (List Environment)

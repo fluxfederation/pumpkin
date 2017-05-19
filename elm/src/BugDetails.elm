@@ -35,7 +35,9 @@ type Msg
     | TimeTick Time.Time
     | ToggleLinkIssueForm
     | LinkIssue String
-    | UpdateIssue String
+    | UnlinkIssue Issue
+    | LinkedIssue (WebData Bug)
+    | UpdateIssueUrl String
 
 
 type alias Model =
@@ -81,16 +83,27 @@ update msg model =
             ToggleLinkIssueForm ->
                 noCmd { model | showLinkIssueForm = not model.showLinkIssueForm }
 
-            UpdateIssue issue ->
+            UpdateIssueUrl issue ->
                 noCmd { model | issueToLink = issue }
 
-            LinkIssue linkIssue ->
+            LinkIssue issueUrl ->
+                ( model, linkIssue model.bug.id issueUrl )
+
+            LinkedIssue bug ->
+                ( model, Cmd.none )
+
+            UnlinkIssue issue ->
                 ( model, Cmd.none )
 
 
 fetchOccurrences : BugID -> Maybe Occurrence -> Cmd Msg
 fetchOccurrences bugId occ =
     Rest.fetch LoadedOccurrences (Rest.loadOccurrences bugId (Maybe.map .id occ))
+
+
+linkIssue : BugID -> String -> Cmd Msg
+linkIssue bugId issueUrl =
+    Rest.fetch LinkedIssue (Rest.linkIssue bugId issueUrl)
 
 
 subscriptions : Model -> Sub Msg
@@ -130,7 +143,7 @@ view model =
 linkIssueForm : Model -> Html Msg
 linkIssueForm model =
     if model.showLinkIssueForm then
-        input [ onInput UpdateIssue, onSubmit (LinkIssue model.issueToLink), placeholder "https://issue-tracker.com/issue-id" ] []
+        input [ onInput UpdateIssueUrl, onSubmit (LinkIssue model.issueToLink), placeholder "https://issue-tracker.com/issue-id" ] []
     else
         a [ class "tag", onClick ToggleLinkIssueForm ] [ text "+" ]
 
@@ -187,7 +200,10 @@ linkedIssues bug =
 
 issueHref : Issue -> Html Msg
 issueHref issue =
-    a [ class "is-warning tag is-warning", href issue.url ] [ text (issueTitle issue) ]
+    a [ class "is-warning tag is-warning", href issue.url ]
+        [ text (issueTitle issue)
+        , a [ onClick (UnlinkIssue issue) ] [ fontAwesome "close" ]
+        ]
 
 
 stackTraceDisplay : Model -> Html Msg
