@@ -5,7 +5,7 @@ class AssignBug < ApplicationJob
     occurrence = Occurrence.find(occurrence_id)
 
     occurrence.with_lock do
-      occurrence.bug = Bug.joins(:primary_occurrence).merge(Occurrence.where(environment_id: occurrence.environment, message: occurrence.message)).first
+      occurrence.bug = Bug.joins(:primary_occurrence).merge(Occurrence.where(message: occurrence.message)).first
       if occurrence.bug.nil?
         occurrence.build_bug(primary_occurrence: occurrence)
         occurrence.bug.events.build(name: 'created')
