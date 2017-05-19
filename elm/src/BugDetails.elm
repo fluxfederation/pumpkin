@@ -153,31 +153,34 @@ selectedBugHeader model =
                     , bugTimes model
                     ]
                 ]
-            , p [] [ closeBugButton model ]
+            , p [] [ bugClosingSection model ]
             ]
         ]
 
 
-closeBugButton : Model -> Html Msg
-closeBugButton model =
+bugClosingSection : Model -> Html Msg
+bugClosingSection model =
     let
         closedLabel =
             span [ class "tag is-danger" ] [ text "Closed" ]
 
-        closeButton =
+        closeButtons =
             case model.showCloseButton of
                 True ->
-                    button [ class "button is-danger", onClick CloseBug ] [ text "Yep - close it!" ]
+                    div []
+                        [ button [ class "button is-danger is-small", onClick CloseBug ] [ text "Yep - close it!" ]
+                        , button [ class "button is-white is-small", onClick HideCloseButton ] [ fontAwesome "times-circle-o" ]
+                        ]
 
                 False ->
-                    button [ class "button is-warning", onClick ShowCloseButton ] [ text "Close Bug" ]
+                    button [ class "button is-white is-small", onClick ShowCloseButton ] [ fontAwesome "trash" ]
     in
         case model.bug.closedAt of
             Just time ->
                 closedLabel
 
             _ ->
-                closeButton
+                closeButtons
 
 
 occurrenceCount : Bug -> Html Msg

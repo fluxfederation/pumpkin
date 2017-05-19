@@ -15744,32 +15744,58 @@ var _user$project$BugDetails$ReloadBug = function (a) {
 var _user$project$BugDetails$CloseBug = {ctor: 'CloseBug'};
 var _user$project$BugDetails$HideCloseButton = {ctor: 'HideCloseButton'};
 var _user$project$BugDetails$ShowCloseButton = {ctor: 'ShowCloseButton'};
-var _user$project$BugDetails$closeBugButton = function (model) {
-	var closeButton = function () {
+var _user$project$BugDetails$bugClosingSection = function (model) {
+	var closeButtons = function () {
 		var _p1 = model.showCloseButton;
 		if (_p1 === true) {
 			return A2(
-				_elm_lang$html$Html$button,
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('button is-danger'),
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('button is-danger is-small'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$CloseBug),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Yep - close it!'),
+							_1: {ctor: '[]'}
+						}),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$CloseBug),
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('button is-white is-small'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$HideCloseButton),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _user$project$ViewCommon$fontAwesome('times-circle-o'),
+								_1: {ctor: '[]'}
+							}),
 						_1: {ctor: '[]'}
 					}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Yep - close it!'),
-					_1: {ctor: '[]'}
 				});
 		} else {
 			return A2(
 				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('button is-warning'),
+					_0: _elm_lang$html$Html_Attributes$class('button is-white is-small'),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ShowCloseButton),
@@ -15778,7 +15804,7 @@ var _user$project$BugDetails$closeBugButton = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Close Bug'),
+					_0: _user$project$ViewCommon$fontAwesome('trash'),
 					_1: {ctor: '[]'}
 				});
 		}
@@ -15799,7 +15825,7 @@ var _user$project$BugDetails$closeBugButton = function (model) {
 	if (_p2.ctor === 'Just') {
 		return closedLabel;
 	} else {
-		return closeButton;
+		return closeButtons;
 	}
 };
 var _user$project$BugDetails$ToggleTimeFormat = {ctor: 'ToggleTimeFormat'};
@@ -15914,7 +15940,7 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: _user$project$BugDetails$closeBugButton(model),
+										_0: _user$project$BugDetails$bugClosingSection(model),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
