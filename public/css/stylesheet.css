@@ -4,6 +4,10 @@ html {
     background-color: #eee;
 }
 
+a:hover {
+    background-color: #f5f5f5;
+}
+
 .loading-spinner {
   position: absolute;
   left: 50%;
