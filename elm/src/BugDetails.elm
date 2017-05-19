@@ -108,7 +108,7 @@ update msg model =
                 noCmd { model | issueToLink = issue }
 
             LinkIssue issueUrl ->
-                ( model, Rest.fetch ReloadBug (Rest.createIssue model.bug.id issueUrl) )
+                ( { model | showCreateIssueForm = False }, Rest.fetch ReloadBug (Rest.createIssue model.bug.id issueUrl) )
 
             DeleteIssue issue ->
                 ( model, Rest.fetch ReloadBug (Rest.deleteIssue model.bug.id issue.id) )

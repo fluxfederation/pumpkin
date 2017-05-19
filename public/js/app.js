@@ -16389,7 +16389,9 @@ var _user$project$BugDetails$update = F2(
 			case 'LinkIssue':
 				return {
 					ctor: '_Tuple2',
-					_0: model,
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{showCreateIssueForm: false}),
 					_1: A2(
 						_user$project$Rest$fetch,
 						_user$project$BugDetails$ReloadBug,
