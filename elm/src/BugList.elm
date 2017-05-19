@@ -157,6 +157,12 @@ sidebarBug model bug =
 
         clickMsg =
             SelectBug (Just bug.id)
+
+        bugIsClosed =
+            Maybe.withDefault False <| Maybe.map (always True) bug.closedAt
+
+        occurrenceCountTag =
+            span [ class "tag", classList [ ( "is-danger", bugIsClosed ) ] ] [ text (toString bug.occurrenceCount) ]
     in
         a
             [ class "sidebar-bug"
@@ -181,10 +187,7 @@ sidebarBug model bug =
                 [ class
                     "sidebar-bug-tags"
                 ]
-                [ span [ class "tag" ]
-                    [ text
-                        (toString bug.occurrenceCount)
-                    ]
+                [ occurrenceCountTag
                 , issueTag
                 ]
             ]
