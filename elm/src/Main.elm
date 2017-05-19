@@ -261,8 +261,18 @@ update msg model =
             let
                 ( newBugModel, cmd ) =
                     RemoteData.update (BugDetails.update m) model.focusedBug
+
+                ( newModel, blcmd ) =
+                    case m of
+                        BugDetails.ReloadBug (RemoteData.Success b) ->
+                            update SearchSubmit model
+
+                        _ ->
+                            noCmd model
             in
-                ( { model | focusedBug = newBugModel }, Cmd.map FocusedBugMsg cmd )
+                ( { newModel | focusedBug = newBugModel }
+                , Cmd.batch [ Cmd.map FocusedBugMsg cmd, blcmd ]
+                )
 
         BugListMsg m ->
             let

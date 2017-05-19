@@ -15728,8 +15728,62 @@ var _user$project$BugDetails$occurrenceCount = function (bug) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$BugDetails$closedLabel = function (bug) {
-	var closedTag = A2(
+var _user$project$BugDetails$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, showCloseButton: g};
+	});
+var _user$project$BugDetails$TimeTick = function (a) {
+	return {ctor: 'TimeTick', _0: a};
+};
+var _user$project$BugDetails$subscriptions = function (model) {
+	return A2(_elm_lang$core$Time$every, _elm_lang$core$Time$minute, _user$project$BugDetails$TimeTick);
+};
+var _user$project$BugDetails$ReloadBug = function (a) {
+	return {ctor: 'ReloadBug', _0: a};
+};
+var _user$project$BugDetails$CloseBug = {ctor: 'CloseBug'};
+var _user$project$BugDetails$HideCloseButton = {ctor: 'HideCloseButton'};
+var _user$project$BugDetails$ShowCloseButton = {ctor: 'ShowCloseButton'};
+var _user$project$BugDetails$closeBugButton = function (model) {
+	var closeButton = function () {
+		var _p1 = model.showCloseButton;
+		if (_p1 === true) {
+			return A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('button is-danger'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$CloseBug),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Yep - close it!'),
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('button is-warning'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ShowCloseButton),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Close Bug'),
+					_1: {ctor: '[]'}
+				});
+		}
+	}();
+	var closedLabel = A2(
 		_elm_lang$html$Html$span,
 		{
 			ctor: '::',
@@ -15741,29 +15795,12 @@ var _user$project$BugDetails$closedLabel = function (bug) {
 			_0: _elm_lang$html$Html$text('Closed'),
 			_1: {ctor: '[]'}
 		});
-	var blankTag = A2(
-		_elm_lang$html$Html$span,
-		{ctor: '[]'},
-		{ctor: '[]'});
-	return A2(
-		_elm_lang$core$Maybe$withDefault,
-		blankTag,
-		A2(
-			_elm_lang$core$Maybe$map,
-			function (x) {
-				return closedTag;
-			},
-			bug.closedAt));
-};
-var _user$project$BugDetails$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f};
-	});
-var _user$project$BugDetails$TimeTick = function (a) {
-	return {ctor: 'TimeTick', _0: a};
-};
-var _user$project$BugDetails$subscriptions = function (model) {
-	return A2(_elm_lang$core$Time$every, _elm_lang$core$Time$minute, _user$project$BugDetails$TimeTick);
+	var _p2 = model.bug.closedAt;
+	if (_p2.ctor === 'Just') {
+		return closedLabel;
+	} else {
+		return closeButton;
+	}
 };
 var _user$project$BugDetails$ToggleTimeFormat = {ctor: 'ToggleTimeFormat'};
 var _user$project$BugDetails$selectedBugHeader = function (model) {
@@ -15830,7 +15867,46 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 						_0: _user$project$BugDetails$occurrenceCount(model.bug),
 						_1: {
 							ctor: '::',
-							_0: _user$project$BugDetails$closedLabel(model.bug),
+							_0: A2(
+								_elm_lang$html$Html$p,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$button,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('button is-primary is-inverted'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$classList(
+													{
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'is-active', _1: !model.showTimeAgo},
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleTimeFormat),
+													_1: {ctor: '[]'}
+												}
+											}
+										},
+										{
+											ctor: '::',
+											_0: A2(_user$project$ViewCommon$icon, 'clock-o', ''),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(' '),
+												_1: {
+													ctor: '::',
+													_0: _user$project$BugDetails$bugTimes(model),
+													_1: {ctor: '[]'}
+												}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}),
 							_1: {
 								ctor: '::',
 								_0: A2(
@@ -15838,39 +15914,7 @@ var _user$project$BugDetails$selectedBugHeader = function (model) {
 									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$button,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('button is-primary is-inverted'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$classList(
-														{
-															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: 'is-active', _1: !model.showTimeAgo},
-															_1: {ctor: '[]'}
-														}),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleTimeFormat),
-														_1: {ctor: '[]'}
-													}
-												}
-											},
-											{
-												ctor: '::',
-												_0: A2(_user$project$ViewCommon$icon, 'clock-o', ''),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html$text(' '),
-													_1: {
-														ctor: '::',
-														_0: _user$project$BugDetails$bugTimes(model),
-														_1: {ctor: '[]'}
-													}
-												}
-											}),
+										_0: _user$project$BugDetails$closeBugButton(model),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
@@ -16056,8 +16100,8 @@ var _user$project$BugDetails$update = F2(
 		var noCmd = function (m) {
 			return {ctor: '_Tuple2', _0: m, _1: _elm_lang$core$Platform_Cmd$none};
 		};
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'LoadMoreOccurrences':
 				return {
 					ctor: '_Tuple2',
@@ -16069,7 +16113,7 @@ var _user$project$BugDetails$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							occurrences: A2(_user$project$ChunkList$update, model.occurrences, _p1._0)
+							occurrences: A2(_user$project$ChunkList$update, model.occurrences, _p3._0)
 						}));
 			case 'ToggleFullStackTrace':
 				return noCmd(
@@ -16077,34 +16121,63 @@ var _user$project$BugDetails$update = F2(
 						model,
 						{showFullStackTrace: !model.showFullStackTrace}));
 			case 'ToggleOccurrence':
-				var _p2 = _p1._0;
-				return A2(_elm_lang$core$List$member, _p2, model.expandedOccurrences) ? noCmd(
+				var _p4 = _p3._0;
+				return A2(_elm_lang$core$List$member, _p4, model.expandedOccurrences) ? noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
 							expandedOccurrences: A2(
 								_elm_lang$core$List$filter,
 								function (oId) {
-									return !_elm_lang$core$Native_Utils.eq(oId, _p2);
+									return !_elm_lang$core$Native_Utils.eq(oId, _p4);
 								},
 								model.expandedOccurrences)
 						})) : noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							expandedOccurrences: {ctor: '::', _0: _p2, _1: model.expandedOccurrences}
+							expandedOccurrences: {ctor: '::', _0: _p4, _1: model.expandedOccurrences}
 						}));
 			case 'ToggleTimeFormat':
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{showTimeAgo: !model.showTimeAgo}));
+			case 'ShowCloseButton':
+				return noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showCloseButton: true}));
+			case 'HideCloseButton':
+				return noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showCloseButton: false}));
+			case 'CloseBug':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(
+						_user$project$Rest$fetch,
+						_user$project$BugDetails$ReloadBug,
+						_user$project$Rest$closeBug(model.bug.id))
+				};
+			case 'ReloadBug':
+				var _p5 = _p3._0;
+				if (_p5.ctor === 'Success') {
+					return noCmd(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{bug: _p5._0}));
+				} else {
+					return noCmd(model);
+				}
 			default:
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							now: _elm_lang$core$Date$fromTime(_p1._0)
+							now: _elm_lang$core$Date$fromTime(_p3._0)
 						}));
 		}
 	});
@@ -16121,7 +16194,8 @@ var _user$project$BugDetails$init = function (bug) {
 			expandedOccurrences: {ctor: '[]'},
 			showFullStackTrace: false,
 			now: _elm_lang$core$Date$fromTime(0),
-			showTimeAgo: true
+			showTimeAgo: true,
+			showCloseButton: false
 		},
 		_1: _elm_lang$core$Platform_Cmd$batch(
 			{
@@ -16942,24 +17016,44 @@ var _user$project$Main$update = F2(
 						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BugListMsg, cmd)
 					};
 				case 'FocusedBugMsg':
-					var _p10 = A2(
+					var _p13 = _p5._0;
+					var _p10 = function () {
+						var _p11 = _p13;
+						if ((_p11.ctor === 'ReloadBug') && (_p11._0.ctor === 'Success')) {
+							return A2(_user$project$Main$update, _user$project$Main$SearchSubmit, model);
+						} else {
+							return _user$project$Main$noCmd(model);
+						}
+					}();
+					var newModel = _p10._0;
+					var blcmd = _p10._1;
+					var _p12 = A2(
 						_bloom$remotedata$RemoteData$update,
-						_user$project$BugDetails$update(_p5._0),
+						_user$project$BugDetails$update(_p13),
 						model.focusedBug);
-					var newBugModel = _p10._0;
-					var cmd = _p10._1;
+					var newBugModel = _p12._0;
+					var cmd = _p12._1;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
-							model,
+							newModel,
 							{focusedBug: newBugModel}),
-						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, cmd)
+						_1: _elm_lang$core$Platform_Cmd$batch(
+							{
+								ctor: '::',
+								_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$FocusedBugMsg, cmd),
+								_1: {
+									ctor: '::',
+									_0: blcmd,
+									_1: {ctor: '[]'}
+								}
+							})
 					};
 				case 'BugListMsg':
-					var _p13 = _p5._0;
-					var _p11 = A2(_user$project$BugList$update, _p13, model.bugList);
-					var newBugList = _p11._0;
-					var listCmd = _p11._1;
+					var _p16 = _p5._0;
+					var _p14 = A2(_user$project$BugList$update, _p16, model.bugList);
+					var newBugList = _p14._0;
+					var listCmd = _p14._1;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -16972,12 +17066,12 @@ var _user$project$Main$update = F2(
 								_1: {
 									ctor: '::',
 									_0: function () {
-										var _p12 = _p13;
-										if ((_p12.ctor === 'SelectBug') && (_p12._0.ctor === 'Just')) {
+										var _p15 = _p16;
+										if ((_p15.ctor === 'SelectBug') && (_p15._0.ctor === 'Just')) {
 											return A2(
 												_user$project$Rest$fetch,
 												_user$project$Main$LoadedDetails,
-												_user$project$Rest$loadBugDetails(_p12._0._0));
+												_user$project$Rest$loadBugDetails(_p15._0._0));
 										} else {
 											return _elm_lang$core$Platform_Cmd$none;
 										}
@@ -17002,26 +17096,26 @@ var _user$project$Main$SetSelectedEnvironmentIds = function (a) {
 var _user$project$Main$location2messages = function (location) {
 	var builder = _rgrempel$elm_route_url$RouteUrl_Builder$fromUrl(location.href);
 	var selectedEnvironmentIds = function () {
-		var _p14 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
-		if (_p14.ctor === 'Just') {
+		var _p17 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'environments', builder);
+		if (_p17.ctor === 'Just') {
 			return A2(
 				_elm_lang$core$List$filter,
-				function (_p15) {
-					return !_elm_lang$core$String$isEmpty(_p15);
+				function (_p18) {
+					return !_elm_lang$core$String$isEmpty(_p18);
 				},
-				A2(_elm_lang$core$String$split, ',', _p14._0));
+				A2(_elm_lang$core$String$split, ',', _p17._0));
 		} else {
 			return {ctor: '[]'};
 		}
 	}();
 	var focusBug = function () {
-		var _p16 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'bug', builder);
-		if (_p16.ctor === 'Just') {
+		var _p19 = A2(_rgrempel$elm_route_url$RouteUrl_Builder$getQuery, 'bug', builder);
+		if (_p19.ctor === 'Just') {
 			return {
 				ctor: '::',
 				_0: _user$project$Main$RequestDetails(
 					_user$project$Types$BugID(
-						_user$project$Types$UUID(_p16._0))),
+						_user$project$Types$UUID(_p19._0))),
 				_1: {ctor: '[]'}
 			};
 		} else {
@@ -17136,23 +17230,23 @@ var _user$project$Main$environmentMenuItem = F2(
 			});
 	});
 var _user$project$Main$sidebarMenu = function (model) {
-	var _p17 = model.environments;
-	switch (_p17.ctor) {
+	var _p20 = model.environments;
+	switch (_p20.ctor) {
 		case 'Success':
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
 				A2(
 					_elm_lang$core$List$map,
-					function (_p18) {
+					function (_p21) {
 						return A2(
 							_user$project$Main$environmentMenuItem,
 							model.selectedEnvironmentIds,
 							function (_) {
 								return _.id;
-							}(_p18));
+							}(_p21));
 					},
-					_p17._0));
+					_p20._0));
 		case 'Loading':
 			return _user$project$ViewCommon$spinner;
 		case 'Failure':
@@ -17366,7 +17460,7 @@ var _user$project$Main$LoadedEnvironments = function (a) {
 	return {ctor: 'LoadedEnvironments', _0: a};
 };
 var _user$project$Main$init = function () {
-	var _p19 = A2(
+	var _p22 = A2(
 		_user$project$BugList$init,
 		{
 			environmentIDs: {ctor: '[]'},
@@ -17374,8 +17468,8 @@ var _user$project$Main$init = function () {
 			search: ''
 		},
 		_elm_lang$core$Maybe$Nothing);
-	var bugList = _p19._0;
-	var bugListCmd = _p19._1;
+	var bugList = _p22._0;
+	var bugListCmd = _p22._1;
 	return {
 		ctor: '_Tuple2',
 		_0: {

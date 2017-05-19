@@ -4,7 +4,7 @@
 module BugDetails
     exposing
         ( Model
-        , Msg
+        , Msg(..)
         , init
         , subscriptions
         , update
@@ -12,7 +12,7 @@ module BugDetails
         )
 
 import Types exposing (..)
-import RemoteData exposing (WebData)
+import RemoteData exposing (RemoteData, WebData)
 import ChunkList exposing (ChunkList)
 import Rest
 import Date exposing (Date)
@@ -32,6 +32,10 @@ type Msg
     | ToggleFullStackTrace
     | ToggleOccurrence OccurrenceID
     | ToggleTimeFormat
+    | ShowCloseButton
+    | HideCloseButton
+    | CloseBug
+    | ReloadBug (WebData Bug)
     | TimeTick Time.Time
 
 
@@ -42,6 +46,7 @@ type alias Model =
     , showFullStackTrace : Bool
     , now : Date.Date
     , showTimeAgo : Bool
+    , showCloseButton : Bool
     }
 
 
@@ -70,6 +75,23 @@ update msg model =
             ToggleTimeFormat ->
                 noCmd { model | showTimeAgo = not model.showTimeAgo }
 
+            ShowCloseButton ->
+                noCmd { model | showCloseButton = True }
+
+            HideCloseButton ->
+                noCmd { model | showCloseButton = False }
+
+            CloseBug ->
+                ( model, Rest.fetch ReloadBug (Rest.closeBug model.bug.id) )
+
+            ReloadBug result ->
+                case result of
+                    RemoteData.Success b ->
+                        noCmd { model | bug = b }
+
+                    _ ->
+                        noCmd model
+
             TimeTick time ->
                 noCmd { model | now = (Date.fromTime time) }
 
@@ -92,6 +114,7 @@ init bug =
       , showFullStackTrace = False
       , now = (Date.fromTime 0)
       , showTimeAgo = True
+      , showCloseButton = False
       }
     , Cmd.batch
         [ Task.perform TimeTick Time.now
@@ -119,7 +142,6 @@ selectedBugHeader model =
             ]
         , div [ class "has-text-right" ]
             [ occurrenceCount model.bug
-            , closedLabel model.bug
             , p []
                 [ button
                     [ class "button is-primary is-inverted"
@@ -131,20 +153,31 @@ selectedBugHeader model =
                     , bugTimes model
                     ]
                 ]
+            , p [] [ closeBugButton model ]
             ]
         ]
 
 
-closedLabel : Bug -> Html Msg
-closedLabel bug =
+closeBugButton : Model -> Html Msg
+closeBugButton model =
     let
-        blankTag =
-            span [] []
-
-        closedTag =
+        closedLabel =
             span [ class "tag is-danger" ] [ text "Closed" ]
+
+        closeButton =
+            case model.showCloseButton of
+                True ->
+                    button [ class "button is-danger", onClick CloseBug ] [ text "Yep - close it!" ]
+
+                False ->
+                    button [ class "button is-warning", onClick ShowCloseButton ] [ text "Close Bug" ]
     in
-        Maybe.withDefault blankTag <| Maybe.map (\x -> closedTag) bug.closedAt
+        case model.bug.closedAt of
+            Just time ->
+                closedLabel
+
+            _ ->
+                closeButton
 
 
 occurrenceCount : Bug -> Html Msg
