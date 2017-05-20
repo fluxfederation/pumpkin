@@ -414,7 +414,7 @@ sidebarMenu model =
             spinner
 
         RemoteData.Failure _ ->
-            div [] [ text "Failed" ]
+            errorNotification Nothing "Failed to load environments"
 
         RemoteData.NotAsked ->
             div [] []
