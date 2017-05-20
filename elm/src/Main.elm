@@ -31,7 +31,6 @@ type Msg
     | SetSelectedEnvironmentIds (List EnvironmentID)
     | LoadedDetails (WebData Bug)
     | RequestDetails BugID
-    | ClearError
     | ToggleShowClosedBugs
     | ToggleMenu
     | SearchChange String
@@ -46,7 +45,6 @@ type alias Model =
     , environments : WebData (List Environment)
     , bugList : BugList.Model
     , focusedBug : WebData BugDetails.Model
-    , error : Maybe String
     , showClosedBugs : Bool
     , showMenu : Bool
     , search : String
@@ -69,7 +67,6 @@ init =
           , environments = RemoteData.NotAsked
           , bugList = bugList
           , focusedBug = RemoteData.NotAsked
-          , error = Nothing
           , showClosedBugs = False
           , showMenu = False
           , search = ""
@@ -186,16 +183,6 @@ subscriptions model =
 -- Updates
 
 
-handleResult : (b -> ( Model, Cmd Msg )) -> Model -> Result a b -> ( Model, Cmd Msg )
-handleResult handler model result =
-    case result of
-        Err err ->
-            noCmd { model | error = Just (toString err) }
-
-        Ok v ->
-            handler v
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -230,9 +217,6 @@ update msg model =
                 (RemoteData.update BugDetails.init result)
                 FocusedBugMsg
                 (\bugDetails -> noCmd { model | focusedBug = bugDetails })
-
-        ClearError ->
-            noCmd { model | error = Nothing }
 
         ToggleShowClosedBugs ->
             update SearchSubmit { model | showClosedBugs = not model.showClosedBugs }
@@ -315,21 +299,6 @@ shouldHideFocusedBug model f =
 
 view : Model -> Html Msg
 view model =
-    div [] [ errorMessages model, content model ]
-
-
-errorMessages : Model -> Html Msg
-errorMessages model =
-    case model.error of
-        Just e ->
-            errorNotification (Just ClearError) e
-
-        Nothing ->
-            div [] []
-
-
-content : Model -> Html Msg
-content model =
     main_ [ class "columns" ]
         [ div [ class "column is-one-third" ]
             [ div [ class "panel sidebar" ]
