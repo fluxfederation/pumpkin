@@ -214,7 +214,11 @@ update msg model =
                 update SearchSubmit { model | selectedEnvironmentIds = newEnvironmentIds }
 
         SetSelectedEnvironmentIds ids ->
-            update SearchSubmit { model | selectedEnvironmentIds = ids }
+            update SearchSubmit
+                { model
+                    | selectedEnvironmentIds = ids
+                    , showMenu = model.showMenu || List.isEmpty ids
+                }
 
         RequestDetails bugId ->
             ( model
@@ -234,7 +238,7 @@ update msg model =
             update SearchSubmit { model | showClosedBugs = not model.showClosedBugs }
 
         ToggleMenu ->
-            noCmd { model | showMenu = not model.showMenu }
+            noCmd { model | showMenu = (List.isEmpty model.selectedEnvironmentIds) || (not model.showMenu) }
 
         SearchChange newSearch ->
             noCmd { model | search = newSearch }
@@ -397,11 +401,7 @@ currentEnvironmentsAsTags model =
                 ]
     in
         p [ class "panel-block" ]
-            (if List.isEmpty tags then
-                [ text "None" ]
-             else
-                [ p [] (List.intersperse (text " ") tags) ]
-            )
+            [ p [] (List.intersperse (text " ") tags) ]
 
 
 sidebarMenu : Model -> Html Msg
