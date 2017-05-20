@@ -222,18 +222,10 @@ update msg model =
             )
 
         LoadedDetails result ->
-            let
-                inited =
-                    RemoteData.map BugDetails.init result
-            in
-                ( { model | focusedBug = RemoteData.map Tuple.first inited }
-                , case RemoteData.map Tuple.second inited of
-                    RemoteData.Success cmd ->
-                        Cmd.map FocusedBugMsg cmd
-
-                    _ ->
-                        Cmd.none
-                )
+            chainUpdates
+                (RemoteData.update BugDetails.init result)
+                FocusedBugMsg
+                (\bugDetails -> noCmd { model | focusedBug = bugDetails })
 
         ClearError ->
             noCmd { model | error = Nothing }
@@ -249,53 +241,60 @@ update msg model =
 
         SearchSubmit ->
             let
-                ( bugList, cmd ) =
-                    BugList.init (toFilter model)
-                        (Maybe.map (.bug >> .id) (RemoteData.toMaybe model.focusedBug))
+                selectedBugId =
+                    (Maybe.map (.bug >> .id) (RemoteData.toMaybe model.focusedBug))
+
+                initBugList =
+                    BugList.init (toFilter model) selectedBugId
             in
-                ( { model | bugList = bugList }
-                , Cmd.map BugListMsg cmd
-                )
+                chainUpdates initBugList BugListMsg (\bugList -> noCmd { model | bugList = bugList })
 
         FocusedBugMsg m ->
-            let
-                ( newBugModel, cmd ) =
-                    RemoteData.update (BugDetails.update m) model.focusedBug
+            chainUpdates
+                (RemoteData.update (BugDetails.update m) model.focusedBug)
+                FocusedBugMsg
+                (\newBugModel ->
+                    let
+                        newModel =
+                            { model | focusedBug = newBugModel }
+                    in
+                        case m of
+                            BugDetails.ReloadBug _ ->
+                                update SearchSubmit newModel
 
-                ( newModel, blcmd ) =
-                    case m of
-                        BugDetails.ReloadBug (RemoteData.Success b) ->
-                            update SearchSubmit model
-
-                        _ ->
-                            noCmd model
-            in
-                ( { newModel | focusedBug = newBugModel }
-                , Cmd.batch [ Cmd.map FocusedBugMsg cmd, blcmd ]
+                            _ ->
+                                noCmd newModel
                 )
 
         BugListMsg m ->
-            let
-                ( newBugList, listCmd ) =
-                    (BugList.update m model.bugList)
-            in
-                ( { model | bugList = newBugList }
-                , Cmd.batch
-                    [ Cmd.map BugListMsg listCmd
+            chainUpdates
+                (BugList.update m model.bugList)
+                BugListMsg
+                (\newBugList ->
+                    ( { model | bugList = newBugList }
                     , case m of
                         BugList.SelectBug (Just id) ->
                             Rest.fetch LoadedDetails (Rest.loadBugDetails id)
 
                         _ ->
                             Cmd.none
-                    ]
+                    )
                 )
 
         TimeTick time ->
             noCmd { model | now = (Date.fromTime time) }
 
 
-noCmd : model -> ( model, Cmd Msg )
+chainUpdates : ( m1, Cmd msg1 ) -> (msg1 -> msg2) -> (m1 -> ( m2, Cmd msg2 )) -> ( m2, Cmd msg2 )
+chainUpdates ( m1, msg1 ) translateMsg step =
+    let
+        ( m2, msg2 ) =
+            step m1
+    in
+        ( m2, Cmd.batch [ Cmd.map translateMsg msg1, msg2 ] )
+
+
+noCmd : model -> ( model, Cmd msg )
 noCmd model =
     ( model, Cmd.none )
 
