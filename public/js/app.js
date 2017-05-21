@@ -15857,7 +15857,7 @@ var _user$project$BugDetails$linkedIssues = function (bug) {
 var _user$project$BugDetails$LinkIssue = function (a) {
 	return {ctor: 'LinkIssue', _0: a};
 };
-var _user$project$BugDetails$ToggleLinkIssueForm = {ctor: 'ToggleLinkIssueForm'};
+var _user$project$BugDetails$ShowLinkIssueForm = {ctor: 'ShowLinkIssueForm'};
 var _user$project$BugDetails$createIssueForm = function (model) {
 	return model.showCreateIssueForm ? A2(
 		_elm_lang$html$Html$form,
@@ -15893,7 +15893,7 @@ var _user$project$BugDetails$createIssueForm = function (model) {
 			_0: _elm_lang$html$Html_Attributes$class('tag'),
 			_1: {
 				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleLinkIssueForm),
+				_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ShowLinkIssueForm),
 				_1: {ctor: '[]'}
 			}
 		},
@@ -16376,7 +16376,7 @@ var _user$project$BugDetails$update = F2(
 						{
 							now: _elm_lang$core$Date$fromTime(_p3._0)
 						}));
-			case 'ToggleLinkIssueForm':
+			case 'ShowLinkIssueForm':
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,

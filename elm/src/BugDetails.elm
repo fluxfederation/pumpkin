@@ -37,7 +37,7 @@ type Msg
     | CloseBug
     | ReloadBug (WebData Bug)
     | TimeTick Time.Time
-    | ToggleLinkIssueForm
+    | ShowLinkIssueForm
     | LinkIssue String
     | DeleteIssue Issue
     | UpdateIssueUrl String
@@ -101,7 +101,7 @@ update msg model =
             TimeTick time ->
                 noCmd { model | now = (Date.fromTime time) }
 
-            ToggleLinkIssueForm ->
+            ShowLinkIssueForm ->
                 noCmd { model | showCreateIssueForm = not model.showCreateIssueForm }
 
             UpdateIssueUrl issue ->
@@ -161,7 +161,7 @@ createIssueForm model =
             [ input [ onInput UpdateIssueUrl, placeholder "https://issue-tracker.com/issue-id", class "input" ] []
             ]
     else
-        a [ class "tag", onClick ToggleLinkIssueForm ] [ text "+" ]
+        a [ class "tag", onClick ShowLinkIssueForm ] [ text "+" ]
 
 
 selectedBugHeader : Model -> Html Msg
