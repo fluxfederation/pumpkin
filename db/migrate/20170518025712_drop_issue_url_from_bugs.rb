@@ -1,4 +1,4 @@
-class DropIssueUrlFromBug < ActiveRecord::Migration[5.0]
+class DropIssueUrlFromBugs < ActiveRecord::Migration[5.0]
   def up
     command = <<-SQL
       DROP VIEW bug_with_latest_details;
