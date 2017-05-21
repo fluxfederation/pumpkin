@@ -1,3 +1,5 @@
+require 'resque_web'
+
 Rails.application.routes.draw do
   root 'static#index'
 
@@ -13,4 +15,6 @@ Rails.application.routes.draw do
   end
 
   get '/monitoring/heartbeat', to: 'heartbeat#index'
+
+  mount ResqueWeb::Engine => "/jobs", constraints: ->(req) { !Rails.env.production? || req.session[SimpleGoogleAuth.config.data_session_key_name].present? }
 end

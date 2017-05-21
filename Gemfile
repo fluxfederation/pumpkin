@@ -23,6 +23,7 @@ gem 'json_schema'
 gem 'dotenv-rails'
 
 gem 'resque'
+gem 'resque-web', require: 'resque_web'
 
 gem 'simple_google_auth', github: 'bagedevimo/simple_google_auth'
 
