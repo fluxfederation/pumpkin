@@ -114,10 +114,21 @@ class BugsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create_issue" do
-    assert_enqueued_with(job: CreateIssue) do
-      post create_issue_bug_path(bugs(:prod_normal))
-    end
+    issues_count = bugs(:prod_normal).issues.count
+    issue_url =  "https://tracker.com/browse/CI-111111"
+    post create_issue_bug_path(bugs(:prod_normal), url: issue_url)
+
     assert_response :success
     assert_response_schema "bugs/show.json"
+    assert_equal (issues_count + 1), bugs(:prod_normal).issues.count
+    assert_includes(bugs(:prod_normal).issues.pluck(:url), issue_url)
+  end
+
+  test "delete_issue" do
+    issues_count = bugs(:prod_normal).issues.count
+    post delete_issue_bug_path(bugs(:prod_normal), issue_id: issues(:prod_normal))
+    assert_response :success
+    assert_response_schema "bugs/show.json"
+    assert_equal (issues_count - 1), bugs(:prod_normal).issues.count
   end
 end
