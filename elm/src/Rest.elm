@@ -128,15 +128,18 @@ decodeBugID =
 
 decodeBug : Decoder Bug
 decodeBug =
-    map8 Bug
-        (field "id" decodeBugID)
-        (field "environment_id" decodeEnvironmentID)
-        (field "message" string)
-        (field "first_occurred_at" date)
-        (field "last_occurred_at" date)
-        (field "occurrence_count" int)
-        (field "closed_at" (maybe date))
-        (stacktrace)
+    map2 (\rest stack -> rest stack)
+        (map8 Bug
+            (field "id" decodeBugID)
+            (field "environment_id" decodeEnvironmentID)
+            (field "message" string)
+            (field "first_occurred_at" date)
+            (field "last_occurred_at" date)
+            (field "occurrence_count" int)
+            (field "closed_at" (maybe date))
+            (field "issues" (list decodeIssue))
+        )
+        stacktrace
 
 
 decodeChunk : Int -> Decoder a -> Decoder (Chunk a)
@@ -172,6 +175,19 @@ stacktrace =
     maybe <| at [ "data", "exception", "backtrace" ] (list string)
 
 
+decodeIssue : Decoder Issue
+decodeIssue =
+    map3 Issue
+        (field "id" decodeIssueID)
+        (field "bug_id" decodeBugID)
+        (field "url" string)
+
+
+decodeIssueID : Decoder IssueID
+decodeIssueID =
+    map IssueID decodeUUID
+
+
 event : Decoder Event
 event =
     map Event (field "name" string)
@@ -180,6 +196,16 @@ event =
 closeBugUrl : BugID -> String
 closeBugUrl (BugID uuid) =
     "/bugs/" ++ uuid.toString ++ "/close"
+
+
+createIssueUrl : BugID -> String -> String
+createIssueUrl (BugID bugId) issueUrl =
+    "/bugs/" ++ bugId.toString ++ "/create_issue?url=" ++ issueUrl
+
+
+deleteIssueUrl : BugID -> IssueID -> String
+deleteIssueUrl (BugID bugId) (IssueID issueId) =
+    "/bugs/" ++ bugId.toString ++ "/delete_issue?issue_id=" ++ issueId.toString
 
 
 
@@ -206,6 +232,16 @@ loadOccurrences bugId start =
 closeBug : BugID -> Http.Request Bug
 closeBug bugId =
     Http.post (closeBugUrl bugId) Http.emptyBody decodeBug
+
+
+createIssue : BugID -> String -> Http.Request Bug
+createIssue bugId url =
+    Http.post (createIssueUrl bugId url) Http.emptyBody decodeBug
+
+
+deleteIssue : BugID -> IssueID -> Http.Request Bug
+deleteIssue bugId issueId =
+    Http.post (deleteIssueUrl bugId issueId) Http.emptyBody decodeBug
 
 
 loadEnvironments : Http.Request (List Environment)

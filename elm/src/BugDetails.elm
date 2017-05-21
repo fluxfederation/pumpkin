@@ -37,6 +37,10 @@ type Msg
     | CloseBug
     | ReloadBug (WebData Bug)
     | TimeTick Time.Time
+    | ShowLinkIssueForm
+    | LinkIssue String
+    | DeleteIssue Issue
+    | UpdateIssueUrl String
 
 
 type alias Model =
@@ -46,6 +50,8 @@ type alias Model =
     , showFullStackTrace : Bool
     , now : Date.Date
     , showTimeAgo : Bool
+    , showCreateIssueForm : Bool
+    , issueToLink : String
     , showCloseButton : Bool
     }
 
@@ -95,6 +101,18 @@ update msg model =
             TimeTick time ->
                 noCmd { model | now = (Date.fromTime time) }
 
+            ShowLinkIssueForm ->
+                noCmd { model | showCreateIssueForm = not model.showCreateIssueForm }
+
+            UpdateIssueUrl issue ->
+                noCmd { model | issueToLink = issue }
+
+            LinkIssue issueUrl ->
+                ( { model | showCreateIssueForm = False }, Rest.fetch ReloadBug (Rest.createIssue model.bug.id issueUrl) )
+
+            DeleteIssue issue ->
+                ( model, Rest.fetch ReloadBug (Rest.deleteIssue model.bug.id issue.id) )
+
 
 fetchOccurrences : BugID -> Maybe Occurrence -> Cmd Msg
 fetchOccurrences bugId occ =
@@ -114,6 +132,8 @@ init bug =
       , showFullStackTrace = False
       , now = (Date.fromTime 0)
       , showTimeAgo = True
+      , showCreateIssueForm = False
+      , issueToLink = ""
       , showCloseButton = False
       }
     , Cmd.batch
@@ -127,10 +147,21 @@ view : Model -> Html Msg
 view model =
     div [ class "box" ]
         [ selectedBugHeader model
-        , linkedIssue model.bug
+        , linkedIssues model.bug
+        , createIssueForm model
         , stackTraceDisplay model
         , occurrencesDisplay model
         ]
+
+
+createIssueForm : Model -> Html Msg
+createIssueForm model =
+    if model.showCreateIssueForm then
+        Html.form [ onSubmit (LinkIssue model.issueToLink) ]
+            [ input [ onInput UpdateIssueUrl, placeholder "https://issue-tracker.com/issue-id", class "input" ] []
+            ]
+    else
+        a [ class "tag", onClick ShowLinkIssueForm ] [ text "+" ]
 
 
 selectedBugHeader : Model -> Html Msg
@@ -204,11 +235,19 @@ date model date =
     formatDate model.showTimeAgo model.now date
 
 
-linkedIssue : Bug -> Html Msg
-linkedIssue bug =
-    a [ class "linked-issue notification" ]
-        [ span [ class "description" ] [ text "No linked incident." ]
-        , icon "cog" ""
+linkedIssues : Bug -> Html Msg
+linkedIssues bug =
+    span []
+        [ text "Issues: "
+        , span [ class "linked-issues" ] (List.map issueHref bug.issues)
+        ]
+
+
+issueHref : Issue -> Html Msg
+issueHref issue =
+    span [ class "is-warning tag" ]
+        [ a [ href issue.url, target "_blank" ] [ text (issueTitle issue) ]
+        , a [ onClick (DeleteIssue issue), class "delete is-small" ] []
         ]
 
 

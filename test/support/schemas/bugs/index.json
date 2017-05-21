@@ -1,18 +1,31 @@
 {
-  "type":"array",
+  "type": "array",
   "items": {
     "type": "object",
     "properties": {
-      "id":{"type":"string"},
-      "message":{"type":"string"},
-      "first_occurred_at":{"type":"string"},
-      "last_occurred_at":{"type":"string"},
+      "id": {"type": "string"},
+      "message": {"type": "string"},
+      "first_occurred_at": {"type": "string"},
+      "last_occurred_at": {"type": "string"},
       "environment_id": { "type": "string" },
       "closed_at": { "type": ["string", "null"] },
-      "issue_url": { "type": ["string", "null"] },
-      "occurrence_count": { "type": "number" }
+      "occurrence_count": { "type": "number" },
+      "issues": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {"type": "string"},
+            "bug_id": {"type": "string"},
+            "url": {"type": "string"},
+            "created_at": {"type": "string"},
+            "updated_at": {"type": "string"}
+          },
+          "required": ["id", "bug_id", "url", "created_at", "updated_at"]
+        }
+      }
     },
-    "required":["id", "message", "first_occurred_at", "last_occurred_at", "environment_id", "closed_at", "issue_url", "occurrence_count"]
+    "required": ["id", "message", "first_occurred_at", "last_occurred_at", "environment_id", "closed_at", "occurrence_count"]
   },
   "minItems": 1
 }

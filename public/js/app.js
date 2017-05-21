@@ -14861,13 +14861,17 @@ var _user$project$Types$UUID = function (a) {
 var _user$project$Types$Environment = function (a) {
 	return {id: a};
 };
-var _user$project$Types$Bug = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, stackTrace: h};
+var _user$project$Types$Bug = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, issues: h, stackTrace: i};
 	});
 var _user$project$Types$Occurrence = F5(
 	function (a, b, c, d, e) {
 		return {id: a, environmentId: b, message: c, occurredAt: d, data: e};
+	});
+var _user$project$Types$Issue = F3(
+	function (a, b, c) {
+		return {id: a, bug_id: b, url: c};
 	});
 var _user$project$Types$EnvironmentID = function (a) {
 	return {ctor: 'EnvironmentID', _0: a};
@@ -14877,6 +14881,9 @@ var _user$project$Types$BugID = function (a) {
 };
 var _user$project$Types$OccurrenceID = function (a) {
 	return {ctor: 'OccurrenceID', _0: a};
+};
+var _user$project$Types$IssueID = function (a) {
+	return {ctor: 'IssueID', _0: a};
 };
 
 var _user$project$ChunkList$items = function (chunks) {
@@ -14955,12 +14962,35 @@ var _user$project$Rest$fetch = F2(
 				_elm_lang$http$Http$toTask(req)));
 	});
 var _user$project$Rest$defaultPageSize = 100;
-var _user$project$Rest$closeBugUrl = function (_p0) {
-	var _p1 = _p0;
+var _user$project$Rest$deleteIssueUrl = F2(
+	function (_p1, _p0) {
+		var _p2 = _p1;
+		var _p3 = _p0;
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			'/bugs/',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p2._0.toString,
+				A2(_elm_lang$core$Basics_ops['++'], '/delete_issue?issue_id=', _p3._0.toString)));
+	});
+var _user$project$Rest$createIssueUrl = F2(
+	function (_p4, issueUrl) {
+		var _p5 = _p4;
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			'/bugs/',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p5._0.toString,
+				A2(_elm_lang$core$Basics_ops['++'], '/create_issue?url=', issueUrl)));
+	});
+var _user$project$Rest$closeBugUrl = function (_p6) {
+	var _p7 = _p6;
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		'/bugs/',
-		A2(_elm_lang$core$Basics_ops['++'], _p1._0.toString, '/close'));
+		A2(_elm_lang$core$Basics_ops['++'], _p7._0.toString, '/close'));
 };
 var _user$project$Rest$event = A2(
 	_elm_lang$core$Json_Decode$map,
@@ -14986,9 +15016,9 @@ var _user$project$Rest$stacktrace = _elm_lang$core$Json_Decode$maybe(
 var _user$project$Rest$decodeChunk = F2(
 	function (pageSize, decodeItem) {
 		var toPage = function (items) {
-			var _p2 = A2(_elm_community$list_extra$List_Extra$splitAt, pageSize, items);
-			var wanted = _p2._0;
-			var rest = _p2._1;
+			var _p8 = A2(_elm_community$list_extra$List_Extra$splitAt, pageSize, items);
+			var wanted = _p8._0;
+			var rest = _p8._1;
 			return A2(
 				_user$project$Types$Chunk,
 				wanted,
@@ -15007,12 +15037,19 @@ var _user$project$Rest$decodeEnvironment = A2(
 var _user$project$Rest$decodeUUID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$UUID, _elm_lang$core$Json_Decode$string);
 var _user$project$Rest$decodeBugID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$BugID, _user$project$Rest$decodeUUID);
 var _user$project$Rest$decodeOccurrenceID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$OccurrenceID, _user$project$Rest$decodeUUID);
+var _user$project$Rest$decodeIssueID = A2(_elm_lang$core$Json_Decode$map, _user$project$Types$IssueID, _user$project$Rest$decodeUUID);
+var _user$project$Rest$decodeIssue = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_user$project$Types$Issue,
+	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeIssueID),
+	A2(_elm_lang$core$Json_Decode$field, 'bug_id', _user$project$Rest$decodeBugID),
+	A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string));
 var _user$project$Rest$decodeEnvironments = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeEnvironment);
 var _user$project$Rest$date = function () {
 	var decodeDateFromString = function (s) {
-		var _p3 = _elm_lang$core$Date$fromString(s);
-		if (_p3.ctor === 'Ok') {
-			return _elm_lang$core$Json_Decode$succeed(_p3._0);
+		var _p9 = _elm_lang$core$Date$fromString(s);
+		if (_p9.ctor === 'Ok') {
+			return _elm_lang$core$Json_Decode$succeed(_p9._0);
 		} else {
 			return _elm_lang$core$Json_Decode$fail(
 				A2(_elm_lang$core$Basics_ops['++'], 'Invalid date: ', s));
@@ -15020,19 +15057,29 @@ var _user$project$Rest$date = function () {
 	};
 	return A2(_elm_lang$core$Json_Decode$andThen, decodeDateFromString, _elm_lang$core$Json_Decode$string);
 }();
-var _user$project$Rest$decodeBug = A9(
-	_elm_lang$core$Json_Decode$map8,
-	_user$project$Types$Bug,
-	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeBugID),
-	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _user$project$Rest$decodeEnvironmentID),
-	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'first_occurred_at', _user$project$Rest$date),
-	A2(_elm_lang$core$Json_Decode$field, 'last_occurred_at', _user$project$Rest$date),
-	A2(_elm_lang$core$Json_Decode$field, 'occurrence_count', _elm_lang$core$Json_Decode$int),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'closed_at',
-		_elm_lang$core$Json_Decode$maybe(_user$project$Rest$date)),
+var _user$project$Rest$decodeBug = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (rest, stack) {
+			return rest(stack);
+		}),
+	A9(
+		_elm_lang$core$Json_Decode$map8,
+		_user$project$Types$Bug,
+		A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeBugID),
+		A2(_elm_lang$core$Json_Decode$field, 'environment_id', _user$project$Rest$decodeEnvironmentID),
+		A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
+		A2(_elm_lang$core$Json_Decode$field, 'first_occurred_at', _user$project$Rest$date),
+		A2(_elm_lang$core$Json_Decode$field, 'last_occurred_at', _user$project$Rest$date),
+		A2(_elm_lang$core$Json_Decode$field, 'occurrence_count', _elm_lang$core$Json_Decode$int),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'closed_at',
+			_elm_lang$core$Json_Decode$maybe(_user$project$Rest$date)),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'issues',
+			_elm_lang$core$Json_Decode$list(_user$project$Rest$decodeIssue))),
 	_user$project$Rest$stacktrace);
 var _user$project$Rest$closeBug = function (bugId) {
 	return A3(
@@ -15041,6 +15088,22 @@ var _user$project$Rest$closeBug = function (bugId) {
 		_elm_lang$http$Http$emptyBody,
 		_user$project$Rest$decodeBug);
 };
+var _user$project$Rest$createIssue = F2(
+	function (bugId, url) {
+		return A3(
+			_elm_lang$http$Http$post,
+			A2(_user$project$Rest$createIssueUrl, bugId, url),
+			_elm_lang$http$Http$emptyBody,
+			_user$project$Rest$decodeBug);
+	});
+var _user$project$Rest$deleteIssue = F2(
+	function (bugId, issueId) {
+		return A3(
+			_elm_lang$http$Http$post,
+			A2(_user$project$Rest$deleteIssueUrl, bugId, issueId),
+			_elm_lang$http$Http$emptyBody,
+			_user$project$Rest$decodeBug);
+	});
 var _user$project$Rest$decodeOccurrence = A6(
 	_elm_lang$core$Json_Decode$map5,
 	_user$project$Types$Occurrence,
@@ -15049,9 +15112,9 @@ var _user$project$Rest$decodeOccurrence = A6(
 	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode$field, 'data', _elm_lang$core$Json_Decode$value));
-var _user$project$Rest$detailsUrl = function (_p4) {
-	var _p5 = _p4;
-	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', _p5._0.toString);
+var _user$project$Rest$detailsUrl = function (_p10) {
+	var _p11 = _p10;
+	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', _p11._0.toString);
 };
 var _user$project$Rest$loadBugDetails = function (bugId) {
 	return A2(
@@ -15072,26 +15135,26 @@ var _user$project$Rest$addParams = F2(
 					'&',
 					A2(
 						_elm_lang$core$List$map,
-						function (_p6) {
-							var _p7 = _p6;
+						function (_p12) {
+							var _p13 = _p12;
 							return A2(
 								_elm_lang$core$Basics_ops['++'],
-								_p7._0,
-								A2(_elm_lang$core$Basics_ops['++'], '=', _p7._1));
+								_p13._0,
+								A2(_elm_lang$core$Basics_ops['++'], '=', _p13._1));
 						},
 						params))));
 	});
-var _user$project$Rest$occurrenceIDToParam = function (_p8) {
-	var _p9 = _p8;
-	return _p9._0.toString;
+var _user$project$Rest$occurrenceIDToParam = function (_p14) {
+	var _p15 = _p14;
+	return _p15._0.toString;
 };
-var _user$project$Rest$envIDToParam = function (_p10) {
-	var _p11 = _p10;
-	return _p11._0;
+var _user$project$Rest$envIDToParam = function (_p16) {
+	var _p17 = _p16;
+	return _p17._0;
 };
-var _user$project$Rest$bugIDToParam = function (_p12) {
-	var _p13 = _p12;
-	return _p13._0.toString;
+var _user$project$Rest$bugIDToParam = function (_p18) {
+	var _p19 = _p18;
+	return _p19._0.toString;
 };
 var _user$project$Rest$environmentsUrl = '/environments';
 var _user$project$Rest$loadEnvironments = A2(_elm_lang$http$Http$get, _user$project$Rest$environmentsUrl, _user$project$Rest$decodeEnvironments);
@@ -15112,14 +15175,14 @@ var _user$project$Rest$pageParams = F3(
 				_1: {ctor: '[]'}
 			},
 			function () {
-				var _p14 = startFrom;
-				if (_p14.ctor === 'Just') {
+				var _p20 = startFrom;
+				if (_p20.ctor === 'Just') {
 					return {
 						ctor: '::',
 						_0: A2(
 							_user$project$Rest$Param,
 							'start',
-							idToString(_p14._0)),
+							idToString(_p20._0)),
 						_1: {ctor: '[]'}
 					};
 				} else {
@@ -15128,14 +15191,14 @@ var _user$project$Rest$pageParams = F3(
 			}());
 	});
 var _user$project$Rest$occurrencesUrl = F3(
-	function (_p15, limit, occurrenceID) {
-		var _p16 = _p15;
+	function (_p21, limit, occurrenceID) {
+		var _p22 = _p21;
 		return A2(
 			_user$project$Rest$addParams,
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				'/bugs/',
-				A2(_elm_lang$core$Basics_ops['++'], _p16._0.toString, '/occurrences')),
+				A2(_elm_lang$core$Basics_ops['++'], _p22._0.toString, '/occurrences')),
 			A3(_user$project$Rest$pageParams, _user$project$Rest$occurrenceIDToParam, limit, occurrenceID));
 	});
 var _user$project$Rest$loadOccurrences = F2(
@@ -15241,6 +15304,21 @@ var _user$project$TimeAgo$timeAgo = F2(
 		}
 	});
 
+var _user$project$ViewCommon$issueTitle = function (issue) {
+	var match = _elm_lang$core$List$head(
+		A3(
+			_elm_lang$core$Regex$find,
+			_elm_lang$core$Regex$AtMost(1),
+			_elm_lang$core$Regex$regex('[0-9a-zA-Z-]+$'),
+			issue.url));
+	var _p0 = match;
+	if (_p0.ctor === 'Just') {
+		var _p1 = _p0._0;
+		return A2(_elm_lang$core$String$contains, 'gotoassist', issue.url) ? A2(_elm_lang$core$Basics_ops['++'], 'B#', _p1.match) : _p1.match;
+	} else {
+		return 'Issue';
+	}
+};
 var _user$project$ViewCommon$errorNotification = F2(
 	function (clickmsg, error) {
 		var deleteButton = function (msg) {
@@ -15291,8 +15369,8 @@ var _user$project$ViewCommon$paginatedList = F3(
 				_elm_lang$core$Basics_ops['++'],
 				displayItems(page.items),
 				function () {
-					var _p0 = page.nextItem;
-					if (_p0.ctor === 'Just') {
+					var _p2 = page.nextItem;
+					if (_p2.ctor === 'Just') {
 						return {
 							ctor: '::',
 							_0: A2(
@@ -15303,7 +15381,7 @@ var _user$project$ViewCommon$paginatedList = F3(
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onClick(
-											loadMoreMessage(_p0._0)),
+											loadMoreMessage(_p2._0)),
 										_1: {ctor: '[]'}
 									}
 								},
@@ -15339,8 +15417,8 @@ var _user$project$ViewCommon$bugErrorClass = function (bug) {
 var _user$project$ViewCommon$paginatedChunkList = F3(
 	function (displayItems, chunkList, loadMoreMessage) {
 		var showChunk = function (remoteChunk) {
-			var _p1 = remoteChunk;
-			switch (_p1.ctor) {
+			var _p3 = remoteChunk;
+			switch (_p3.ctor) {
 				case 'NotAsked':
 					return A2(
 						_elm_lang$html$Html$div,
@@ -15369,16 +15447,16 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 							_1: {ctor: '[]'}
 						});
 				default:
-					var _p3 = _p1._0;
+					var _p5 = _p3._0;
 					return A2(
 						_elm_lang$html$Html$div,
 						{ctor: '[]'},
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							displayItems(_p3.items),
+							displayItems(_p5.items),
 							function () {
-								var _p2 = _p3.nextItem;
-								if (_p2.ctor === 'Just') {
+								var _p4 = _p5.nextItem;
+								if (_p4.ctor === 'Just') {
 									return {
 										ctor: '::',
 										_0: A2(
@@ -15390,7 +15468,7 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 													ctor: '::',
 													_0: _elm_lang$html$Html_Events$onClick(
 														loadMoreMessage(
-															_elm_lang$core$Maybe$Just(_p2._0))),
+															_elm_lang$core$Maybe$Just(_p4._0))),
 													_1: {ctor: '[]'}
 												}
 											},
@@ -15647,35 +15725,6 @@ var _user$project$BugDetails$stackTraceLine = function (line) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$BugDetails$linkedIssue = function (bug) {
-	return A2(
-		_elm_lang$html$Html$a,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('linked-issue notification'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$span,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('description'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('No linked incident.'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(_user$project$ViewCommon$icon, 'cog', ''),
-				_1: {ctor: '[]'}
-			}
-		});
-};
 var _user$project$BugDetails$date = F2(
 	function (model, date) {
 		return A3(_user$project$ViewCommon$formatDate, model.showTimeAgo, model.now, date);
@@ -15728,10 +15777,132 @@ var _user$project$BugDetails$occurrenceCount = function (bug) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$BugDetails$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, showCloseButton: g};
+var _user$project$BugDetails$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {bug: a, occurrences: b, expandedOccurrences: c, showFullStackTrace: d, now: e, showTimeAgo: f, showCreateIssueForm: g, issueToLink: h, showCloseButton: i};
 	});
+var _user$project$BugDetails$UpdateIssueUrl = function (a) {
+	return {ctor: 'UpdateIssueUrl', _0: a};
+};
+var _user$project$BugDetails$DeleteIssue = function (a) {
+	return {ctor: 'DeleteIssue', _0: a};
+};
+var _user$project$BugDetails$issueHref = function (issue) {
+	return A2(
+		_elm_lang$html$Html$span,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('is-warning tag'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$a,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$href(issue.url),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$target('_blank'),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						_user$project$ViewCommon$issueTitle(issue)),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$a,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_user$project$BugDetails$DeleteIssue(issue)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('delete is-small'),
+							_1: {ctor: '[]'}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$BugDetails$linkedIssues = function (bug) {
+	return A2(
+		_elm_lang$html$Html$span,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Issues: '),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('linked-issues'),
+						_1: {ctor: '[]'}
+					},
+					A2(_elm_lang$core$List$map, _user$project$BugDetails$issueHref, bug.issues)),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$BugDetails$LinkIssue = function (a) {
+	return {ctor: 'LinkIssue', _0: a};
+};
+var _user$project$BugDetails$ShowLinkIssueForm = {ctor: 'ShowLinkIssueForm'};
+var _user$project$BugDetails$createIssueForm = function (model) {
+	return model.showCreateIssueForm ? A2(
+		_elm_lang$html$Html$form,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onSubmit(
+				_user$project$BugDetails$LinkIssue(model.issueToLink)),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onInput(_user$project$BugDetails$UpdateIssueUrl),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$placeholder('https://issue-tracker.com/issue-id'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('input'),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		}) : A2(
+		_elm_lang$html$Html$a,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('tag'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ShowLinkIssueForm),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('+'),
+			_1: {ctor: '[]'}
+		});
+};
 var _user$project$BugDetails$TimeTick = function (a) {
 	return {ctor: 'TimeTick', _0: a};
 };
@@ -16198,13 +16369,43 @@ var _user$project$BugDetails$update = F2(
 				} else {
 					return noCmd(model);
 				}
-			default:
+			case 'TimeTick':
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
 							now: _elm_lang$core$Date$fromTime(_p3._0)
 						}));
+			case 'ShowLinkIssueForm':
+				return noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showCreateIssueForm: !model.showCreateIssueForm}));
+			case 'UpdateIssueUrl':
+				return noCmd(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{issueToLink: _p3._0}));
+			case 'LinkIssue':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{showCreateIssueForm: false}),
+					_1: A2(
+						_user$project$Rest$fetch,
+						_user$project$BugDetails$ReloadBug,
+						A2(_user$project$Rest$createIssue, model.bug.id, _p3._0))
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(
+						_user$project$Rest$fetch,
+						_user$project$BugDetails$ReloadBug,
+						A2(_user$project$Rest$deleteIssue, model.bug.id, _p3._0.id))
+				};
 		}
 	});
 var _user$project$BugDetails$init = function (bug) {
@@ -16221,6 +16422,8 @@ var _user$project$BugDetails$init = function (bug) {
 			showFullStackTrace: false,
 			now: _elm_lang$core$Date$fromTime(0),
 			showTimeAgo: true,
+			showCreateIssueForm: false,
+			issueToLink: '',
 			showCloseButton: false
 		},
 		_1: _elm_lang$core$Platform_Cmd$batch(
@@ -16348,14 +16551,18 @@ var _user$project$BugDetails$view = function (model) {
 			_0: _user$project$BugDetails$selectedBugHeader(model),
 			_1: {
 				ctor: '::',
-				_0: _user$project$BugDetails$linkedIssue(model.bug),
+				_0: _user$project$BugDetails$linkedIssues(model.bug),
 				_1: {
 					ctor: '::',
-					_0: _user$project$BugDetails$stackTraceDisplay(model),
+					_0: _user$project$BugDetails$createIssueForm(model),
 					_1: {
 						ctor: '::',
-						_0: _user$project$BugDetails$occurrencesDisplay(model),
-						_1: {ctor: '[]'}
+						_0: _user$project$BugDetails$stackTraceDisplay(model),
+						_1: {
+							ctor: '::',
+							_0: _user$project$BugDetails$occurrencesDisplay(model),
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
@@ -16404,6 +16611,31 @@ var _user$project$BugList$bugGroups = F2(
 		};
 		return A2(_elm_lang$core$List$map, group, groupNames);
 	});
+var _user$project$BugList$issueHref = function (issue) {
+	return A2(
+		_elm_lang$html$Html$a,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$href(issue.url),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('is-warning tag'),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(
+				_user$project$ViewCommon$issueTitle(issue)),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$BugList$linkedIssues = function (bug) {
+	return A2(
+		_elm_lang$html$Html$span,
+		{ctor: '[]'},
+		A2(_elm_lang$core$List$map, _user$project$BugList$issueHref, bug.issues));
+};
 var _user$project$BugList$allBugs = function (model) {
 	return _user$project$ChunkList$items(model.bugs);
 };
@@ -16466,18 +16698,7 @@ var _user$project$BugList$sidebarBug = F2(
 		var isSelected = _elm_lang$core$Native_Utils.eq(
 			model.selected,
 			_elm_lang$core$Maybe$Just(bug.id));
-		var issueTag = A2(
-			_elm_lang$html$Html$span,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('tag is-warning'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('CI-000'),
-				_1: {ctor: '[]'}
-			});
+		var issueTag = _user$project$BugList$linkedIssues(bug);
 		return A2(
 			_elm_lang$html$Html$a,
 			{

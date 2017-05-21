@@ -50,6 +50,7 @@ type alias Bug =
     , lastOccurredAt : Date.Date
     , occurrenceCount : Int
     , closedAt : Maybe Date.Date
+    , issues : List Issue
     , stackTrace : Maybe (List String)
     }
 
@@ -64,6 +65,17 @@ type alias Occurrence =
     , message : String
     , occurredAt : Date.Date
     , data : Json.Decode.Value
+    }
+
+
+type IssueID
+    = IssueID UUID
+
+
+type alias Issue =
+    { id : IssueID
+    , bug_id : BugID
+    , url : String
     }
 
 

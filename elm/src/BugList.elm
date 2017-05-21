@@ -22,7 +22,6 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra.Period as Period
-import Types exposing (..)
 import ChunkList exposing (ChunkList)
 import RemoteData exposing (WebData)
 import Task
@@ -146,11 +145,21 @@ sidebarBugGroup model ( label, bugs ) =
         []
 
 
+linkedIssues : Bug -> Html Msg
+linkedIssues bug =
+    span [] (List.map issueHref bug.issues)
+
+
+issueHref : Issue -> Html Msg
+issueHref issue =
+    a [ href issue.url, class "is-warning tag" ] [ text (issueTitle issue) ]
+
+
 sidebarBug : Model -> Bug -> Html Msg
 sidebarBug model bug =
     let
         issueTag =
-            span [ class "tag is-warning" ] [ text "CI-000" ]
+            linkedIssues bug
 
         isSelected =
             model.selected == Just bug.id

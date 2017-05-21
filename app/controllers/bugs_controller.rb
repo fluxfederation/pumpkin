@@ -8,7 +8,7 @@ class BugsController < ApplicationController
       limit: params[:limit],
       start: params[:start]
     )
-    render json: search.bugs, include: []
+    render json: search.bugs, include: [:issues]
   end
 
   def show
@@ -24,7 +24,13 @@ class BugsController < ApplicationController
 
   def create_issue
     bug = fetch_bug
-    CreateIssue.perform_later(bug.id)
+    bug.issues.create!(url: params[:url])
+    render json: fetch_bug, serializer: FullBugSerializer
+  end
+
+  def delete_issue
+    bug = fetch_bug
+    bug.issues.find(params[:issue_id]).destroy
     render json: fetch_bug, serializer: FullBugSerializer
   end
 

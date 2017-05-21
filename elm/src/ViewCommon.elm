@@ -11,6 +11,7 @@ import ChunkList exposing (ChunkList)
 import RemoteData
 import Maybe.Extra as MaybeX
 import List.Extra as ListX
+import Regex exposing (..)
 
 
 formatDate : Bool -> Date.Date -> Date -> String
@@ -98,3 +99,20 @@ errorNotification clickmsg error =
         div [ class "notification is-danger" ] <|
             MaybeX.toList (Maybe.map deleteButton clickmsg)
                 ++ [ text error ]
+
+
+issueTitle : Issue -> String
+issueTitle issue =
+    let
+        match =
+            List.head (find (AtMost 1) (regex "[0-9a-zA-Z-]+$") issue.url)
+    in
+        case match of
+            Just m ->
+                if String.contains "gotoassist" issue.url then
+                    "B#" ++ m.match
+                else
+                    m.match
+
+            Nothing ->
+                "Issue"

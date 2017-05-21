@@ -1,0 +1,3 @@
+prod_normal:
+  url: "http://jira.tracker.com/browse/CI-123"
+  bug: prod_normal
