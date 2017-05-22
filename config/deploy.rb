@@ -14,7 +14,7 @@ set :bundle_without, [:development, :test, :deployment]
 
 set(:deploy_to) { "/apps/#{fetch(:application)}" }
 
-set(:linked_dirs) { %w(log) }
+set(:linked_dirs) { %w(log tmp/cache) }
 
 set :rails_env, 'production'
 
