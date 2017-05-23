@@ -19,7 +19,7 @@ set(:linked_dirs) { %w(log tmp/cache) }
 set :rails_env, 'production'
 
 before "bundler:install", "deploy:fix_permissions"
-before "deploy:migrate",  "deploy:link_global_app_env"
+before "deploy:assets:precompile",  "deploy:link_global_app_env"
 
 namespace :deploy do
   task :fix_permissions do

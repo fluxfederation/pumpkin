@@ -24,3 +24,7 @@
 
 # Ingore redis files:
 dump.rdb
+
+
+# Ignore assets
+public/assets/*
