@@ -158,7 +158,7 @@ createIssueForm : Model -> Html Msg
 createIssueForm model =
     if model.showCreateIssueForm then
         Html.form [ onSubmit (LinkIssue model.issueToLink) ]
-            [ input [ onInput UpdateIssueUrl, placeholder "https://issue-tracker.com/issue-id", class "input" ] []
+            [ input [ type_ "URL", onInput UpdateIssueUrl, placeholder "Full issue tracker URL", class "input" ] []
             ]
     else
         a [ class "tag", onClick ShowLinkIssueForm ] [ text "+" ]
