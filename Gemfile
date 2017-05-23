@@ -24,6 +24,7 @@ gem 'dotenv-rails'
 
 gem 'resque'
 gem 'resque-web', require: 'resque_web'
+gem 'therubyracer', platforms: :ruby # Needed by resque-web
 
 gem 'simple_google_auth', github: 'bagedevimo/simple_google_auth'
 

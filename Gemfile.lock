@@ -106,6 +106,7 @@ GEM
       less (~> 2.6.0)
       sprockets (> 2, < 4)
       tilt
+    libv8 (3.16.14.19)
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -168,6 +169,7 @@ GEM
     redis (3.3.3)
     redis-namespace (1.5.3)
       redis (~> 3.0, >= 3.0.4)
+    ref (2.0.0)
     resque (1.27.4)
       mono_logger (~> 1.0)
       multi_json (~> 1.0)
@@ -207,6 +209,9 @@ GEM
     sshkit (1.11.3)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
+    therubyracer (0.12.3)
+      libv8 (~> 3.16.14.15)
+      ref
     thor (0.19.1)
     thread_safe (0.3.5)
     tilt (2.0.7)
@@ -243,6 +248,7 @@ DEPENDENCIES
   simple_google_auth!
   spring
   spring-watcher-listen (~> 2.0.0)
+  therubyracer
   tzinfo-data
 
 BUNDLED WITH
