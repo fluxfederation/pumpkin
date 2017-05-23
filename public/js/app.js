@@ -15873,14 +15873,18 @@ var _user$project$BugDetails$createIssueForm = function (model) {
 				_elm_lang$html$Html$input,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onInput(_user$project$BugDetails$UpdateIssueUrl),
+					_0: _elm_lang$html$Html_Attributes$type_('URL'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$placeholder('https://issue-tracker.com/issue-id'),
+						_0: _elm_lang$html$Html_Events$onInput(_user$project$BugDetails$UpdateIssueUrl),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('input'),
-							_1: {ctor: '[]'}
+							_0: _elm_lang$html$Html_Attributes$placeholder('Full issue tracker URL'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('input'),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				},
