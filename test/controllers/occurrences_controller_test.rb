@@ -8,6 +8,9 @@ class OccurrencesControllerTest < ActionDispatch::IntegrationTest
     get bug_occurrences_path(bug_id: bugs(:prod_normal))
     assert_response :success
     assert_response_schema "occurrences/index.json"
+
+    parsed = JSON::parse(@response.body)
+    assert_equal parsed, parsed.sort_by { |o| o['occurred_at'] }.reverse
   end
 
   test "index with limit" do

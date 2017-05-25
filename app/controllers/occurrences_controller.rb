@@ -4,7 +4,7 @@ class OccurrencesController < ApplicationController
 
   def index
     bug = Bug.find(params[:bug_id])
-    occurrences = bug.occurrences
+    occurrences = bug.occurrences.order("occurred_at DESC")
     occurrences = occurrences.limit(params[:limit]) if params[:limit]
     render json: occurrences
   end

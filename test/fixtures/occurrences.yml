@@ -12,6 +12,13 @@ prod_normal:
   message: "Very normal occurrence"
   data: {"admin_id":5}
 
+prod_normal_later:
+  environment_id: "Production"
+  bug: prod_normal
+  occurred_at: "2016-01-02"
+  message: "Very normal occurrence"
+  data: {"admin_id":5}
+
 prod_normal_unassigned:
   environment_id: "Production"
   occurred_at: "2016-01-02"
