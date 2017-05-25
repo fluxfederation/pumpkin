@@ -2,6 +2,7 @@ class Occurrence < ApplicationRecord
   belongs_to :environment
   belongs_to :bug, optional: true
 
+  validates :message, presence: true
   validates :occurred_at, presence: true
 
   validate :data_present
