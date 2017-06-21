@@ -1,0 +1,10 @@
+#+CATEGORY: Pumpskell
+
+* TODO Serve static assets
+  :LOGBOOK:  
+  CLOCK: [2017-06-22 Thu 10:45]
+  :END:      
+* TODO Serve fake environments list and empty bugs
+* TODO Serve real environments
+* TODO Serve real bugs / occurrences
+* TODO Deployment story
