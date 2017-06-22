@@ -5,23 +5,42 @@ module Lib
   ( runServer
   ) where
 
-import Servant.Utils.StaticFiles (serveDirectory)
+import Bug
+import Control.Monad.Except
+import Data.Aeson
+import Environment
+import Network.Wai.Application.Static
+       (StaticSettings(..), defaultFileServerSettings, staticApp)
+import qualified Network.Wai.Handler.Warp as Warp
+import Network.Wai.Middleware.Static (static)
+import Servant (Proxy(..))
 import Servant.API
 import Servant.Server
-import Servant (Proxy(..))
-import qualified Network.Wai.Handler.Warp as Warp
-import Network.Wai.Application.Static
-       (defaultFileServerSettings, staticApp, StaticSettings(..))
+import System.Posix.Directory (changeWorkingDirectory)
 
-type API = "" :> Raw
+type API
+   = "environments" :> Get '[ JSON] [Environment] :<|> "bugs" :> Get '[ JSON] [Bug]
 
-server :: FilePath -> Server API
-server = undefined
+getEnvironments :: ExceptT ServantErr IO [Environment]
+getEnvironments = return [Environment "first-env", Environment "second-env"]
 
-app :: FilePath -> Application
-app -- serve (Proxy :: Proxy API)
+getBugs :: ExceptT ServantErr IO [Bug]
+getBugs = return []
+
+api :: Server API
+api = getEnvironments :<|> getBugs
+
+instance ToJSON Bug
+
+instance ToJSON Environment
+
+app :: Application
+app = static serveAPI
+  where
+    serveAPI = serve (Proxy :: Proxy API) api
+
 -- staticApp . defaultFileServerSettings
- = serveDirectory
-
 runServer :: FilePath -> IO ()
-runServer = Warp.run 8080 . app
+runServer root = do
+  changeWorkingDirectory root
+  Warp.run 8080 app
