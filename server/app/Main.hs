@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import Server
 import System.Environment (getArgs)
 
 main :: IO ()

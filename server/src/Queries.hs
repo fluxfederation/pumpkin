@@ -3,24 +3,100 @@
 
 module Queries
   ( loadEnvironments
+  , loadBugs
+  , BugSearch(..)
+  , withConnection
+  , Connection
   ) where
 
+import Control.Exception (bracket)
+import Data.Aeson (Value)
 import Data.Monoid ((<>))
-import Database.PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow (fromRow, field)
 import Data.Time.LocalTime
-import Environment
+import Database.PostgreSQL.Simple
+import Types
 
-environmentsByRecencyQuery =
-  "SELECT id FROM (SELECT e.*, last_occurred_at FROM environments e " <>
-  "JOIN (SELECT environment_id, MAX(occurred_at) AS last_occurred_at " <>
-  "      FROM occurrences GROUP BY environment_id) l " <>
-  "  ON l.environment_id = e.id " <>
-  "ORDER BY last_occurred_at DESC) AS envs"
+withConnection :: (Connection -> IO a) -> IO a
+withConnection = bracket (connectPostgreSQL "") close
 
 instance FromRow Environment
 
 loadEnvironments :: IO [Environment]
-loadEnvironments = do
-  conn <- connectPostgreSQL ""
-  query_ conn environmentsByRecencyQuery
+loadEnvironments =
+  withConnection $ \conn ->
+    query_
+      conn
+      " SELECT id FROM \
+      \   (SELECT e.*, last_occurred_at FROM environments e \
+      \      JOIN (SELECT environment_id, MAX(occurred_at) AS last_occurred_at \
+      \            FROM occurrences GROUP BY environment_id) AS l \
+      \        ON l.environment_id = e.id \
+      \     ORDER BY last_occurred_at DESC) AS envs"
+
+data BugSearch = BugSearch
+  { bsEnvIDs :: [EnvironmentID]
+  , bsClosed :: Bool
+  , bsSearch :: Maybe String
+  , bsLimit :: Int
+  , bsStart :: Maybe Int
+  } deriving (Show)
+
+instance FromRow Issue
+
+loadBugs :: BugSearch -> IO [Bug]
+loadBugs search =
+  withConnection $ \conn -> do
+    bugRows :: [( BugID
+                , EnvironmentID
+                , String
+                , LocalTime
+                , LocalTime
+                , Int
+                , Maybe LocalTime
+                , Value)] <-
+      query
+        conn
+        " SELECT b.id \
+        \      , environment_id \
+        \      , message \
+        \      , o.occurred_at AS first_occurred_at \
+        \      , last_occurred_at \
+        \      , (SELECT COUNT(1) FROM occurrences WHERE bug_id = b.id) AS occurrence_count \
+        \      , e.created_at AS closed_at \
+        \      , data \
+        \ FROM bug_with_latest_details b \
+        \ JOIN occurrences o ON o.id = b.primary_occurrence_id AND o.environment_id IN ? \
+        \ LEFT OUTER JOIN events e ON latest_event_id = e.id AND e.name = 'closed' \
+        \ WHERE (e.id IS NULL OR ?) \
+        \   AND (? IS NULL \
+        \        OR b.last_occurred_at <= \
+        \           (SELECT last_occurred_at FROM bug_with_latest_details WHERE id = ?)) \
+        \   AND (? IS NULL OR ? = '' \
+        \        OR EXISTS (SELECT 1 FROM occurrences WHERE bug_id = b.id AND message @@ ?)) \
+        \ ORDER BY last_occurred_at DESC LIMIT ?"
+        ( In (bsEnvIDs search)
+        , bsClosed search
+        , bsStart search
+        , bsStart search
+        , bsSearch search
+        , bsSearch search
+        , bsSearch search
+        , bsLimit search)
+    issues <-
+      query
+        conn
+        "SELECT id, bug_id, url FROM issues WHERE bug_id IN ?"
+        (Only $ In ((\(id, _, _, _, _, _, _, _) -> id) <$> bugRows))
+    return $
+      (\(bID, eID, message, first, last, count, closedAt, data_) ->
+         Bug
+           bID
+           eID
+           message
+           first
+           last
+           count
+           closedAt
+           data_
+           [i | i <- issues, issueBugID i == bID]) <$>
+      bugRows

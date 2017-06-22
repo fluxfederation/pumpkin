@@ -15,12 +15,13 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib
+  exposed-modules:     Server
+                     , API
                      , Queries
-                     , Bug
-                     , Environment
+                     , Types
   build-depends:       base >= 4.7 && < 5
                      , aeson
+                     , bytestring
                      , mtl
                      , postgresql-simple
                      , servant

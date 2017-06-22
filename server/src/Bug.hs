@@ -2,6 +2,8 @@
 
 module Bug where
 
+import Data.Aeson (Value)
+import Data.Time.LocalTime
 import Data.UUID.Types (UUID)
 import Environment
 import GHC.Generics
@@ -12,10 +14,10 @@ data Bug = Bug
   { id :: BugID
   , environmentID :: EnvironmentID
   , message :: String
-    -- , firstOccurredAt :: Date
-    -- , lastOccurredAt :: Date
+  , firstOccurredAt :: LocalTime
+  , lastOccurredAt :: LocalTime
   , occurrenceCount :: Int
-    -- , closedAt :: Maybe Date
+  , closedAt :: Maybe LocalTime
     -- , issues :: [Issue]
-  , stackTrace :: Maybe [String]
-  } deriving (Generic)
+  , data_ :: Value
+  } deriving (Generic, Show)
