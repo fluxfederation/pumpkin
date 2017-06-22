@@ -3,9 +3,10 @@
 module Environment where
 
 import GHC.Generics
+import Data.Time.LocalTime
 
 type EnvironmentID = String
 
-newtype Environment = Environment
+data Environment = Environment
   { id :: EnvironmentID
-  } deriving (Generic)
+  } deriving (Generic, Show)

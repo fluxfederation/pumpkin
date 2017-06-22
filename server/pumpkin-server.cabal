@@ -16,12 +16,18 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Lib
+                     , Queries
+                     , Bug
+                     , Environment
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , mtl
+                     , postgresql-simple
                      , servant
                      , servant-server
+                     , time
                      , unix
+                     , uuid-types
                      , wai
                      , wai-middleware-static
                      , warp
