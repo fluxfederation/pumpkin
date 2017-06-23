@@ -1,10 +1,31 @@
 #+CATEGORY: Pumpskell
 
-* TODO Serve static assets
+* DONE Serve static assets
+  CLOSED: [2017-06-22 Thu 12:57]
   :LOGBOOK:  
-  CLOCK: [2017-06-22 Thu 10:45]
+  - State "DONE"       from "TODO"       [2017-06-22 Thu 12:57]
+  CLOCK: [2017-06-22 Thu 12:20]--[2017-06-22 Thu 12:57] =>  0:37
+  CLOCK: [2017-06-22 Thu 10:45]--[2017-06-22 Thu 11:31] =>  0:46
   :END:      
-* TODO Serve fake environments list and empty bugs
-* TODO Serve real environments
-* TODO Serve real bugs / occurrences
+* DONE Serve fake environments list and empty bugs
+  CLOSED: [2017-06-22 Thu 15:30]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-22 Thu 15:30]
+  CLOCK: [2017-06-22 Thu 14:18]--[2017-06-22 Thu 15:30] =>  1:12
+  :END:      
+* DONE Serve real environments
+  CLOSED: [2017-06-23 Fri 08:12]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-23 Fri 08:12]
+  :END:      
+* DONE Serve real bug search results
+  CLOSED: [2017-06-23 Fri 15:35]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-23 Fri 15:35]
+  :END:      
+* TODO Handle serving / as /index.html
+* TODO Serve real bug details
+* TODO Support collection of inbound occurrences
+* TODO Allow closing bugs
+* TODO Allow editing bugs
 * TODO Deployment story
