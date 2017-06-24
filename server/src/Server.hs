@@ -6,6 +6,8 @@ import API
 import Control.Monad.Except
 import Data.Maybe (fromMaybe)
 import JSON
+import Network.HTTP.Types.Status
+import Network.Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai.Middleware.Static (static)
 import Queries
@@ -47,7 +49,13 @@ api = getEnvironments :<|> getBugs :<|> getBugDetails :<|> getBugOccurrences
 apiAPP :: Application
 apiAPP = serve (Proxy :: Proxy API) api
 
+app :: Application
+app req respond =
+  if null (pathInfo req) -- Root page
+    then respond (responseFile status200 [] "index.html" Nothing)
+    else (static apiAPP) req respond
+
 runServer :: FilePath -> IO ()
 runServer root = do
   changeWorkingDirectory root
-  Warp.run 8080 (static apiAPP)
+  Warp.run 8080 app
