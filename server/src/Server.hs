@@ -36,8 +36,13 @@ getBugDetails id = do
     Nothing -> throwError err404
     Just details -> return details
 
+getBugOccurrences :: BugID -> Maybe Int -> ExceptT ServantErr IO [Occurrence]
+getBugOccurrences id limit
+   -- should technically return 404 if bug does not exist
+ = liftIO (Queries.loadBugOccurrences id (fromMaybe 100 limit))
+
 api :: Server API
-api = getEnvironments :<|> getBugs :<|> getBugDetails
+api = getEnvironments :<|> getBugs :<|> getBugDetails :<|> getBugOccurrences
 
 apiAPP :: Application
 apiAPP = serve (Proxy :: Proxy API) api

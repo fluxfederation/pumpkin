@@ -29,6 +29,18 @@ data BugDetails = BugDetails
   , bdIssues :: [Issue]
   , bdData :: Value
   } deriving (Generic, Show)
+
+type OccurrenceID = UUID
+
+data Occurrence = Occurrence
+  { occID :: OccurrenceID
+  , occMessage :: String
+  , occOccurredAt :: LocalTime
+  , occData :: Value
+  , occEnvironmentID :: EnvironmentID
+  , occBugID :: BugID
+  } deriving (Generic, Show)
+
 type EnvironmentID = String
 
 data Environment = Environment

@@ -14,4 +14,8 @@ type BugListEndpoint
 
 type BugDetailsEndpoint = "bugs" :> Capture "id" UUID :> Get '[ JSON] BugDetails
 
-type API = EnvironmentsEndpoint :<|> BugListEndpoint :<|> BugDetailsEndpoint
+type BugOccurrencesEndpoint
+   = "bugs" :> Capture "id" UUID :> "occurrences" :> QueryParam "limit" Int :> Get '[ JSON] [Occurrence]
+
+type API
+   = EnvironmentsEndpoint :<|> BugListEndpoint :<|> BugDetailsEndpoint :<|> BugOccurrencesEndpoint

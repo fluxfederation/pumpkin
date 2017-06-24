@@ -7,6 +7,7 @@ module Queries
   , loadBugs
   , BugSearch(..)
   , loadBugDetails
+  , loadBugOccurrences
   , withConnection
   , Connection
   ) where
@@ -115,3 +116,13 @@ loadBugDetails id =
         issues <- loadIssuesByBugID conn [bugID bug]
         return $ Just (BugDetails bug issues data_)
       _ -> return Nothing
+
+instance FromRow Occurrence
+
+loadBugOccurrences :: BugID -> Int -> IO [Occurrence]
+loadBugOccurrences id limit =
+  withConnection $ \conn ->
+    query
+      conn
+      "SELECT id, message, occurred_at, data, environment_id, bug_id FROM occurrences WHERE bug_id = ? LIMIT ?"
+      (id, limit)
