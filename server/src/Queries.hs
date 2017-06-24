@@ -43,17 +43,12 @@ data BugSearch = BugSearch
 
 instance FromRow Issue
 
-loadBugs :: BugSearch -> IO [Bug]
+instance FromRow Bug
+
+loadBugs :: BugSearch -> IO [BugWithIssues]
 loadBugs search =
   withConnection $ \conn -> do
-    bugRows :: [( BugID
-                , EnvironmentID
-                , String
-                , LocalTime
-                , LocalTime
-                , Int
-                , Maybe LocalTime
-                , Value)] <-
+    bugs <-
       query
         conn
         " SELECT b.id \
@@ -86,17 +81,7 @@ loadBugs search =
       query
         conn
         "SELECT id, bug_id, url FROM issues WHERE bug_id IN ?"
-        (Only $ In ((\(id, _, _, _, _, _, _, _) -> id) <$> bugRows))
+        (Only $ In (bugID <$> bugs))
     return $
-      (\(bID, eID, message, first, last, count, closedAt, data_) ->
-         Bug
-           bID
-           eID
-           message
-           first
-           last
-           count
-           closedAt
-           data_
-           [i | i <- issues, issueBugID i == bID]) <$>
-      bugRows
+      (\bug -> BugWithIssues bug [i | i <- issues, issueBugID i == bugID bug]) <$>
+      bugs

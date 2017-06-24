@@ -18,7 +18,11 @@ data Bug = Bug
   , bugOccurrenceCount :: Int
   , bugClosedAt :: Maybe LocalTime
   , bugData :: Value
-  , bugIssues :: [Issue]
+  } deriving (Generic, Show)
+
+data BugWithIssues = BugWithIssues
+  { bwiBug :: Bug
+  , bwiIssues :: [Issue]
   } deriving (Generic, Show)
 
 type EnvironmentID = String

@@ -19,6 +19,7 @@ library
                      , API
                      , Queries
                      , Types
+                     , JSON
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , bytestring
@@ -28,6 +29,7 @@ library
                      , servant-server
                      , time
                      , unix
+                     , unordered-containers
                      , uuid-types
                      , wai
                      , wai-middleware-static

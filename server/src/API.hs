@@ -3,12 +3,13 @@
 
 module API where
 
+import Data.UUID.Types (UUID)
 import Servant.API
 import Types
 
 type EnvironmentsEndpoint = "environments" :> Get '[ JSON] [Environment]
 
-type BugsEndpoint
-   = "bugs" :> QueryParams "environment_ids" String :> QueryFlag "closed" :> QueryParam "search" String :> QueryParam "limit" Int :> QueryParam "start" Int :> Get '[ JSON] [Bug]
+type BugListEndpoint
+   = "bugs" :> QueryParams "environment_ids" String :> QueryFlag "closed" :> QueryParam "search" String :> QueryParam "limit" Int :> QueryParam "start" Int :> Get '[ JSON] [BugWithIssues]
 
-type API = EnvironmentsEndpoint :<|> BugsEndpoint
+type API = EnvironmentsEndpoint :<|> BugListEndpoint
