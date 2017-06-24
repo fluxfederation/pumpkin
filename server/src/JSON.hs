@@ -32,6 +32,21 @@ instance ToJSON BugWithIssues where
   toJSON (BugWithIssues bug issues) =
     mergeJSON (toJSON bug) (object ["issues" .= issues])
 
+instance ToJSON BugDetails where
+  toJSON (BugDetails bug issues occs) =
+    mergeJSON (toJSON bug) (object ["issues" .= issues, "occurrences" .= occs])
+
+instance ToJSON Occurrence where
+  toJSON occ =
+    object
+      [ "id" .= occID occ
+      , "message" .= occMessage occ
+      , "occurred_at" .= occOccurredAt occ
+      , "data" .= occData occ
+      , "environment_id" .= occEnvironmentID occ
+      , "bug_id" .= occBugID occ
+      ]
+
 instance ToJSON Environment where
   toJSON e = object ["id" .= environmentID e]
 

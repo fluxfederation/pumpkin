@@ -12,4 +12,6 @@ type EnvironmentsEndpoint = "environments" :> Get '[ JSON] [Environment]
 type BugListEndpoint
    = "bugs" :> QueryParams "environment_ids" String :> QueryFlag "closed" :> QueryParam "search" String :> QueryParam "limit" Int :> QueryParam "start" Int :> Get '[ JSON] [BugWithIssues]
 
-type API = EnvironmentsEndpoint :<|> BugListEndpoint
+type BugDetailsEndpoint = "bugs" :> Capture "id" UUID :> Get '[ JSON] BugDetails
+
+type API = EnvironmentsEndpoint :<|> BugListEndpoint :<|> BugDetailsEndpoint

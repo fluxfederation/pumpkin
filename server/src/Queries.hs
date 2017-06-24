@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -5,12 +6,14 @@ module Queries
   ( loadEnvironments
   , loadBugs
   , BugSearch(..)
+  , loadBugDetails
   , withConnection
   , Connection
   ) where
 
 import Control.Exception (bracket)
 import Data.Aeson (Value)
+import Data.Maybe (listToMaybe)
 import Data.Monoid ((<>))
 import Data.Time.LocalTime
 import Database.PostgreSQL.Simple
@@ -76,11 +79,39 @@ loadBugs search =
         , bsSearch search
         , bsSearch search
         , bsLimit search)
-    issues <-
-      query
-        conn
-        "SELECT id, bug_id, url FROM issues WHERE bug_id IN ?"
-        (Only $ In (bugID <$> bugs))
+    issues <- loadIssuesByBugID conn (bugID <$> bugs)
     return $
       (\bug -> BugWithIssues bug [i | i <- issues, issueBugID i == bugID bug]) <$>
       bugs
+
+loadIssuesByBugID :: Connection -> [BugID] -> IO [Issue]
+loadIssuesByBugID conn ids =
+  query
+    conn
+    "SELECT id, bug_id, url FROM issues WHERE bug_id IN ?"
+    (Only $ In ids)
+
+loadBugDetails :: BugID -> IO (Maybe BugDetails)
+loadBugDetails id =
+  withConnection $ \conn -> do
+    bugs :: [Bug :. Only Value] <-
+      query
+        conn
+        " SELECT b.id \
+        \      , environment_id \
+        \      , message \
+        \      , o.occurred_at AS first_occurred_at \
+        \      , last_occurred_at \
+        \      , (SELECT COUNT(1) FROM occurrences WHERE bug_id = b.id) AS occurrence_count \
+        \      , e.created_at AS closed_at \
+        \      , o.data \
+        \ FROM bug_with_latest_details b \
+        \ JOIN occurrences o ON o.id = b.primary_occurrence_id \
+        \ LEFT OUTER JOIN events e ON latest_event_id = e.id AND e.name = 'closed' \
+        \ WHERE b.id = ?"
+        (Only id)
+    case listToMaybe bugs of
+      Just (bug :. Only data_) -> do
+        issues <- loadIssuesByBugID conn [bugID bug]
+        return $ Just (BugDetails bug issues data_)
+      _ -> return Nothing

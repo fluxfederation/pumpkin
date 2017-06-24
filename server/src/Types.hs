@@ -24,6 +24,11 @@ data BugWithIssues = BugWithIssues
   , bwiIssues :: [Issue]
   } deriving (Generic, Show)
 
+data BugDetails = BugDetails
+  { bdBug :: Bug
+  , bdIssues :: [Issue]
+  , bdData :: Value
+  } deriving (Generic, Show)
 type EnvironmentID = String
 
 data Environment = Environment

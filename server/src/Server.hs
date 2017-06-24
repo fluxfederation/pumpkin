@@ -29,8 +29,15 @@ getBugs envIDs closed search limit start = lift (Queries.loadBugs bs)
   where
     bs = BugSearch envIDs closed search (fromMaybe 100 limit) start
 
+getBugDetails :: BugID -> ExceptT ServantErr IO BugDetails
+getBugDetails id = do
+  found <- liftIO (Queries.loadBugDetails id)
+  case found of
+    Nothing -> throwError err404
+    Just details -> return details
+
 api :: Server API
-api = getEnvironments :<|> getBugs
+api = getEnvironments :<|> getBugs :<|> getBugDetails
 
 apiAPP :: Application
 apiAPP = serve (Proxy :: Proxy API) api
