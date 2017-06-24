@@ -49,29 +49,39 @@ instance FromRow Issue
 
 instance FromRow Bug
 
+bugListSelect :: Query
+bugListSelect =
+  " SELECT b.id \
+  \      , environment_id \
+  \      , message \
+  \      , o.occurred_at AS first_occurred_at \
+  \      , last_occurred_at \
+  \      , (SELECT COUNT(1) FROM occurrences WHERE bug_id = b.id) AS occurrence_count \
+  \      , e.created_at AS closed_at \
+  \      , o.data \
+  \ FROM bug_with_latest_details b \
+  \ JOIN occurrences o ON o.id = b.primary_occurrence_id \
+  \ LEFT OUTER JOIN events e ON latest_event_id = e.id AND e.name = 'closed'"
+
 loadBugs :: BugSearch -> IO [BugWithIssues]
 loadBugs search =
   withConnection $ \conn -> do
     bugs <-
       query
         conn
-        " SELECT b.id \
-        \      , environment_id \
-        \      , message \
-        \      , o.occurred_at AS first_occurred_at \
-        \      , last_occurred_at \
-        \      , (SELECT COUNT(1) FROM occurrences WHERE bug_id = b.id) AS occurrence_count \
-        \      , e.created_at AS closed_at \
-        \ FROM bug_with_latest_details b \
-        \ JOIN occurrences o ON o.id = b.primary_occurrence_id AND o.environment_id IN ? \
-        \ LEFT OUTER JOIN events e ON latest_event_id = e.id AND e.name = 'closed' \
-        \ WHERE (e.id IS NULL OR ?) \
-        \   AND (? IS NULL \
-        \        OR b.last_occurred_at <= \
-        \           (SELECT last_occurred_at FROM bug_with_latest_details WHERE id = ?)) \
-        \   AND (? IS NULL OR ? = '' \
-        \        OR EXISTS (SELECT 1 FROM occurrences WHERE bug_id = b.id AND message @@ ?)) \
-        \ ORDER BY last_occurred_at DESC LIMIT ?"
+        ("WITH bug_list AS (" <> bugListSelect <> ") " <>
+         "SELECT id, environment_id, message, first_occurred_at, \
+         \       last_occurred_at, occurrence_count, closed_at \
+         \  FROM bug_list \
+         \ WHERE environment_id IN ? \
+         \   AND (closed_at IS NULL OR ?) \
+         \   AND (? IS NULL \
+         \        OR last_occurred_at <= \
+         \           (SELECT last_occurred_at FROM bug_with_latest_details WHERE id = ?)) \
+         \   AND (? IS NULL OR ? = '' \
+         \        OR EXISTS (SELECT 1 FROM occurrences \
+         \                   WHERE bug_id = bug_list.id AND message @@ ?)) \
+         \ ORDER BY last_occurred_at DESC LIMIT ?")
         ( In (bsEnvIDs search)
         , bsClosed search
         , bsStart search
@@ -98,18 +108,8 @@ loadBugDetails id =
     bugs :: [Bug :. Only Value] <-
       query
         conn
-        " SELECT b.id \
-        \      , environment_id \
-        \      , message \
-        \      , o.occurred_at AS first_occurred_at \
-        \      , last_occurred_at \
-        \      , (SELECT COUNT(1) FROM occurrences WHERE bug_id = b.id) AS occurrence_count \
-        \      , e.created_at AS closed_at \
-        \      , o.data \
-        \ FROM bug_with_latest_details b \
-        \ JOIN occurrences o ON o.id = b.primary_occurrence_id \
-        \ LEFT OUTER JOIN events e ON latest_event_id = e.id AND e.name = 'closed' \
-        \ WHERE b.id = ?"
+        ("WITH bug_list AS (" <> bugListSelect <>
+         ") SELECT * FROM bug_list WHERE id = ?")
         (Only id)
     case listToMaybe bugs of
       Just (bug :. Only data_) -> do
