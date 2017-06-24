@@ -20,5 +20,8 @@ type BugOccurrencesEndpoint
 type BugCloseEndpoint
    = "bugs" :> Capture "id" UUID :> "close" :> Post '[ JSON] BugDetails
 
+type CreateOccurrenceEndpoint
+   = "occurrences" :> ReqBody '[ JSON] NewOccurrence :> Post '[ JSON] ()
+
 type API
-   = EnvironmentsEndpoint :<|> BugListEndpoint :<|> BugDetailsEndpoint :<|> BugOccurrencesEndpoint :<|> BugCloseEndpoint
+   = EnvironmentsEndpoint :<|> BugListEndpoint :<|> BugDetailsEndpoint :<|> BugOccurrencesEndpoint :<|> BugCloseEndpoint :<|> CreateOccurrenceEndpoint

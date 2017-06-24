@@ -41,6 +41,13 @@ data Occurrence = Occurrence
   , occBugID :: BugID
   } deriving (Generic, Show)
 
+data NewOccurrence = NewOccurrence
+  { neEnvironmentID :: EnvironmentID
+  , neMessage :: String
+  , neData :: Value
+  , neOccurredAt :: LocalTime
+  } deriving (Generic, Show)
+
 type EnvironmentID = String
 
 data Environment = Environment

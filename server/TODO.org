@@ -33,12 +33,21 @@
   :LOGBOOK:  
   - State "DONE"       from "TODO"       [2017-06-24 Sat 17:31]
   :END:      
-* TODO Support collection of inbound occurrences
+* DONE Support collection of inbound occurrences
+  CLOSED: [2017-06-24 Sat 20:49]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-24 Sat 20:49]
+  :END:      
 * DONE Allow closing bugs
   CLOSED: [2017-06-24 Sat 20:07]
   :LOGBOOK:  
   - State "DONE"       from "TODO"       [2017-06-24 Sat 20:07]
   :END:      
 * TODO Allow editing issues
+* TODO Proper transaction bracketing
+* TODO Nicer error handling, validation
 * TODO Job processing
-* TODO Deployment story
+* TODO Google Auth
+* TODO Heartbeat
+* TODO [[https://maxgabriel.github.io/ekg-yesod/][EKG]] monitoring
+* TODO Deployment story (Docker?)

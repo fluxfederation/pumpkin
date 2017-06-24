@@ -53,3 +53,9 @@ instance ToJSON Environment where
 instance ToJSON Issue where
   toJSON i =
     object ["id" .= issueID i, "bug_id" .= issueBugID i, "url" .= issueURL i]
+
+instance FromJSON NewOccurrence where
+  parseJSON (Object o) =
+    NewOccurrence <$> o .: "environment" <*> o .: "message" <*> o .: "data" <*>
+    o .: "occurred_at"
+  parseJSON invalid = typeMismatch "Coord" invalid

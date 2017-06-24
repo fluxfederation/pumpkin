@@ -9,6 +9,7 @@ module DB
   , loadBugDetails
   , loadBugOccurrences
   , closeBug
+  , createOccurrence
   , withConnection
   , Connection
   ) where
@@ -138,3 +139,19 @@ closeBug id =
       " INSERT INTO events (bug_id, name, created_at, updated_at) \
       \ SELECT id, 'closed', NOW(), NOW() FROM bugs WHERE id = ?"
       (Only id)
+
+createOccurrence :: NewOccurrence -> IO ()
+createOccurrence (NewOccurrence env message data_ occurred_at) =
+  void $
+  withConnection $ \conn ->
+    withTransaction conn $ do
+      execute
+        conn
+        "INSERT INTO environments (id, created_at, updated_at) SELECT ?, NOW(), NOW() WHERE NOT EXISTS (SELECT 1 FROM environments WHERE id = ?)"
+        (env, env)
+      execute
+        conn
+        " INSERT INTO occurrences \
+          \  (environment_id, message, data, occurred_at, created_at, updated_at) \
+          \ VALUES ?, ?, ?, ?, NOW(), NOW()"
+        (env, message, data_, occurred_at)

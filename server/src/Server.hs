@@ -48,10 +48,14 @@ closeBug id = do
   liftIO $ DB.closeBug id
   getBugDetails id
 
+createOccurrence :: NewOccurrence -> ExceptT ServantErr IO ()
+createOccurrence = liftIO . DB.createOccurrence
+
 api :: Server API
 api =
   getEnvironments :<|> getBugs :<|> getBugDetails :<|> getBugOccurrences :<|>
-  closeBug
+  closeBug :<|>
+  createOccurrence
 
 apiAPP :: Application
 apiAPP = serve (Proxy :: Proxy API) api
