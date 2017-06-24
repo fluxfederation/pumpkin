@@ -4,13 +4,13 @@ module Server
 
 import API
 import Control.Monad.Except
+import qualified DB
 import Data.Maybe (fromMaybe)
 import JSON
 import Network.HTTP.Types.Status
 import Network.Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai.Middleware.Static (static)
-import Queries
 import Servant (Proxy(..))
 import Servant.API
 import Servant.Server
@@ -18,7 +18,7 @@ import System.Posix.Directory (changeWorkingDirectory)
 import Types
 
 getEnvironments :: ExceptT ServantErr IO [Environment]
-getEnvironments = lift Queries.loadEnvironments
+getEnvironments = lift DB.loadEnvironments
 
 getBugs ::
      [String]
@@ -27,13 +27,13 @@ getBugs ::
   -> Maybe Int
   -> Maybe Int
   -> ExceptT ServantErr IO [BugWithIssues]
-getBugs envIDs closed search limit start = lift (Queries.loadBugs bs)
+getBugs envIDs closed search limit start = lift (DB.loadBugs bs)
   where
-    bs = BugSearch envIDs closed search (fromMaybe 100 limit) start
+    bs = DB.BugSearch envIDs closed search (fromMaybe 100 limit) start
 
 getBugDetails :: BugID -> ExceptT ServantErr IO BugDetails
 getBugDetails id = do
-  found <- liftIO (Queries.loadBugDetails id)
+  found <- liftIO (DB.loadBugDetails id)
   case found of
     Nothing -> throwError err404
     Just details -> return details
@@ -41,10 +41,17 @@ getBugDetails id = do
 getBugOccurrences :: BugID -> Maybe Int -> ExceptT ServantErr IO [Occurrence]
 getBugOccurrences id limit
    -- should technically return 404 if bug does not exist
- = liftIO (Queries.loadBugOccurrences id (fromMaybe 100 limit))
+ = liftIO (DB.loadBugOccurrences id (fromMaybe 100 limit))
+
+closeBug :: BugID -> ExceptT ServantErr IO BugDetails
+closeBug id = do
+  liftIO $ DB.closeBug id
+  getBugDetails id
 
 api :: Server API
-api = getEnvironments :<|> getBugs :<|> getBugDetails :<|> getBugOccurrences
+api =
+  getEnvironments :<|> getBugs :<|> getBugDetails :<|> getBugOccurrences :<|>
+  closeBug
 
 apiAPP :: Application
 apiAPP = serve (Proxy :: Proxy API) api

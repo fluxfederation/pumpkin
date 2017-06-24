@@ -2,17 +2,19 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Queries
+module DB
   ( loadEnvironments
   , loadBugs
   , BugSearch(..)
   , loadBugDetails
   , loadBugOccurrences
+  , closeBug
   , withConnection
   , Connection
   ) where
 
 import Control.Exception (bracket)
+import Control.Monad (void)
 import Data.Aeson (Value)
 import Data.Maybe (listToMaybe)
 import Data.Monoid ((<>))
@@ -126,3 +128,13 @@ loadBugOccurrences id limit =
       conn
       "SELECT id, message, occurred_at, data, environment_id, bug_id FROM occurrences WHERE bug_id = ? LIMIT ?"
       (id, limit)
+
+closeBug :: BugID -> IO ()
+closeBug id =
+  withConnection $ \conn ->
+    void $
+    execute
+      conn
+      " INSERT INTO events (bug_id, name, created_at, updated_at) \
+      \ SELECT id, 'closed', NOW(), NOW() FROM bugs WHERE id = ?"
+      (Only id)
