@@ -58,7 +58,6 @@ loadBugs search =
         \      , last_occurred_at \
         \      , (SELECT COUNT(1) FROM occurrences WHERE bug_id = b.id) AS occurrence_count \
         \      , e.created_at AS closed_at \
-        \      , data \
         \ FROM bug_with_latest_details b \
         \ JOIN occurrences o ON o.id = b.primary_occurrence_id AND o.environment_id IN ? \
         \ LEFT OUTER JOIN events e ON latest_event_id = e.id AND e.name = 'closed' \

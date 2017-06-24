@@ -22,7 +22,6 @@ instance ToJSON Bug where
       , "last_occurred_at" .= bugLastOccurredAt b
       , "occurrence_count" .= bugOccurrenceCount b
       , "closed_at" .= bugClosedAt b
-      , "data" .= bugData b
       ]
 
 mergeJSON :: Value -> Value -> Value

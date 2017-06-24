@@ -17,7 +17,6 @@ data Bug = Bug
   , bugLastOccurredAt :: LocalTime
   , bugOccurrenceCount :: Int
   , bugClosedAt :: Maybe LocalTime
-  , bugData :: Value
   } deriving (Generic, Show)
 
 data BugWithIssues = BugWithIssues
