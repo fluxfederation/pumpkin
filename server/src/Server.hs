@@ -6,6 +6,7 @@ import API
 import Control.Monad.Except
 import qualified DB
 import Data.Maybe (fromMaybe)
+import Data.Text (Text)
 import JSON
 import Network.HTTP.Types.Status
 import Network.Wai
@@ -21,9 +22,9 @@ getEnvironments :: ExceptT ServantErr IO [Environment]
 getEnvironments = lift DB.loadEnvironments
 
 getBugs ::
-     [String]
+     [Text]
   -> Bool
-  -> Maybe String
+  -> Maybe Text
   -> Maybe Int
   -> Maybe Int
   -> ExceptT ServantErr IO [BugWithIssues]

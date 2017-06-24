@@ -19,6 +19,7 @@ import Control.Monad (void)
 import Data.Aeson (Value)
 import Data.Maybe (listToMaybe)
 import Data.Monoid ((<>))
+import Data.Text (Text)
 import Data.Time.LocalTime
 import Database.PostgreSQL.Simple
 import Types
@@ -43,7 +44,7 @@ loadEnvironments =
 data BugSearch = BugSearch
   { bsEnvIDs :: [EnvironmentID]
   , bsClosed :: Bool
-  , bsSearch :: Maybe String
+  , bsSearch :: Maybe Text
   , bsLimit :: Int
   , bsStart :: Maybe Int
   } deriving (Show)

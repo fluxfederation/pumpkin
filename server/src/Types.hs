@@ -3,6 +3,7 @@
 module Types where
 
 import Data.Aeson (Value)
+import Data.Text
 import Data.Time.LocalTime
 import Data.UUID.Types (UUID)
 import GHC.Generics
@@ -12,7 +13,7 @@ type BugID = UUID
 data Bug = Bug
   { bugID :: BugID
   , bugEnvironmentID :: EnvironmentID
-  , bugMessage :: String
+  , bugMessage :: Text
   , bugFirstOccurredAt :: LocalTime
   , bugLastOccurredAt :: LocalTime
   , bugOccurrenceCount :: Int
@@ -34,7 +35,7 @@ type OccurrenceID = UUID
 
 data Occurrence = Occurrence
   { occID :: OccurrenceID
-  , occMessage :: String
+  , occMessage :: Text
   , occOccurredAt :: LocalTime
   , occData :: Value
   , occEnvironmentID :: EnvironmentID
@@ -43,12 +44,12 @@ data Occurrence = Occurrence
 
 data NewOccurrence = NewOccurrence
   { neEnvironmentID :: EnvironmentID
-  , neMessage :: String
+  , neMessage :: Text
   , neData :: Value
   , neOccurredAt :: LocalTime
   } deriving (Generic, Show)
 
-type EnvironmentID = String
+type EnvironmentID = Text
 
 data Environment = Environment
   { environmentID :: EnvironmentID
@@ -60,5 +61,5 @@ type IssueID = UUID
 data Issue = Issue
   { issueID :: IssueID
   , issueBugID :: BugID
-  , issueURL :: String
+  , issueURL :: Text
   } deriving (Generic, Show)

@@ -28,6 +28,7 @@ library
                      , postgresql-simple
                      , servant
                      , servant-server
+                     , text
                      , time
                      , unix
                      , unordered-containers
