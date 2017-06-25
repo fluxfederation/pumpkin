@@ -43,7 +43,11 @@
   :LOGBOOK:  
   - State "DONE"       from "TODO"       [2017-06-24 Sat 20:07]
   :END:      
-* TODO Allow editing issues
+* DONE Allow editing issues
+  CLOSED: [2017-06-26 Mon 10:23]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-26 Mon 10:23]
+  :END:      
 * TODO Proper transaction bracketing
 * TODO Nicer error handling, validation
 * TODO Job processing
