@@ -253,22 +253,27 @@ issueHref issue =
 
 stackTraceDisplay : Model -> Html Msg
 stackTraceDisplay model =
-    let
-        lines =
-            filterStackTrace model model.bug.stackTrace
-    in
-        div [ class "section" ]
-            [ div [ class "section-title" ]
-                [ h3 [ class "menu-label" ] [ text "Stack Trace" ]
-                , button
-                    [ class "button is-small is-primary is-inverted"
-                    , classList [ ( "is-active", model.showFullStackTrace ) ]
-                    , onClick ToggleFullStackTrace
+    case List.head (ChunkList.items model.occurrences) of
+        Just occurrence ->
+            let
+                lines =
+                    filterStackTrace model occurrence.stackTrace
+            in
+                div [ class "section" ]
+                    [ div [ class "section-title" ]
+                        [ h3 [ class "menu-label" ] [ text "Stack Trace" ]
+                        , button
+                            [ class "button is-small is-primary is-inverted"
+                            , classList [ ( "is-active", model.showFullStackTrace ) ]
+                            , onClick ToggleFullStackTrace
+                            ]
+                            [ text "Full Trace" ]
+                        ]
+                    , div [ class "stack-trace notification" ] (List.map stackTraceLine lines)
                     ]
-                    [ text "Full Trace" ]
-                ]
-            , div [ class "stack-trace notification" ] (List.map stackTraceLine lines)
-            ]
+
+        _ ->
+            div [] [ text "Loading..." ]
 
 
 stackTraceLine : String -> Html Msg

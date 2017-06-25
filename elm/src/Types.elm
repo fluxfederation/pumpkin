@@ -1,8 +1,6 @@
 module Types exposing (..)
 
-import Http
 import Date
-import Time
 import String
 import Json.Decode
 
@@ -51,7 +49,6 @@ type alias Bug =
     , occurrenceCount : Int
     , closedAt : Maybe Date.Date
     , issues : List Issue
-    , stackTrace : Maybe (List String)
     }
 
 
@@ -65,6 +62,7 @@ type alias Occurrence =
     , message : String
     , occurredAt : Date.Date
     , data : Json.Decode.Value
+    , stackTrace : Maybe (List String)
     }
 
 
@@ -84,6 +82,6 @@ isClosed bug =
     Maybe.withDefault False <| Maybe.map (\x -> True) bug.closedAt
 
 
-stackTraceString : Bug -> String
-stackTraceString bug =
-    Maybe.withDefault "" <| Maybe.map (\trace -> String.join ",\n" trace) bug.stackTrace
+stackTraceString : Occurrence -> String
+stackTraceString occ =
+    Maybe.withDefault "" <| Maybe.map (\trace -> String.join ",\n" trace) occ.stackTrace

@@ -128,18 +128,15 @@ decodeBugID =
 
 decodeBug : Decoder Bug
 decodeBug =
-    map2 (\rest stack -> rest stack)
-        (map8 Bug
-            (field "id" decodeBugID)
-            (field "environment_id" decodeEnvironmentID)
-            (field "message" string)
-            (field "first_occurred_at" date)
-            (field "last_occurred_at" date)
-            (field "occurrence_count" int)
-            (field "closed_at" (maybe date))
-            (field "issues" (list decodeIssue))
-        )
-        stacktrace
+    map8 Bug
+        (field "id" decodeBugID)
+        (field "environment_id" decodeEnvironmentID)
+        (field "message" string)
+        (field "first_occurred_at" date)
+        (field "last_occurred_at" date)
+        (field "occurrence_count" int)
+        (field "closed_at" (maybe date))
+        (field "issues" (list decodeIssue))
 
 
 decodeChunk : Int -> Decoder a -> Decoder (Chunk a)
@@ -162,12 +159,13 @@ decodeOccurrenceID =
 
 decodeOccurrence : Decoder Occurrence
 decodeOccurrence =
-    map5 Occurrence
+    map6 Occurrence
         (field "id" decodeOccurrenceID)
         (field "environment_id" decodeEnvironmentID)
         (field "message" string)
         (field "occurred_at" date)
         (field "data" value)
+        stacktrace
 
 
 stacktrace : Decoder (Maybe (List String))
