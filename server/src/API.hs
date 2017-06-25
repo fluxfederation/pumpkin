@@ -25,8 +25,11 @@ type BugCloseEndpoint
 type BugCreateIssueEndpoint
    = "bugs" :> Capture "id" UUID :> "create_issue" :> QueryParam "url" URI :> Post '[ JSON] BugDetails
 
+type BugDeleteIssueEndpoint
+   = "bugs" :> Capture "id" UUID :> "delete_issue" :> QueryParam "issue_id" IssueID :> Post '[ JSON] BugDetails
+
 type CreateOccurrenceEndpoint
    = "occurrences" :> ReqBody '[ JSON] NewOccurrence :> Post '[ JSON] ()
 
 type API
-   = EnvironmentsEndpoint :<|> BugListEndpoint :<|> BugDetailsEndpoint :<|> BugOccurrencesEndpoint :<|> BugCloseEndpoint :<|> CreateOccurrenceEndpoint :<|> BugCreateIssueEndpoint
+   = EnvironmentsEndpoint :<|> BugListEndpoint :<|> BugDetailsEndpoint :<|> BugOccurrencesEndpoint :<|> BugCloseEndpoint :<|> CreateOccurrenceEndpoint :<|> BugCreateIssueEndpoint :<|> BugDeleteIssueEndpoint

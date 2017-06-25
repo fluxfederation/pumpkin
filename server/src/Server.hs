@@ -64,6 +64,14 @@ createIssue id url =
       getBugDetails id
     _ -> throwError err400 {errBody = "Missing URL"}
 
+deleteIssue :: BugID -> Maybe IssueID -> ExceptT ServantErr IO BugDetails
+deleteIssue bugID mIssueID =
+  case mIssueID of
+    Just issueID -> do
+      liftIO $ DB.deleteIssue bugID issueID
+      getBugDetails bugID
+    _ -> throwError err400 {errBody = "Missing issue ID"}
+
 createOccurrence :: NewOccurrence -> ExceptT ServantErr IO ()
 createOccurrence = liftIO . DB.createOccurrence
 
@@ -72,7 +80,8 @@ api =
   getEnvironments :<|> getBugs :<|> getBugDetails :<|> getBugOccurrences :<|>
   closeBug :<|>
   createOccurrence :<|>
-  createIssue
+  createIssue :<|>
+  deleteIssue
 
 instance FromHttpApiData URI where
   parseUrlPiece s =

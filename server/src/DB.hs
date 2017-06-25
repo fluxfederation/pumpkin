@@ -10,6 +10,7 @@ module DB
   , loadBugOccurrences
   , closeBug
   , createIssue
+  , deleteIssue
   , createOccurrence
   , withConnection
   , Connection
@@ -165,6 +166,15 @@ createIssue id url =
       " INSERT INTO issues (bug_id, url, created_at, updated_at) \
       \ SELECT ?, ?, NOW(), NOW() FROM bugs WHERE id = ?"
       (id, url, id)
+
+deleteIssue :: BugID -> IssueID -> IO ()
+deleteIssue bugID issueID =
+  withConnection $ \conn ->
+    void $
+    execute
+      conn
+      " DELETE FROM issues WHERE bug_id = ? AND id = ?"
+      (bugID, issueID)
 
 createOccurrence :: NewOccurrence -> IO ()
 createOccurrence (NewOccurrence env message data_ occurred_at) =
