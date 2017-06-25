@@ -14822,7 +14822,7 @@ var _rluiten$elm_date_extra$Date_Extra_Duration$Minute = {ctor: 'Minute'};
 var _rluiten$elm_date_extra$Date_Extra_Duration$Second = {ctor: 'Second'};
 var _rluiten$elm_date_extra$Date_Extra_Duration$Millisecond = {ctor: 'Millisecond'};
 
-var _user$project$Types$stackTraceString = function (bug) {
+var _user$project$Types$stackTraceString = function (occ) {
 	return A2(
 		_elm_lang$core$Maybe$withDefault,
 		'',
@@ -14831,7 +14831,7 @@ var _user$project$Types$stackTraceString = function (bug) {
 			function (trace) {
 				return A2(_elm_lang$core$String$join, ',\n', trace);
 			},
-			bug.stackTrace));
+			occ.stackTrace));
 };
 var _user$project$Types$isClosed = function (bug) {
 	return A2(
@@ -14861,13 +14861,13 @@ var _user$project$Types$UUID = function (a) {
 var _user$project$Types$Environment = function (a) {
 	return {id: a};
 };
-var _user$project$Types$Bug = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, issues: h, stackTrace: i};
+var _user$project$Types$Bug = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, issues: h};
 	});
-var _user$project$Types$Occurrence = F5(
-	function (a, b, c, d, e) {
-		return {id: a, environmentId: b, message: c, occurredAt: d, data: e};
+var _user$project$Types$Occurrence = F6(
+	function (a, b, c, d, e, f) {
+		return {id: a, environmentId: b, message: c, occurredAt: d, data: e, stackTrace: f};
 	});
 var _user$project$Types$Issue = F3(
 	function (a, b, c) {
@@ -15057,30 +15057,23 @@ var _user$project$Rest$date = function () {
 	};
 	return A2(_elm_lang$core$Json_Decode$andThen, decodeDateFromString, _elm_lang$core$Json_Decode$string);
 }();
-var _user$project$Rest$decodeBug = A3(
-	_elm_lang$core$Json_Decode$map2,
-	F2(
-		function (rest, stack) {
-			return rest(stack);
-		}),
-	A9(
-		_elm_lang$core$Json_Decode$map8,
-		_user$project$Types$Bug,
-		A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeBugID),
-		A2(_elm_lang$core$Json_Decode$field, 'environment_id', _user$project$Rest$decodeEnvironmentID),
-		A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
-		A2(_elm_lang$core$Json_Decode$field, 'first_occurred_at', _user$project$Rest$date),
-		A2(_elm_lang$core$Json_Decode$field, 'last_occurred_at', _user$project$Rest$date),
-		A2(_elm_lang$core$Json_Decode$field, 'occurrence_count', _elm_lang$core$Json_Decode$int),
-		A2(
-			_elm_lang$core$Json_Decode$field,
-			'closed_at',
-			_elm_lang$core$Json_Decode$maybe(_user$project$Rest$date)),
-		A2(
-			_elm_lang$core$Json_Decode$field,
-			'issues',
-			_elm_lang$core$Json_Decode$list(_user$project$Rest$decodeIssue))),
-	_user$project$Rest$stacktrace);
+var _user$project$Rest$decodeBug = A9(
+	_elm_lang$core$Json_Decode$map8,
+	_user$project$Types$Bug,
+	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeBugID),
+	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _user$project$Rest$decodeEnvironmentID),
+	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'first_occurred_at', _user$project$Rest$date),
+	A2(_elm_lang$core$Json_Decode$field, 'last_occurred_at', _user$project$Rest$date),
+	A2(_elm_lang$core$Json_Decode$field, 'occurrence_count', _elm_lang$core$Json_Decode$int),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'closed_at',
+		_elm_lang$core$Json_Decode$maybe(_user$project$Rest$date)),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'issues',
+		_elm_lang$core$Json_Decode$list(_user$project$Rest$decodeIssue)));
 var _user$project$Rest$closeBug = function (bugId) {
 	return A3(
 		_elm_lang$http$Http$post,
@@ -15104,14 +15097,15 @@ var _user$project$Rest$deleteIssue = F2(
 			_elm_lang$http$Http$emptyBody,
 			_user$project$Rest$decodeBug);
 	});
-var _user$project$Rest$decodeOccurrence = A6(
-	_elm_lang$core$Json_Decode$map5,
+var _user$project$Rest$decodeOccurrence = A7(
+	_elm_lang$core$Json_Decode$map6,
 	_user$project$Types$Occurrence,
 	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeOccurrenceID),
 	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _user$project$Rest$decodeEnvironmentID),
 	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'occurred_at', _user$project$Rest$date),
-	A2(_elm_lang$core$Json_Decode$field, 'data', _elm_lang$core$Json_Decode$value));
+	A2(_elm_lang$core$Json_Decode$field, 'data', _elm_lang$core$Json_Decode$value),
+	_user$project$Rest$stacktrace);
 var _user$project$Rest$detailsUrl = function (_p10) {
 	var _p11 = _p10;
 	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', _p11._0.toString);
@@ -16203,80 +16197,93 @@ var _user$project$BugDetails$occurrenceDisplay = F2(
 	});
 var _user$project$BugDetails$ToggleFullStackTrace = {ctor: 'ToggleFullStackTrace'};
 var _user$project$BugDetails$stackTraceDisplay = function (model) {
-	var lines = A2(_user$project$BugDetails$filterStackTrace, model, model.bug.stackTrace);
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('section'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('section-title'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$h3,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('menu-label'),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Stack Trace'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$button,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$classList(
-										{
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showFullStackTrace},
-											_1: {ctor: '[]'}
-										}),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleFullStackTrace),
-										_1: {ctor: '[]'}
-									}
-								}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Full Trace'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {
+	var _p3 = _elm_lang$core$List$head(
+		_user$project$ChunkList$items(model.occurrences));
+	if (_p3.ctor === 'Just') {
+		var lines = A2(_user$project$BugDetails$filterStackTrace, model, _p3._0.stackTrace);
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('section'),
+				_1: {ctor: '[]'}
+			},
+			{
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('stack-trace notification'),
+						_0: _elm_lang$html$Html_Attributes$class('section-title'),
 						_1: {ctor: '[]'}
 					},
-					A2(_elm_lang$core$List$map, _user$project$BugDetails$stackTraceLine, lines)),
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h3,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('menu-label'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Stack Trace'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$button,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('button is-small is-primary is-inverted'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$classList(
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'is-active', _1: model.showFullStackTrace},
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_user$project$BugDetails$ToggleFullStackTrace),
+											_1: {ctor: '[]'}
+										}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Full Trace'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('stack-trace notification'),
+							_1: {ctor: '[]'}
+						},
+						A2(_elm_lang$core$List$map, _user$project$BugDetails$stackTraceLine, lines)),
+					_1: {ctor: '[]'}
+				}
+			});
+	} else {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Loading...'),
 				_1: {ctor: '[]'}
-			}
-		});
+			});
+	}
 };
 var _user$project$BugDetails$LoadedOccurrences = function (a) {
 	return {ctor: 'LoadedOccurrences', _0: a};
@@ -16301,8 +16308,8 @@ var _user$project$BugDetails$update = F2(
 		var noCmd = function (m) {
 			return {ctor: '_Tuple2', _0: m, _1: _elm_lang$core$Platform_Cmd$none};
 		};
-		var _p3 = msg;
-		switch (_p3.ctor) {
+		var _p4 = msg;
+		switch (_p4.ctor) {
 			case 'LoadMoreOccurrences':
 				return {
 					ctor: '_Tuple2',
@@ -16314,7 +16321,7 @@ var _user$project$BugDetails$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							occurrences: A2(_user$project$ChunkList$update, model.occurrences, _p3._0)
+							occurrences: A2(_user$project$ChunkList$update, model.occurrences, _p4._0)
 						}));
 			case 'ToggleFullStackTrace':
 				return noCmd(
@@ -16322,22 +16329,22 @@ var _user$project$BugDetails$update = F2(
 						model,
 						{showFullStackTrace: !model.showFullStackTrace}));
 			case 'ToggleOccurrence':
-				var _p4 = _p3._0;
-				return A2(_elm_lang$core$List$member, _p4, model.expandedOccurrences) ? noCmd(
+				var _p5 = _p4._0;
+				return A2(_elm_lang$core$List$member, _p5, model.expandedOccurrences) ? noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
 							expandedOccurrences: A2(
 								_elm_lang$core$List$filter,
 								function (oId) {
-									return !_elm_lang$core$Native_Utils.eq(oId, _p4);
+									return !_elm_lang$core$Native_Utils.eq(oId, _p5);
 								},
 								model.expandedOccurrences)
 						})) : noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							expandedOccurrences: {ctor: '::', _0: _p4, _1: model.expandedOccurrences}
+							expandedOccurrences: {ctor: '::', _0: _p5, _1: model.expandedOccurrences}
 						}));
 			case 'ToggleTimeFormat':
 				return noCmd(
@@ -16364,12 +16371,12 @@ var _user$project$BugDetails$update = F2(
 						_user$project$Rest$closeBug(model.bug.id))
 				};
 			case 'ReloadBug':
-				var _p5 = _p3._0;
-				if (_p5.ctor === 'Success') {
+				var _p6 = _p4._0;
+				if (_p6.ctor === 'Success') {
 					return noCmd(
 						_elm_lang$core$Native_Utils.update(
 							model,
-							{bug: _p5._0}));
+							{bug: _p6._0}));
 				} else {
 					return noCmd(model);
 				}
@@ -16378,7 +16385,7 @@ var _user$project$BugDetails$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							now: _elm_lang$core$Date$fromTime(_p3._0)
+							now: _elm_lang$core$Date$fromTime(_p4._0)
 						}));
 			case 'ShowLinkIssueForm':
 				return noCmd(
@@ -16389,7 +16396,7 @@ var _user$project$BugDetails$update = F2(
 				return noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{issueToLink: _p3._0}));
+						{issueToLink: _p4._0}));
 			case 'LinkIssue':
 				return {
 					ctor: '_Tuple2',
@@ -16399,7 +16406,7 @@ var _user$project$BugDetails$update = F2(
 					_1: A2(
 						_user$project$Rest$fetch,
 						_user$project$BugDetails$ReloadBug,
-						A2(_user$project$Rest$createIssue, model.bug.id, _p3._0))
+						A2(_user$project$Rest$createIssue, model.bug.id, _p4._0))
 				};
 			default:
 				return {
@@ -16408,7 +16415,7 @@ var _user$project$BugDetails$update = F2(
 					_1: A2(
 						_user$project$Rest$fetch,
 						_user$project$BugDetails$ReloadBug,
-						A2(_user$project$Rest$deleteIssue, model.bug.id, _p3._0.id))
+						A2(_user$project$Rest$deleteIssue, model.bug.id, _p4._0.id))
 				};
 		}
 	});
