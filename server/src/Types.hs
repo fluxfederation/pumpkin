@@ -7,6 +7,7 @@ import Data.Text
 import Data.Time.LocalTime
 import Data.UUID.Types (UUID)
 import GHC.Generics
+import Network.URI (URI)
 
 type BugID = UUID
 
@@ -57,9 +58,8 @@ data Environment = Environment
 
 type IssueID = UUID
 
--- TODO: URL type?
 data Issue = Issue
   { issueID :: IssueID
   , issueBugID :: BugID
-  , issueURL :: Text
+  , issueURL :: URI
   } deriving (Generic, Show)
