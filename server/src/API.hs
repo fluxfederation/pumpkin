@@ -22,9 +22,11 @@ type BugOccurrences
 type BugClose
    = "bugs" :> Capture "id" UUID :> "close" :> Post '[ JSON] BugDetails
 
+-- FIXME: Rails backend uses hokey non-restful route, which we reproduce here
 type BugCreateIssue
    = "bugs" :> Capture "id" UUID :> "create_issue" :> QueryParam "url" URI :> Post '[ JSON] BugDetails
 
+-- FIXME: Rails backend uses hokey non-restful route, which we reproduce here
 type BugDeleteIssue
    = "bugs" :> Capture "id" UUID :> "delete_issue" :> QueryParam "issue_id" IssueID :> Post '[ JSON] BugDetails
 
