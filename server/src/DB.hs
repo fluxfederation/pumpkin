@@ -9,6 +9,7 @@ module DB
   , loadBugDetails
   , loadBugOccurrences
   , closeBug
+  , createIssue
   , createOccurrence
   , withConnection
   , Connection
@@ -22,6 +23,10 @@ import Data.Monoid ((<>))
 import Data.Text (Text)
 import Data.Time.LocalTime
 import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple.FromField
+import Database.PostgreSQL.Simple.ToField
+import Network.URI (URI)
+import qualified Network.URI as URI
 import Types
 
 withConnection :: (Connection -> IO a) -> IO a
@@ -140,6 +145,26 @@ closeBug id =
       " INSERT INTO events (bug_id, name, created_at, updated_at) \
       \ SELECT id, 'closed', NOW(), NOW() FROM bugs WHERE id = ?"
       (Only id)
+
+instance FromField URI where
+  fromField f mdata =
+    fromField f mdata >>= \s ->
+      case URI.parseURI s of
+        Just uri -> return uri
+        _ -> returnError ConversionFailed f ("Invalid URI: " <> s)
+
+instance ToField URI where
+  toField u = toField $ URI.uriToString id u ""
+
+createIssue :: BugID -> URI -> IO ()
+createIssue id url =
+  withConnection $ \conn ->
+    void $
+    execute
+      conn
+      " INSERT INTO issues (bug_id, url, created_at, updated_at) \
+      \ SELECT ?, ?, NOW(), NOW() FROM bugs WHERE id = ?"
+      (id, url, id)
 
 createOccurrence :: NewOccurrence -> IO ()
 createOccurrence (NewOccurrence env message data_ occurred_at) =

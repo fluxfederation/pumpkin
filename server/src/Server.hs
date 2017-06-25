@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Server
   ( runServer
   ) where
@@ -6,9 +8,13 @@ import API
 import Control.Monad.Except
 import qualified DB
 import Data.Maybe (fromMaybe)
+import Data.Monoid ((<>))
 import Data.Text (Text)
+import qualified Data.Text as T
 import JSON
 import Network.HTTP.Types.Status
+import Network.URI (URI)
+import qualified Network.URI as URI
 import Network.Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai.Middleware.Static (static)
@@ -17,6 +23,7 @@ import Servant.API
 import Servant.Server
 import System.Posix.Directory (changeWorkingDirectory)
 import Types
+import Web.HttpApiData (FromHttpApiData(..))
 
 getEnvironments :: ExceptT ServantErr IO [Environment]
 getEnvironments = lift DB.loadEnvironments
@@ -49,6 +56,14 @@ closeBug id = do
   liftIO $ DB.closeBug id
   getBugDetails id
 
+createIssue :: BugID -> Maybe URI -> ExceptT ServantErr IO BugDetails
+createIssue id url =
+  case url of
+    Just u -> do
+      liftIO $ DB.createIssue id u
+      getBugDetails id
+    _ -> throwError err400 {errBody = "Missing URL"}
+
 createOccurrence :: NewOccurrence -> ExceptT ServantErr IO ()
 createOccurrence = liftIO . DB.createOccurrence
 
@@ -56,7 +71,15 @@ api :: Server API
 api =
   getEnvironments :<|> getBugs :<|> getBugDetails :<|> getBugOccurrences :<|>
   closeBug :<|>
-  createOccurrence
+  createOccurrence :<|>
+  createIssue
+
+instance FromHttpApiData URI where
+  parseUrlPiece s =
+    parseUrlPiece s >>= \str ->
+      case URI.parseURI str of
+        Just u -> Right u
+        Nothing -> Left ("Invalid URL: " <> T.pack str)
 
 apiAPP :: Application
 apiAPP = serve (Proxy :: Proxy API) api
@@ -65,7 +88,7 @@ app :: Application
 app req respond =
   if null (pathInfo req) -- Root page
     then respond (responseFile status200 [] "index.html" Nothing)
-    else (static apiAPP) req respond
+    else static apiAPP req respond
 
 runServer :: FilePath -> IO ()
 runServer root = do

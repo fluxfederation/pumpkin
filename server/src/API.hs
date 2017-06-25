@@ -5,6 +5,7 @@ module API where
 
 import Data.Text (Text)
 import Data.UUID.Types (UUID)
+import Network.URI (URI)
 import Servant.API
 import Types
 
@@ -21,8 +22,11 @@ type BugOccurrencesEndpoint
 type BugCloseEndpoint
    = "bugs" :> Capture "id" UUID :> "close" :> Post '[ JSON] BugDetails
 
+type BugCreateIssueEndpoint
+   = "bugs" :> Capture "id" UUID :> "create_issue" :> QueryParam "url" URI :> Post '[ JSON] BugDetails
+
 type CreateOccurrenceEndpoint
    = "occurrences" :> ReqBody '[ JSON] NewOccurrence :> Post '[ JSON] ()
 
 type API
-   = EnvironmentsEndpoint :<|> BugListEndpoint :<|> BugDetailsEndpoint :<|> BugOccurrencesEndpoint :<|> BugCloseEndpoint :<|> CreateOccurrenceEndpoint
+   = EnvironmentsEndpoint :<|> BugListEndpoint :<|> BugDetailsEndpoint :<|> BugOccurrencesEndpoint :<|> BugCloseEndpoint :<|> CreateOccurrenceEndpoint :<|> BugCreateIssueEndpoint
