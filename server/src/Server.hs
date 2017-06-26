@@ -48,9 +48,9 @@ app req respond =
     then respond (responseFile status200 [] "index.html" Nothing)
     else static apiAPP req respond
 
-runServer :: FilePath -> IO ()
-runServer root = do
+runServer :: FilePath -> Int -> Int -> IO ()
+runServer root serverPort ekgPort = do
   changeWorkingDirectory root
-  store <- serverMetricStore <$> forkServer "localhost" 8000
+  store <- serverMetricStore <$> forkServer "localhost" ekgPort
   waiMetrics <- registerWaiMetrics store
-  Warp.run 8080 (metrics waiMetrics app)
+  Warp.run serverPort (metrics waiMetrics app)

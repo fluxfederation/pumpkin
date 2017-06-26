@@ -58,4 +58,5 @@
   :LOGBOOK:  
   - State "DONE"       from "TODO"       [2017-06-26 Mon 12:22]
   :END:      
+* TODO Nicer command-line arg parsing
 * TODO Deployment story (Docker?)
