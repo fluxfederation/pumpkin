@@ -6,10 +6,9 @@ module Server
 
 import API
 import Actions
-import JSON
+import JSON ()
 
 import Data.Monoid ((<>))
-import Data.Text (Text)
 import qualified Data.Text as T
 import Network.HTTP.Types.Status
 import Network.URI (URI)
