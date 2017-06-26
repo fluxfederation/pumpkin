@@ -53,5 +53,9 @@
 * TODO Job processing
 * TODO Google Auth
 * TODO Heartbeat
-* TODO [[https://maxgabriel.github.io/ekg-yesod/][EKG]] monitoring
+* DONE [[https://maxgabriel.github.io/ekg-yesod/][EKG]] monitoring
+  CLOSED: [2017-06-26 Mon 12:22]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-26 Mon 12:22]
+  :END:      
 * TODO Deployment story (Docker?)

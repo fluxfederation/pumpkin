@@ -15,11 +15,13 @@ import Network.URI (URI)
 import qualified Network.URI as URI
 import Network.Wai
 import qualified Network.Wai.Handler.Warp as Warp
+import Network.Wai.Metrics
 import Network.Wai.Middleware.Static (static)
 import Servant (Proxy(..))
 import Servant.API
 import Servant.Server
 import System.Posix.Directory (changeWorkingDirectory)
+import System.Remote.Monitoring (forkServer, serverMetricStore)
 import Web.HttpApiData (FromHttpApiData(..))
 
 instance FromHttpApiData URI where
@@ -49,4 +51,6 @@ app req respond =
 runServer :: FilePath -> IO ()
 runServer root = do
   changeWorkingDirectory root
-  Warp.run 8080 app
+  store <- serverMetricStore <$> forkServer "localhost" 8000
+  waiMetrics <- registerWaiMetrics store
+  Warp.run 8080 (metrics waiMetrics app)
