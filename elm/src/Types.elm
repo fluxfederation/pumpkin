@@ -42,7 +42,6 @@ type BugID
 
 type alias Bug =
     { id : BugID
-    , environmentId : EnvironmentID
     , message : String
     , firstOccurredAt : Date.Date
     , lastOccurredAt : Date.Date

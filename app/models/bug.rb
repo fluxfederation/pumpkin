@@ -10,8 +10,7 @@ class Bug < ApplicationRecord
   scope :with_occurrence_includes, ->{ includes(:primary_occurrence => :environment) }
   scope :with_issue_includes, ->{ includes(:issues) }
 
-  #Assumes join with primary_occurrence
-  scope :with_primary_occurrence_in_environment, ->(environment_ids) { joins(:primary_occurrence).merge(Occurrence.where(:environment_id => environment_ids)) }
+  scope :with_occurrence_in_environment, ->(environment_ids) { where("EXISTS (SELECT 1 FROM occurrences ox WHERE ox.bug_id = bugs.id AND ox.environment_id IN (?))", environment_ids) }
   scope :search, ->(query){ distinct.joins(:occurrences).merge(Occurrence.where("occurrences.message @@ ?", query)) }
 
   # closed and open rely on latest_even_name from the bug_with_latest_details view

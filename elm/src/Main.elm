@@ -287,11 +287,6 @@ noCmd model =
     ( model, Cmd.none )
 
 
-bugInEnvironment : EnvironmentID -> Bug -> Bool
-bugInEnvironment environmentId bug =
-    bug.environmentId == environmentId
-
-
 shouldHideFocusedBug : Model -> (Bug -> Bool) -> Bool
 shouldHideFocusedBug model f =
     Maybe.withDefault False <| Maybe.map (\b -> f (b.bug)) <| RemoteData.toMaybe model.focusedBug
