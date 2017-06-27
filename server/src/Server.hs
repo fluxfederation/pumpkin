@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Server
@@ -26,15 +27,15 @@ import Web.HttpApiData (FromHttpApiData(..))
 
 instance FromHttpApiData URI where
   parseUrlPiece s =
-    parseUrlPiece s >>= \str ->
-      case URI.parseURI str of
-        Just u -> Right u
-        Nothing -> Left ("Invalid URL: " <> T.pack str)
+    parseUrlPiece s >>=
+    \str ->
+       case URI.parseURI str of
+         Just u -> Right u
+         Nothing -> Left ("Invalid URL: " <> T.pack str)
 
 api :: Server API
 api =
-  getEnvironments :<|> getBugs :<|> getBugDetails :<|> getBugOccurrences :<|>
-  closeBug :<|>
+  getEnvironments :<|> getBugs :<|> getBugDetails :<|> getBugOccurrences :<|> closeBug :<|>
   createOccurrence :<|>
   createIssue :<|>
   deleteIssue

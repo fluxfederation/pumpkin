@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module JSON where
@@ -11,7 +12,7 @@ import Network.URI (URI)
 import qualified Network.URI as URI
 import Types
 
-instance ToJSON UUID.UUID where
+instance ToJSON UUID where
   toJSON = toJSON . UUID.toString
 
 instance ToJSON URI where

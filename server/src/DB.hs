@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -22,7 +23,6 @@ import Data.Aeson (Value)
 import Data.Maybe (listToMaybe)
 import Data.Monoid ((<>))
 import Data.Text (Text)
-import Data.Time.LocalTime
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromField
 import Database.PostgreSQL.Simple.ToField
@@ -37,10 +37,11 @@ instance FromRow Environment
 
 loadEnvironments :: IO [Environment]
 loadEnvironments =
-  withConnection $ \conn ->
-    query_
-      conn
-      " SELECT id FROM \
+  withConnection $
+  \conn ->
+     query_
+       conn
+       " SELECT id FROM \
       \   (SELECT e.*, last_occurred_at FROM environments e \
       \      JOIN (SELECT environment_id, MAX(occurred_at) AS last_occurred_at \
       \            FROM occurrences GROUP BY environment_id) AS l \
@@ -74,7 +75,8 @@ bugListSelect =
 
 loadBugs :: BugSearch -> IO [BugWithIssues]
 loadBugs search =
-  withConnection $ \conn -> do
+  withConnection $
+  \conn -> do
     bugs <-
       query
         conn
@@ -101,7 +103,12 @@ loadBugs search =
         , bsLimit search)
     issues <- loadIssuesByBugID conn (bugID <$> bugs)
     return $
-      (\bug -> BugWithIssues bug [i | i <- issues, issueBugID i == bugID bug]) <$>
+      (\bug ->
+          BugWithIssues
+            bug
+            [ i
+            | i <- issues
+            , issueBugID i == bugID bug ]) <$>
       bugs
 
 loadIssuesByBugID :: Connection -> [BugID] -> IO [Issue]
@@ -112,81 +119,87 @@ loadIssuesByBugID conn ids =
     (Only $ In ids)
 
 loadBugDetails :: BugID -> IO (Maybe BugDetails)
-loadBugDetails id =
-  withConnection $ \conn -> do
+loadBugDetails bug =
+  withConnection $
+  \conn -> do
     bugs :: [Bug :. Only Value] <-
       query
         conn
         ("WITH bug_list AS (" <> bugListSelect <>
          ") SELECT * FROM bug_list WHERE id = ?")
-        (Only id)
+        (Only bug)
     case listToMaybe bugs of
-      Just (bug :. Only data_) -> do
-        issues <- loadIssuesByBugID conn [bugID bug]
-        return $ Just (BugDetails bug issues data_)
+      Just (bug_ :. Only data_) -> do
+        issues <- loadIssuesByBugID conn [bugID bug_]
+        return $ Just (BugDetails bug_ issues data_)
       _ -> return Nothing
 
 instance FromRow Occurrence
 
 loadBugOccurrences :: BugID -> Int -> IO [Occurrence]
-loadBugOccurrences id limit =
-  withConnection $ \conn ->
-    query
-      conn
-      "SELECT id, message, occurred_at, data, environment_id, bug_id FROM occurrences WHERE bug_id = ? LIMIT ?"
-      (id, limit)
+loadBugOccurrences bug limit =
+  withConnection $
+  \conn ->
+     query
+       conn
+       "SELECT id, message, occurred_at, data, environment_id, bug_id FROM occurrences WHERE bug_id = ? LIMIT ?"
+       (bug, limit)
 
 closeBug :: BugID -> IO ()
-closeBug id =
-  withConnection $ \conn ->
-    void $
-    execute
-      conn
-      " INSERT INTO events (bug_id, name, created_at, updated_at) \
+closeBug bug =
+  withConnection $
+  \conn ->
+     void $
+     execute
+       conn
+       " INSERT INTO events (bug_id, name, created_at, updated_at) \
       \ SELECT id, 'closed', NOW(), NOW() FROM bugs WHERE id = ?"
-      (Only id)
+       (Only bug)
 
 instance FromField URI where
   fromField f mdata =
-    fromField f mdata >>= \s ->
-      case URI.parseURI s of
-        Just uri -> return uri
-        _ -> returnError ConversionFailed f ("Invalid URI: " <> s)
+    fromField f mdata >>=
+    \s ->
+       case URI.parseURI s of
+         Just uri -> return uri
+         _ -> returnError ConversionFailed f ("Invalid URI: " <> s)
 
 instance ToField URI where
   toField u = toField $ URI.uriToString id u ""
 
 createIssue :: BugID -> URI -> IO ()
-createIssue id url =
-  withConnection $ \conn ->
-    void $
-    execute
-      conn
-      " INSERT INTO issues (bug_id, url, created_at, updated_at) \
+createIssue bug url =
+  withConnection $
+  \conn ->
+     void $
+     execute
+       conn
+       " INSERT INTO issues (bug_id, url, created_at, updated_at) \
       \ SELECT ?, ?, NOW(), NOW() FROM bugs WHERE id = ?"
-      (id, url, id)
+       (bug, url, bug)
 
 deleteIssue :: BugID -> IssueID -> IO ()
-deleteIssue bugID issueID =
-  withConnection $ \conn ->
-    void $
-    execute
-      conn
-      " DELETE FROM issues WHERE bug_id = ? AND id = ?"
-      (bugID, issueID)
+deleteIssue bug issue =
+  withConnection $
+  \conn ->
+     void $
+     execute conn " DELETE FROM issues WHERE bug_id = ? AND id = ?" (bug, issue)
 
 createOccurrence :: NewOccurrence -> IO ()
 createOccurrence (NewOccurrence env message data_ occurred_at) =
   void $
-  withConnection $ \conn ->
-    withTransaction conn $ do
-      execute
-        conn
-        "INSERT INTO environments (id, created_at, updated_at) SELECT ?, NOW(), NOW() WHERE NOT EXISTS (SELECT 1 FROM environments WHERE id = ?)"
-        (env, env)
-      execute
-        conn
-        " INSERT INTO occurrences \
+  withConnection $
+  \conn ->
+     withTransaction conn $
+     do void $
+          execute
+            conn
+            "INSERT INTO environments (id, created_at, updated_at) SELECT ?, NOW(), NOW() WHERE NOT EXISTS (SELECT 1 FROM environments WHERE id = ?)"
+            (env, env)
+        void $
+          execute
+            conn
+            " INSERT INTO occurrences \
           \  (environment_id, message, data, occurred_at, created_at, updated_at) \
           \ VALUES ?, ?, ?, ?, NOW(), NOW()"
-        (env, message, data_, occurred_at)
+            (env, message, data_, occurred_at)
