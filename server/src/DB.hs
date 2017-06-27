@@ -62,7 +62,6 @@ instance FromRow Bug
 bugListSelect :: Query
 bugListSelect =
   " SELECT b.id \
-  \      , environment_id \
   \      , message \
   \      , o.occurred_at AS first_occurred_at \
   \      , last_occurred_at \
@@ -80,22 +79,22 @@ loadBugs search =
       query
         conn
         ("WITH bug_list AS (" <> bugListSelect <> ") " <>
-         "SELECT id, environment_id, message, first_occurred_at, \
+         "SELECT id, message, first_occurred_at, \
          \       last_occurred_at, occurrence_count, closed_at \
          \  FROM bug_list \
-         \ WHERE environment_id IN ? \
-         \   AND (closed_at IS NULL OR ?) \
+         \ WHERE (closed_at IS NULL OR ?) \
          \   AND (? IS NULL \
          \        OR last_occurred_at <= \
          \           (SELECT last_occurred_at FROM bug_with_latest_details WHERE id = ?)) \
-         \   AND (? IS NULL OR ? = '' \
-         \        OR EXISTS (SELECT 1 FROM occurrences \
-         \                   WHERE bug_id = bug_list.id AND message @@ ?)) \
+         \   AND EXISTS (SELECT 1 FROM occurrences \
+         \                WHERE bug_id = bug_list.id \
+         \                  AND environment_id IN ? \
+         \                  AND (? IS NULL OR ? = '' OR message @@ ?)) \
          \ ORDER BY last_occurred_at DESC LIMIT ?")
-        ( In (bsEnvIDs search)
-        , bsClosed search
+        ( bsClosed search
         , bsStart search
         , bsStart search
+        , In (bsEnvIDs search)
         , bsSearch search
         , bsSearch search
         , bsSearch search

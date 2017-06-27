@@ -13,7 +13,6 @@ type BugID = UUID
 
 data Bug = Bug
   { bugID :: BugID
-  , bugEnvironmentID :: EnvironmentID
   , bugMessage :: Text
   , bugFirstOccurredAt :: LocalTime
   , bugLastOccurredAt :: LocalTime

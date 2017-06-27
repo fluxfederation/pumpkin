@@ -21,7 +21,6 @@ instance ToJSON Bug where
   toJSON b =
     object
       [ "id" .= bugID b
-      , "environment_id" .= bugEnvironmentID b
       , "message" .= bugMessage b
       , "first_occurred_at" .= bugFirstOccurredAt b
       , "last_occurred_at" .= bugLastOccurredAt b
