@@ -14861,9 +14861,9 @@ var _user$project$Types$UUID = function (a) {
 var _user$project$Types$Environment = function (a) {
 	return {id: a};
 };
-var _user$project$Types$Bug = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {id: a, environmentId: b, message: c, firstOccurredAt: d, lastOccurredAt: e, occurrenceCount: f, closedAt: g, issues: h};
+var _user$project$Types$Bug = F7(
+	function (a, b, c, d, e, f, g) {
+		return {id: a, message: b, firstOccurredAt: c, lastOccurredAt: d, occurrenceCount: e, closedAt: f, issues: g};
 	});
 var _user$project$Types$Occurrence = F6(
 	function (a, b, c, d, e, f) {
@@ -15057,11 +15057,10 @@ var _user$project$Rest$date = function () {
 	};
 	return A2(_elm_lang$core$Json_Decode$andThen, decodeDateFromString, _elm_lang$core$Json_Decode$string);
 }();
-var _user$project$Rest$decodeBug = A9(
-	_elm_lang$core$Json_Decode$map8,
+var _user$project$Rest$decodeBug = A8(
+	_elm_lang$core$Json_Decode$map7,
 	_user$project$Types$Bug,
 	A2(_elm_lang$core$Json_Decode$field, 'id', _user$project$Rest$decodeBugID),
-	A2(_elm_lang$core$Json_Decode$field, 'environment_id', _user$project$Rest$decodeEnvironmentID),
 	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'first_occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode$field, 'last_occurred_at', _user$project$Rest$date),
@@ -16948,10 +16947,6 @@ var _user$project$Main$shouldHideFocusedBug = F2(
 					return f(b.bug);
 				},
 				_bloom$remotedata$RemoteData$toMaybe(model.focusedBug)));
-	});
-var _user$project$Main$bugInEnvironment = F2(
-	function (environmentId, bug) {
-		return _elm_lang$core$Native_Utils.eq(bug.environmentId, environmentId);
 	});
 var _user$project$Main$noCmd = function (model) {
 	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};

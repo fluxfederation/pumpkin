@@ -128,9 +128,8 @@ decodeBugID =
 
 decodeBug : Decoder Bug
 decodeBug =
-    map8 Bug
+    map7 Bug
         (field "id" decodeBugID)
-        (field "environment_id" decodeEnvironmentID)
         (field "message" string)
         (field "first_occurred_at" date)
         (field "last_occurred_at" date)
