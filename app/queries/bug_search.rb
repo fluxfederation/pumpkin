@@ -2,15 +2,16 @@ class BugSearch
   attr_reader :bugs
 
   def initialize(ids: nil, environment_ids: nil, closed: false, limit: nil, start: nil, search: nil)
-    @bugs = Bug.with_latest_details
+    @bugs = BugSummary
                .in_occurrence_order
-               .with_occurrence_includes
-               .with_issue_includes
-               .with_occurrence_in_environment(environment_ids)
+               .includes(:issues)
+
+    occurrence_match = Occurrence.where("bug_id = bug_summaries.id").in_environments(Array(environment_ids))
+    occurrence_match = occurrence_match.search(search) if search.present?
+
+    @bugs = @bugs.where(occurrence_match.select(1).exists)
 
     @bugs = bugs.where(id: ids) if ids
-
-    @bugs = bugs.search(search) if search.present?
 
     @bugs = @bugs.limit(limit) if limit
 
