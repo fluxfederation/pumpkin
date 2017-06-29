@@ -15,23 +15,16 @@ import Types
 instance ToJSON UUID where
   toJSON = toJSON . UUID.toString
 
-instance ToJSON BugID where
-  toJSON (BugID uuid) = toJSON uuid
+instance ToJSON a =>
+         ToJSON (IDFor t a) where
+  toJSON (IDFor i) = toJSON i
 
-instance ToJSON OccurrenceID where
-  toJSON (OccurrenceID uuid) = toJSON uuid
-
-instance ToJSON IssueID where
-  toJSON (IssueID uuid) = toJSON uuid
-
-instance ToJSON EnvironmentID where
-  toJSON (EnvironmentID uuid) = toJSON uuid
+instance FromJSON a =>
+         FromJSON (IDFor t a) where
+  parseJSON = fmap IDFor . parseJSON
 
 instance ToJSON URI where
   toJSON u = toJSON $ URI.uriToString id u ""
-
-instance FromJSON EnvironmentID where
-  parseJSON = fmap EnvironmentID . parseJSON
 
 instance ToJSON BugSummary where
   toJSON b =

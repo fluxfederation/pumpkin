@@ -34,14 +34,9 @@ instance FromHttpApiData URI where
          Just u -> Right u
          Nothing -> Left ("Invalid URL: " <> T.pack str)
 
-instance FromHttpApiData BugID where
-  parseUrlPiece = fmap BugID . parseUrlPiece
-
-instance FromHttpApiData IssueID where
-  parseUrlPiece = fmap IssueID . parseUrlPiece
-
-instance FromHttpApiData EnvironmentID where
-  parseUrlPiece = fmap EnvironmentID . parseUrlPiece
+instance FromHttpApiData a =>
+         FromHttpApiData (IDFor t a) where
+  parseUrlPiece = fmap IDFor . parseUrlPiece
 
 api :: Server API
 api =

@@ -67,5 +67,9 @@
   :LOGBOOK:  
   - State "DONE"       from "TODO"       [2017-06-27 Tue 21:10]
   :END:      
-* TODO Newtype wrappers for IDs
+* DONE Newtype wrappers for IDs
+  CLOSED: [2017-06-30 Fri 10:43]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-30 Fri 10:43]
+  :END:      
 * TODO Deployment story (Docker?)
