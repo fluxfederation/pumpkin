@@ -85,33 +85,25 @@ loadBugs search =
         , bsSearch search
         , bsSearch search
         , bsLimit search)
-    issues <- loadIssuesByBugID conn (bugID <$> bugs)
-    return $
-      (\bug ->
-          BugDetails
-            bug
-            [ i
-            | i <- issues
-            , issueBugID i == bugID bug ]) <$>
-      bugs
+    expandToBugDetails conn bugs
 
-loadIssuesByBugID :: Connection -> [BugID] -> IO [Issue]
-loadIssuesByBugID conn ids =
-  query
-    conn
-    "SELECT id, bug_id, url FROM issues WHERE bug_id IN ?"
-    (Only $ In ids)
+expandToBugDetails :: Connection -> [BugSummary] -> IO [BugDetails]
+expandToBugDetails _ [] = return []
+expandToBugDetails conn summaries = do
+  issues <-
+    query
+      conn
+      "SELECT id, bug_id, url FROM issues WHERE bug_id IN ?"
+      (Only $ In (bugID <$> summaries))
+  return $
+    (\bug -> BugDetails bug (filter ((bugID bug ==) . issueBugID) issues)) <$> summaries
 
 loadBugDetails :: BugID -> IO (Maybe BugDetails)
 loadBugDetails bug =
   withConnection $
   \conn -> do
     bugs <- query conn "SELECT * FROM bug_summaries WHERE id = ?" (Only bug)
-    case listToMaybe bugs of
-      Just bug_ -> do
-        issues <- loadIssuesByBugID conn [bugID bug_]
-        return $ Just (BugDetails bug_ issues)
-      _ -> return Nothing
+    listToMaybe <$> expandToBugDetails conn bugs
 
 instance FromRow Occurrence
 
