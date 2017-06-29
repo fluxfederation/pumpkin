@@ -7,6 +7,9 @@ class Occurrence < ApplicationRecord
 
   validate :data_present
 
+  scope :in_environments, ->(environment_ids) { where(environment_id: environment_ids) }
+  scope :search, ->(query) { where("#{table_name}.message @@ ?", query) }
+
   private
 
   def data_present

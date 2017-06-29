@@ -6,8 +6,6 @@
     "first_occurred_at": {"type": "string"},
     "last_occurred_at": {"type": "string"},
     "occurrence_count": {"type": "number"},
-    "environment_id": { "type": "string" },
-    "data": { "type": "object" },
     "closed_at": { "type": ["string", "null"] },
     "issues": {
       "type": "array",
@@ -24,5 +22,5 @@
       }
     }
   },
-  "required": ["id", "message", "first_occurred_at", "last_occurred_at", "occurrence_count", "environment_id", "data", "closed_at", "issues"]
+  "required": ["id", "message", "first_occurred_at", "last_occurred_at", "occurrence_count", "closed_at", "issues"]
 }
