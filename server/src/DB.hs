@@ -20,7 +20,7 @@ module DB
 import Control.Exception (bracket)
 import Control.Monad (void)
 import Data.Maybe (listToMaybe)
-import Data.Monoid ((<>))
+import Data.Semigroup ((<>))
 import Data.Text (Text)
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromField
