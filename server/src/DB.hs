@@ -13,8 +13,8 @@ module DB
   , createIssue
   , deleteIssue
   , createOccurrence
-  , withConnection
-  , Connection
+  , DB
+  , runDB
   ) where
 
 import Control.Exception (bracket)
@@ -23,24 +23,28 @@ import Data.Maybe (listToMaybe)
 import Data.Semigroup ((<>))
 import Data.Text (Text)
 import Database.PostgreSQL.Simple
+       (Connection, connectPostgreSQL, close, FromRow, In(..), Only(..))
+import Database.PostgreSQL.Transaction
 import Database.PostgreSQL.Simple.FromField
 import Database.PostgreSQL.Simple.ToField
 import Network.URI (URI)
 import qualified Network.URI as URI
 import Types
 
+type DB a = PGTransaction a
+
+runDB :: DB a -> IO a
+runDB action = withConnection $ \conn -> runPGTransactionIO action conn
+
 withConnection :: (Connection -> IO a) -> IO a
 withConnection = bracket (connectPostgreSQL "") close
 
 instance FromRow Environment
 
-loadEnvironments :: IO [Environment]
+loadEnvironments :: DB [Environment]
 loadEnvironments =
-  withConnection $
-  \conn ->
-     query_
-       conn
-       " SELECT id FROM \
+  query_
+    " SELECT id FROM \
       \   (SELECT e.*, last_occurred_at FROM environments e \
       \      JOIN (SELECT environment_id, MAX(occurred_at) AS last_occurred_at \
       \            FROM occurrences GROUP BY environment_id) AS l \
@@ -59,14 +63,19 @@ instance FromRow Issue
 
 instance FromRow BugSummary
 
-loadBugs :: BugSearch -> IO [BugDetails]
-loadBugs search =
-  withConnection $
-  \conn -> do
-    bugs <-
-      query
-        conn
-        "SELECT * \
+loadBugs :: BugSearch -> DB [BugDetails]
+loadBugs search = do
+  bugs <-
+    query
+      ( bsClosed search
+      , bsStart search
+      , bsStart search
+      , In (bsEnvIDs search)
+      , bsSearch search
+      , bsSearch search
+      , bsSearch search
+      , bsLimit search)
+      "SELECT * \
         \  FROM bug_summaries \
         \ WHERE (closed_at IS NULL OR ?) \
         \   AND (? IS NULL \
@@ -77,55 +86,38 @@ loadBugs search =
         \                  AND environment_id IN ? \
         \                  AND (? IS NULL OR ? = '' OR message @@ ?)) \
         \ ORDER BY last_occurred_at DESC LIMIT ?"
-        ( bsClosed search
-        , bsStart search
-        , bsStart search
-        , In (bsEnvIDs search)
-        , bsSearch search
-        , bsSearch search
-        , bsSearch search
-        , bsLimit search)
-    expandToBugDetails conn bugs
+  expandToBugDetails bugs
 
-expandToBugDetails :: Connection -> [BugSummary] -> IO [BugDetails]
-expandToBugDetails _ [] = return []
-expandToBugDetails conn summaries = do
+expandToBugDetails :: [BugSummary] -> DB [BugDetails]
+expandToBugDetails [] = return []
+expandToBugDetails summaries = do
   issues <-
     query
-      conn
-      "SELECT id, bug_id, url FROM issues WHERE bug_id IN ?"
       (Only $ In (bugID <$> summaries))
+      "SELECT id, bug_id, url FROM issues WHERE bug_id IN ?"
   return $
     (\bug -> BugDetails bug (filter ((bugID bug ==) . issueBugID) issues)) <$> summaries
 
-loadBugDetails :: BugID -> IO (Maybe BugDetails)
-loadBugDetails bug =
-  withConnection $
-  \conn -> do
-    bugs <- query conn "SELECT * FROM bug_summaries WHERE id = ?" (Only bug)
-    listToMaybe <$> expandToBugDetails conn bugs
+loadBugDetails :: BugID -> DB (Maybe BugDetails)
+loadBugDetails bug = do
+  bugs <- query (Only bug) "SELECT * FROM bug_summaries WHERE id = ?"
+  listToMaybe <$> expandToBugDetails bugs
 
 instance FromRow Occurrence
 
-loadBugOccurrences :: BugID -> Int -> IO [Occurrence]
+loadBugOccurrences :: BugID -> Int -> DB [Occurrence]
 loadBugOccurrences bug limit =
-  withConnection $
-  \conn ->
-     query
-       conn
-       "SELECT id, message, occurred_at, data, environment_id, bug_id FROM occurrences WHERE bug_id = ? LIMIT ?"
-       (bug, limit)
+  query
+    (bug, limit)
+    "SELECT id, message, occurred_at, data, environment_id, bug_id FROM occurrences WHERE bug_id = ? LIMIT ?"
 
-closeBug :: BugID -> IO ()
+closeBug :: BugID -> DB ()
 closeBug bug =
-  withConnection $
-  \conn ->
-     void $
-     execute
-       conn
-       " INSERT INTO events (bug_id, name, created_at, updated_at) \
+  void $
+  execute
+    (Only bug)
+    " INSERT INTO events (bug_id, name, created_at, updated_at) \
       \ SELECT id, 'closed', NOW(), NOW() FROM bugs WHERE id = ?"
-       (Only bug)
 
 instance FromField URI where
   fromField f mdata =
@@ -138,39 +130,27 @@ instance FromField URI where
 instance ToField URI where
   toField u = toField $ URI.uriToString id u ""
 
-createIssue :: BugID -> URI -> IO ()
+createIssue :: BugID -> URI -> DB ()
 createIssue bug url =
-  withConnection $
-  \conn ->
-     void $
-     execute
-       conn
-       " INSERT INTO issues (bug_id, url, created_at, updated_at) \
-      \ SELECT ?, ?, NOW(), NOW() FROM bugs WHERE id = ?"
-       (bug, url, bug)
-
-deleteIssue :: BugID -> IssueID -> IO ()
-deleteIssue bug issue =
-  withConnection $
-  \conn ->
-     void $
-     execute conn " DELETE FROM issues WHERE bug_id = ? AND id = ?" (bug, issue)
-
-createOccurrence :: NewOccurrence -> IO ()
-createOccurrence (NewOccurrence env message data_ occurred_at) =
   void $
-  withConnection $
-  \conn ->
-     withTransaction conn $
-     do void $
-          execute
-            conn
-            "INSERT INTO environments (id, created_at, updated_at) SELECT ?, NOW(), NOW() WHERE NOT EXISTS (SELECT 1 FROM environments WHERE id = ?)"
-            (env, env)
-        void $
-          execute
-            conn
-            " INSERT INTO occurrences \
+  execute
+    (bug, url, bug)
+    " INSERT INTO issues (bug_id, url, created_at, updated_at) \
+      \ SELECT ?, ?, NOW(), NOW() FROM bugs WHERE id = ?"
+
+deleteIssue :: BugID -> IssueID -> DB ()
+deleteIssue bug issue =
+  void $ execute (bug, issue) " DELETE FROM issues WHERE bug_id = ? AND id = ?"
+
+createOccurrence :: NewOccurrence -> DB ()
+createOccurrence (NewOccurrence env message data_ occurred_at) = do
+  void $
+    execute
+      (env, env)
+      "INSERT INTO environments (id, created_at, updated_at) SELECT ?, NOW(), NOW() WHERE NOT EXISTS (SELECT 1 FROM environments WHERE id = ?)"
+  void $
+    execute
+      (env, message, data_, occurred_at)
+      " INSERT INTO occurrences \
           \  (environment_id, message, data, occurred_at, created_at, updated_at) \
           \ VALUES ?, ?, ?, ?, NOW(), NOW()"
-            (env, message, data_, occurred_at)

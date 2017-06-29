@@ -48,7 +48,11 @@
   :LOGBOOK:  
   - State "DONE"       from "TODO"       [2017-06-26 Mon 10:23]
   :END:      
-* TODO Proper transaction bracketing
+* DONE Proper transaction bracketing
+  CLOSED: [2017-06-29 Thu 18:38]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-29 Thu 18:38]
+  :END:      
 * TODO Nicer error handling, validation
 * TODO Job processing
 * TODO Google Auth
