@@ -7,6 +7,7 @@ module Server
 
 import API
 import Actions
+import Types
 import JSON ()
 
 import Data.Monoid ((<>))
@@ -32,6 +33,15 @@ instance FromHttpApiData URI where
        case URI.parseURI str of
          Just u -> Right u
          Nothing -> Left ("Invalid URL: " <> T.pack str)
+
+instance FromHttpApiData BugID where
+  parseUrlPiece = fmap BugID . parseUrlPiece
+
+instance FromHttpApiData IssueID where
+  parseUrlPiece = fmap IssueID . parseUrlPiece
+
+instance FromHttpApiData EnvironmentID where
+  parseUrlPiece = fmap EnvironmentID . parseUrlPiece
 
 api :: Server API
 api =

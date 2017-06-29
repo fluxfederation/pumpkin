@@ -39,6 +39,30 @@ runDB action = withConnection $ \conn -> runPGTransactionIO action conn
 withConnection :: (Connection -> IO a) -> IO a
 withConnection = bracket (connectPostgreSQL "") close
 
+instance FromField BugID where
+  fromField f dat = BugID <$> fromField f dat
+
+instance FromField OccurrenceID where
+  fromField f dat = OccurrenceID <$> fromField f dat
+
+instance FromField IssueID where
+  fromField f dat = IssueID <$> fromField f dat
+
+instance FromField EnvironmentID where
+  fromField f dat = EnvironmentID <$> fromField f dat
+
+instance ToField BugID where
+  toField (BugID i) = toField i
+
+instance ToField OccurrenceID where
+  toField (OccurrenceID i) = toField i
+
+instance ToField IssueID where
+  toField (IssueID i) = toField i
+
+instance ToField EnvironmentID where
+  toField (EnvironmentID i) = toField i
+
 instance FromRow Environment
 
 loadEnvironments :: DB [Environment]

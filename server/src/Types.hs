@@ -9,7 +9,9 @@ import Data.UUID.Types (UUID)
 import GHC.Generics
 import Network.URI (URI)
 
-type BugID = UUID
+newtype BugID =
+  BugID UUID
+  deriving (Show, Eq, Ord)
 
 data BugSummary = BugSummary
   { bugID :: BugID
@@ -27,7 +29,9 @@ data BugDetails = BugDetails
   , bwiIssues :: [Issue]
   } deriving (Generic, Show)
 
-type OccurrenceID = UUID
+newtype OccurrenceID =
+  OccurrenceID UUID
+  deriving (Show, Eq, Ord)
 
 data Occurrence = Occurrence
   { occID :: OccurrenceID
@@ -45,13 +49,17 @@ data NewOccurrence = NewOccurrence
   , neOccurredAt :: LocalTime
   } deriving (Generic, Show)
 
-type EnvironmentID = Text
+newtype EnvironmentID =
+  EnvironmentID Text
+  deriving (Show, Eq, Ord)
 
 data Environment = Environment
   { environmentID :: EnvironmentID
   } deriving (Generic, Show)
 
-type IssueID = UUID
+newtype IssueID =
+  IssueID UUID
+  deriving (Show, Eq, Ord)
 
 data Issue = Issue
   { issueID :: IssueID

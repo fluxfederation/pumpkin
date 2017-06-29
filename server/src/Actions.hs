@@ -17,7 +17,7 @@ liftDB :: DB.DB a -> ExceptT ServantErr IO a
 liftDB = liftIO . DB.runDB
 
 getBugs
-  :: [Text]
+  :: [EnvironmentID]
   -> Bool
   -> Maybe Text
   -> Maybe Int
