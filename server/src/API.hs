@@ -9,29 +9,22 @@ import Network.URI (URI)
 import Servant.API
 import Types
 
-type Environments = "environments" :> Get '[ JSON] [Environment]
+type Environments = "environments" :> Get '[JSON] [Environment]
 
-type BugList
-   = "bugs" :> QueryParams "environment_ids" Text :> QueryFlag "closed" :> QueryParam "search" Text :> QueryParam "limit" Int :> QueryParam "start" Int :> Get '[ JSON] [BugWithIssues]
+type BugList = "bugs" :> QueryParams "environment_ids" Text :> QueryFlag "closed" :> QueryParam "search" Text :> QueryParam "limit" Int :> QueryParam "start" Int :> Get '[JSON] [BugDetails]
 
-type BugShow = "bugs" :> Capture "id" UUID :> Get '[ JSON] BugDetails
+type BugShow = "bugs" :> Capture "id" UUID :> Get '[JSON] BugDetails
 
-type BugOccurrences
-   = "bugs" :> Capture "id" UUID :> "occurrences" :> QueryParam "limit" Int :> Get '[ JSON] [Occurrence]
+type BugOccurrences = "bugs" :> Capture "id" UUID :> "occurrences" :> QueryParam "limit" Int :> Get '[JSON] [Occurrence]
 
-type BugClose
-   = "bugs" :> Capture "id" UUID :> "close" :> Post '[ JSON] BugDetails
+type BugClose = "bugs" :> Capture "id" UUID :> "close" :> Post '[JSON] BugDetails
 
 -- FIXME: Rails backend uses hokey non-restful route, which we reproduce here
-type BugCreateIssue
-   = "bugs" :> Capture "id" UUID :> "create_issue" :> QueryParam "url" URI :> Post '[ JSON] BugDetails
+type BugCreateIssue = "bugs" :> Capture "id" UUID :> "create_issue" :> QueryParam "url" URI :> Post '[JSON] BugDetails
 
 -- FIXME: Rails backend uses hokey non-restful route, which we reproduce here
-type BugDeleteIssue
-   = "bugs" :> Capture "id" UUID :> "delete_issue" :> QueryParam "issue_id" IssueID :> Post '[ JSON] BugDetails
+type BugDeleteIssue = "bugs" :> Capture "id" UUID :> "delete_issue" :> QueryParam "issue_id" IssueID :> Post '[JSON] BugDetails
 
-type CreateOccurrence
-   = "occurrences" :> ReqBody '[ JSON] NewOccurrence :> Post '[ JSON] ()
+type CreateOccurrence = "occurrences" :> ReqBody '[JSON] NewOccurrence :> Post '[JSON] ()
 
-type API
-   = Environments :<|> BugList :<|> BugShow :<|> BugOccurrences :<|> BugClose :<|> CreateOccurrence :<|> BugCreateIssue :<|> BugDeleteIssue
+type API = Environments :<|> BugList :<|> BugShow :<|> BugOccurrences :<|> BugClose :<|> CreateOccurrence :<|> BugCreateIssue :<|> BugDeleteIssue

@@ -18,7 +18,7 @@ instance ToJSON UUID where
 instance ToJSON URI where
   toJSON u = toJSON $ URI.uriToString id u ""
 
-instance ToJSON Bug where
+instance ToJSON BugSummary where
   toJSON b =
     object
       [ "id" .= bugID b
@@ -33,13 +33,9 @@ mergeJSON :: Value -> Value -> Value
 mergeJSON (Object a) (Object b) = Object (HM.unionWith mergeJSON a b)
 mergeJSON a _b = a
 
-instance ToJSON BugWithIssues where
-  toJSON (BugWithIssues bug issues) =
-    mergeJSON (toJSON bug) (object ["issues" .= issues])
-
 instance ToJSON BugDetails where
-  toJSON (BugDetails bug issues occs) =
-    mergeJSON (toJSON bug) (object ["issues" .= issues, "occurrences" .= occs])
+  toJSON (BugDetails bug issues) =
+    mergeJSON (toJSON bug) (object ["issues" .= issues])
 
 instance ToJSON Occurrence where
   toJSON occ =

@@ -19,7 +19,7 @@ getBugs
   -> Maybe Text
   -> Maybe Int
   -> Maybe Int
-  -> ExceptT ServantErr IO [BugWithIssues]
+  -> ExceptT ServantErr IO [BugDetails]
 getBugs envIDs closed search limit start = lift (DB.loadBugs bs)
   where
     bs = DB.BugSearch envIDs closed search (fromMaybe 100 limit) start

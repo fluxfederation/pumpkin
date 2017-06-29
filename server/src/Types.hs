@@ -11,24 +11,20 @@ import Network.URI (URI)
 
 type BugID = UUID
 
-data Bug = Bug
+data BugSummary = BugSummary
   { bugID :: BugID
   , bugMessage :: Text
+  , bugLatestEventName :: Text
+  , bugLatestEventAt :: LocalTime
   , bugFirstOccurredAt :: LocalTime
   , bugLastOccurredAt :: LocalTime
-  , bugOccurrenceCount :: Int
   , bugClosedAt :: Maybe LocalTime
-  } deriving (Generic, Show)
-
-data BugWithIssues = BugWithIssues
-  { bwiBug :: Bug
-  , bwiIssues :: [Issue]
+  , bugOccurrenceCount :: Int
   } deriving (Generic, Show)
 
 data BugDetails = BugDetails
-  { bdBug :: Bug
-  , bdIssues :: [Issue]
-  , bdData :: Value
+  { bwiBug :: BugSummary
+  , bwiIssues :: [Issue]
   } deriving (Generic, Show)
 
 type OccurrenceID = UUID
