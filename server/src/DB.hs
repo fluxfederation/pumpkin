@@ -13,6 +13,7 @@ module DB
   , createIssue
   , deleteIssue
   , createOccurrence
+  , matchOccurrences
   , DB
   , runDB
   ) where
@@ -20,6 +21,7 @@ module DB
 import Control.Exception (bracket)
 import Control.Monad (void)
 import Data.Maybe (listToMaybe)
+import Data.List ((\\))
 import Data.Semigroup ((<>))
 import Data.Text (Text)
 import Database.PostgreSQL.Simple
@@ -162,3 +164,63 @@ createOccurrence (NewOccurrence env message data_ occurred_at) = do
       " INSERT INTO occurrences \
           \  (environment_id, message, data, occurred_at, created_at, updated_at) \
           \ VALUES ?, ?, ?, ?, NOW(), NOW()"
+
+createEventsFor :: Text -> [BugID] -> DB ()
+createEventsFor _ [] = pure ()
+createEventsFor eventName bugIDs =
+  void $
+  execute
+    (eventName, In bugIDs)
+    "INSERT INTO events (bug_id, name, created_at, updated_at) SELECT id, ?, NOW(), NOW() FROM bugs WHERE id IN ?"
+
+createBugsFor :: [OccurrenceID] -> DB [BugID]
+createBugsFor [] = pure []
+createBugsFor occurrences = do
+  results <-
+    query
+      (Only $ In occurrences)
+      " INSERT INTO bugs (primary_occurrence_id, created_at, updated_at) \
+      \ SELECT DISTINCT ON (message) o.id, NOW(), NOW() \
+      \   FROM occurrences o WHERE o.id IN ? \
+      \  ORDER BY message, occurred_at ASC \
+      \ RETURNING bugs.id"
+  newPrimaries <-
+    query
+      ()
+      " UPDATE occurrences SET bug_id = bugs.id, updated_at = NOW() \
+      \   FROM bugs WHERE occurrences.id = bugs.primary_occurrence_id AND bug_id IS NULL \
+      \ RETURNING occurrences.id"
+  void $ matchOccurrencesToExisting (occurrences \\ (fromOnly <$> newPrimaries))
+  let newBugIDs = fromOnly <$> results
+  createEventsFor "closed" newBugIDs
+  pure newBugIDs
+
+matchOccurrencesToExisting :: [OccurrenceID] -> DB [OccurrenceID]
+matchOccurrencesToExisting [] = pure []
+matchOccurrencesToExisting ids = do
+  matched <-
+    query
+      (Only $ In ids)
+      " WITH matches AS ( \
+      \   SELECT o.id AS occurrence_id, o2.bug_id \
+      \   FROM occurrences o \
+      \   JOIN occurrences o2 \
+      \     ON o2.id IN (SELECT primary_occurrence_id FROM bugs) \
+      \    AND o2.message = o.message \
+      \    AND o2.bug_id IS NOT NULL -- paranoid \
+      \   WHERE o.id IN ? \
+      \ ) \
+      \ UPDATE occurrences SET bug_id = matches.bug_id \
+      \   FROM matches WHERE occurrences.id = matches.occurrence_id \
+      \ RETURNING occurrences.id"
+  pure $ fromOnly <$> matched
+
+matchOccurrences :: Int -> DB ()
+matchOccurrences limit = do
+  ids <-
+    query
+      (Only limit)
+      "SELECT id FROM occurrences WHERE bug_id IS NULL LIMIT ? FOR UPDATE SKIP LOCKED"
+  matched <- matchOccurrencesToExisting (fromOnly <$> ids)
+  let remaining = (fromOnly <$> ids) \\ matched
+  void $ createBugsFor remaining
