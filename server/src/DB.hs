@@ -99,13 +99,13 @@ loadBugs search = do
   expandToBugDetails bugs
 
 expandToBugDetails :: [BugSummary] -> DB [BugDetails]
-expandToBugDetails [] = return []
+expandToBugDetails [] = pure []
 expandToBugDetails summaries = do
   issues <-
     query
       (Only $ In (bugID <$> summaries))
       "SELECT id, bug_id, url FROM issues WHERE bug_id IN ?"
-  return $
+  pure $
     (\bug -> BugDetails bug (filter ((bugID bug ==) . issueBugID) issues)) <$> summaries
 
 loadBugDetails :: BugID -> DB (Maybe BugDetails)
@@ -134,7 +134,7 @@ instance FromField URI where
     fromField f mdata >>=
     \s ->
        case URI.parseURI s of
-         Just uri -> return uri
+         Just uri -> pure uri
          _ -> returnError ConversionFailed f ("Invalid URI: " <> s)
 
 instance ToField URI where

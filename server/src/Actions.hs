@@ -32,7 +32,7 @@ getBugDetails bug = do
   found <- liftDB (DB.loadBugDetails bug)
   case found of
     Nothing -> throwError err404
-    Just details -> return details
+    Just details -> pure details
 
 getBugOccurrences :: BugID -> Maybe Int -> ExceptT ServantErr IO [Occurrence]
 getBugOccurrences bug limit
