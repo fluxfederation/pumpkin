@@ -54,7 +54,11 @@
   - State "DONE"       from "TODO"       [2017-06-29 Thu 18:38]
   :END:      
 * TODO Nicer error handling, validation
-* TODO Job processing
+* DONE Matching of new occurrences
+  CLOSED: [2017-06-30 Fri 17:51]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-30 Fri 17:51]
+  :END:      
 * TODO Google Auth
 * TODO Heartbeat
 * DONE [[https://maxgabriel.github.io/ekg-yesod/][EKG]] monitoring

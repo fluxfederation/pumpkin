@@ -146,7 +146,7 @@ createIssue bug url =
   execute
     (bug, url, bug)
     " INSERT INTO issues (bug_id, url, created_at, updated_at) \
-      \ SELECT ?, ?, NOW(), NOW() FROM bugs WHERE id = ?"
+    \ SELECT ?, ?, NOW(), NOW() FROM bugs WHERE id = ?"
 
 deleteIssue :: BugID -> IssueID -> DB ()
 deleteIssue bug issue =
@@ -157,13 +157,15 @@ createOccurrence (NewOccurrence env message data_ occurred_at) = do
   void $
     execute
       (env, env)
-      "INSERT INTO environments (id, created_at, updated_at) SELECT ?, NOW(), NOW() WHERE NOT EXISTS (SELECT 1 FROM environments WHERE id = ?)"
+      " INSERT INTO environments (id, created_at, updated_at) \
+      \ SELECT ?, NOW(), NOW() \
+      \ WHERE NOT EXISTS (SELECT 1 FROM environments WHERE id = ?)"
   void $
     execute
       (env, message, data_, occurred_at)
       " INSERT INTO occurrences \
-          \  (environment_id, message, data, occurred_at, created_at, updated_at) \
-          \ VALUES ?, ?, ?, ?, NOW(), NOW()"
+      \  (environment_id, message, data, occurred_at, created_at, updated_at) \
+      \ VALUES ?, ?, ?, ?, NOW(), NOW()"
 
 createEventsFor :: Text -> [BugID] -> DB ()
 createEventsFor _ [] = pure ()
