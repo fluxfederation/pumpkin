@@ -20,15 +20,15 @@ module DB
 
 import Control.Exception (bracket)
 import Control.Monad (void)
-import Data.Maybe (listToMaybe)
 import Data.List ((\\))
+import Data.Maybe (listToMaybe)
 import Data.Semigroup ((<>))
 import Data.Text (Text)
 import Database.PostgreSQL.Simple
-       (Connection, connectPostgreSQL, close, FromRow, In(..), Only(..))
-import Database.PostgreSQL.Transaction
+       (Connection, FromRow, In(..), Only(..), close, connectPostgreSQL)
 import Database.PostgreSQL.Simple.FromField
 import Database.PostgreSQL.Simple.ToField
+import Database.PostgreSQL.Transaction
 import Network.URI (URI)
 import qualified Network.URI as URI
 import Types
@@ -41,12 +41,10 @@ runDB action = withConnection $ \conn -> runPGTransactionIO action conn
 withConnection :: (Connection -> IO a) -> IO a
 withConnection = bracket (connectPostgreSQL "") close
 
-instance FromField a =>
-         FromField (IDFor t a) where
+instance FromField a => FromField (IDFor t a) where
   fromField f dat = IDFor <$> fromField f dat
 
-instance ToField a =>
-         ToField (IDFor t a) where
+instance ToField a => ToField (IDFor t a) where
   toField (IDFor i) = toField i
 
 instance FromRow Environment
@@ -106,7 +104,8 @@ expandToBugDetails summaries = do
       (Only $ In (bugID <$> summaries))
       "SELECT id, bug_id, url FROM issues WHERE bug_id IN ?"
   pure $
-    (\bug -> BugDetails bug (filter ((bugID bug ==) . issueBugID) issues)) <$> summaries
+    (\bug -> BugDetails bug (filter ((bugID bug ==) . issueBugID) issues)) <$>
+    summaries
 
 loadBugDetails :: BugID -> DB (Maybe BugDetails)
 loadBugDetails bug = do
@@ -131,11 +130,10 @@ closeBug bug =
 
 instance FromField URI where
   fromField f mdata =
-    fromField f mdata >>=
-    \s ->
-       case URI.parseURI s of
-         Just uri -> pure uri
-         _ -> returnError ConversionFailed f ("Invalid URI: " <> s)
+    fromField f mdata >>= \s ->
+      case URI.parseURI s of
+        Just uri -> pure uri
+        _ -> returnError ConversionFailed f ("Invalid URI: " <> s)
 
 instance ToField URI where
   toField u = toField $ URI.uriToString id u ""
@@ -165,7 +163,7 @@ createOccurrence (NewOccurrence env message data_ occurred_at) = do
       (env, message, data_, occurred_at)
       " INSERT INTO occurrences \
       \  (environment_id, message, data, occurred_at, created_at, updated_at) \
-      \ VALUES ?, ?, ?, ?, NOW(), NOW()"
+      \ VALUES (?, ?, ?, ?, NOW(), NOW())"
 
 createEventsFor :: Text -> [BugID] -> DB ()
 createEventsFor _ [] = pure ()
@@ -194,7 +192,7 @@ createBugsFor occurrences = do
       \ RETURNING occurrences.id"
   void $ matchOccurrencesToExisting (occurrences \\ (fromOnly <$> newPrimaries))
   let newBugIDs = fromOnly <$> results
-  createEventsFor "closed" newBugIDs
+  createEventsFor "created" newBugIDs
   pure newBugIDs
 
 matchOccurrencesToExisting :: [OccurrenceID] -> DB [OccurrenceID]
@@ -209,7 +207,7 @@ matchOccurrencesToExisting ids = do
       \   JOIN occurrences o2 \
       \     ON o2.id IN (SELECT primary_occurrence_id FROM bugs) \
       \    AND o2.message = o.message \
-      \    AND o2.bug_id IS NOT NULL -- paranoid \
+      \    AND o2.bug_id IS NOT NULL \
       \   WHERE o.id IN ? \
       \ ) \
       \ UPDATE occurrences SET bug_id = matches.bug_id \

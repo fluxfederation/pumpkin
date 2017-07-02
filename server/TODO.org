@@ -59,6 +59,11 @@
   :LOGBOOK:  
   - State "DONE"       from "TODO"       [2017-06-30 Fri 17:51]
   :END:      
+* DONE Auth for [[file:~/Projects/pumpkin/app/controllers/occurrences_controller.rb::'Authorization'][occurrence submission]]
+  CLOSED: [2017-07-02 Sun 16:37]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-07-02 Sun 16:37]
+  :END:      
 * TODO Google Auth
 * TODO Heartbeat
 * DONE [[https://maxgabriel.github.io/ekg-yesod/][EKG]] monitoring
@@ -77,3 +82,4 @@
   - State "DONE"       from "TODO"       [2017-06-30 Fri 10:43]
   :END:      
 * TODO Deployment story (Docker?)
+* TODO Generate API docs

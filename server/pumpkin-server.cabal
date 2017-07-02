@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Server
                      , Actions
+                     , Auth
                      , API
                      , DB
                      , Matcher
@@ -41,6 +42,7 @@ library
                      , unordered-containers
                      , uuid-types
                      , wai
+                     , wai-middleware-auth
                      , wai-middleware-metrics
                      , wai-middleware-static
                      , warp

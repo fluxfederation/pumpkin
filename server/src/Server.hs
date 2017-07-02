@@ -3,15 +3,18 @@
 
 module Server
   ( runServer
+  , Config(..)
   ) where
 
 import API
 import Actions
-import Types
+import Auth
 import JSON ()
+import Types
 
 import Data.Monoid ((<>))
 import qualified Data.Text as T
+import Network.HTTP.Types.Method
 import Network.HTTP.Types.Status
 import Network.URI (URI)
 import qualified Network.URI as URI
@@ -28,20 +31,19 @@ import Web.HttpApiData (FromHttpApiData(..))
 
 instance FromHttpApiData URI where
   parseUrlPiece s =
-    parseUrlPiece s >>=
-    \str ->
-       case URI.parseURI str of
-         Just u -> Right u
-         Nothing -> Left ("Invalid URL: " <> T.pack str)
+    parseUrlPiece s >>= \str ->
+      case URI.parseURI str of
+        Just u -> Right u
+        Nothing -> Left ("Invalid URL: " <> T.pack str)
 
-instance FromHttpApiData a =>
-         FromHttpApiData (IDFor t a) where
+instance FromHttpApiData a => FromHttpApiData (IDFor t a) where
   parseUrlPiece = fmap IDFor . parseUrlPiece
 
 api :: Server API
 api =
-  getEnvironments :<|> getBugs :<|> getBugDetails :<|> getBugOccurrences :<|> closeBug :<|>
-  createOccurrence :<|>
+  createOccurrence :<|> getEnvironments :<|> getBugs :<|> getBugDetails :<|>
+  getBugOccurrences :<|>
+  closeBug :<|>
   createIssue :<|>
   deleteIssue
 
@@ -54,9 +56,25 @@ app req respond =
     then respond (responseFile status200 [] "index.html" Nothing)
     else static apiAPP req respond
 
-runServer :: FilePath -> Int -> Int -> IO ()
-runServer root serverPort ekgPort = do
-  changeWorkingDirectory root
-  store <- serverMetricStore <$> forkServer "localhost" ekgPort
+withAuth :: String -> Middleware
+withAuth secret protected req respond =
+  let pass = protected req respond
+  in if ["occurrences"] == pathInfo req && (requestMethod req == methodPost)
+       then secretAuth secret protected req respond
+       else pass
+
+data Config = Config
+  { rootDir :: FilePath
+  , serverPort :: Int
+  , ekgPort :: Int
+  , authToken :: String
+  }
+
+runServer :: Config -> IO ()
+runServer config = do
+  changeWorkingDirectory (rootDir config)
+  store <- serverMetricStore <$> forkServer "localhost" (ekgPort config)
   waiMetrics <- registerWaiMetrics store
-  Warp.run serverPort (metrics waiMetrics app)
+  Warp.run
+    (serverPort config)
+    (metrics waiMetrics (withAuth (authToken config) app))

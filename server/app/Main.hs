@@ -2,32 +2,33 @@ module Main where
 
 import Server
 
-import Options.Applicative
 import Data.Semigroup ((<>))
+import Options.Applicative
+import System.Environment (getEnvironment)
 
-data Opts = Opts
-  { publicDir :: FilePath
-  , serverPort :: Int
-  , ekgPort :: Int
-  }
-
-parseOpts :: Parser Opts
-parseOpts =
-  Opts <$> strOption (long "rootdir" <> help "Web root dir") <*>
+parseOpts :: [(String, String)] -> Parser Config
+parseOpts env =
+  Config <$> strOption (long "rootdir" <> help "Web root dir") <*>
   option
     auto
     (long "port" <> showDefault <> value 8080 <> help "Web server port") <*>
   option
     auto
-    (long "ekgport" <> showDefault <> value 8000 <> help "EKG front end port")
-
-run :: Opts -> IO ()
-run opts = runServer (publicDir opts) (serverPort opts) (ekgPort opts)
+    (long "ekgport" <> showDefault <> value 8000 <> help "EKG front end port") <*>
+  strOption
+    (long "auth-token" <> envDefault "AUTH_TOKEN" <>
+     help "Auth token (default: $AUTH_TOKEN)")
+  where
+    envDefault name =
+      case lookup name env of
+        Just val -> value val
+        Nothing -> mempty
 
 main :: IO ()
-main = run =<< execParser opts
-  where
-    opts =
-      info
-        (parseOpts <**> helper)
-        (fullDesc <> progDesc "Serve the pumpkin API")
+main = do
+  env <- getEnvironment
+  runServer =<<
+    execParser
+      (info
+         (parseOpts env <**> helper)
+         (fullDesc <> progDesc "Serve the pumpkin API"))

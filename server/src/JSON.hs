@@ -3,6 +3,7 @@
 
 module JSON where
 
+import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Aeson.Types
 import Data.HashMap.Strict as HM
@@ -15,12 +16,10 @@ import Types
 instance ToJSON UUID where
   toJSON = toJSON . UUID.toString
 
-instance ToJSON a =>
-         ToJSON (IDFor t a) where
+instance ToJSON a => ToJSON (IDFor t a) where
   toJSON (IDFor i) = toJSON i
 
-instance FromJSON a =>
-         FromJSON (IDFor t a) where
+instance FromJSON a => FromJSON (IDFor t a) where
   parseJSON = fmap IDFor . parseJSON
 
 instance ToJSON URI where
@@ -65,6 +64,7 @@ instance ToJSON Issue where
 
 instance FromJSON NewOccurrence where
   parseJSON (Object o) =
-    NewOccurrence <$> o .: "environment" <*> o .: "message" <*> o .: "data" <*>
+    NewOccurrence <$> o .: "environment" <*> o .: "message" <*>
+    (o .: "data" <|> pure (Object HM.empty)) <*>
     o .: "occurred_at"
-  parseJSON invalid = typeMismatch "Coord" invalid
+  parseJSON invalid = typeMismatch "NewOccurrence" invalid
