@@ -217,7 +217,7 @@ bugGroups now bugs =
             else if diff.day >= 1 then
                 "Past Week"
             else if diff.hour >= 1 then
-                "Earlier Today"
+                "Past Day"
             else
                 "Past Hour"
 
