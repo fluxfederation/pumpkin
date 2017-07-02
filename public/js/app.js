@@ -15481,7 +15481,13 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
-			A2(_elm_lang$core$List$map, showChunk, chunkList));
+			A2(
+				_elm_lang$core$List$map,
+				function (chunk) {
+					return showChunk(
+						A2(_elm_lang$core$Debug$log, 'chunk', chunk));
+				},
+				chunkList));
 	});
 var _user$project$ViewCommon$fontAwesome = function (name) {
 	return A2(
@@ -16582,7 +16588,7 @@ var _user$project$BugDetails$view = function (model) {
 var _user$project$BugList$bugGroups = F2(
 	function (now, bugs) {
 		var groupFor = function (diff) {
-			return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > -1) ? 'Earlier' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > -1) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > -1) ? 'Earlier Today' : 'Past Hour'));
+			return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > -1) ? 'Earlier' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > -1) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > -1) ? 'Past Day' : 'Past Hour'));
 		};
 		var groupNames = {
 			ctor: '::',
