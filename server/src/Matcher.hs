@@ -6,9 +6,9 @@ import Control.Concurrent (threadDelay)
 import qualified DB
 
 runMatcher :: Int -> Int -> IO ()
-runMatcher intervalMillis batchSize = loop
+runMatcher intervalSecs batchSize = loop
   where
     loop = do
       DB.runDB $ DB.matchOccurrences batchSize
-      threadDelay (intervalMillis * 1000)
+      threadDelay (intervalSecs * 1000 * 1000)
       loop
