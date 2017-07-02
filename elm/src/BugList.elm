@@ -17,6 +17,7 @@ import Date
 import Types exposing (..)
 import ViewCommon exposing (..)
 import Rest
+import List.Extra exposing (groupWhile)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
@@ -205,23 +206,29 @@ sidebarBug model bug =
 bugGroups : Date.Date -> List Bug -> List ( String, List Bug )
 bugGroups now bugs =
     let
-        periodDiff bug =
-            Period.diff now bug.lastOccurredAt
+        groupFor bug =
+            let
+                diff =
+                    Period.diff now bug.lastOccurredAt
+            in
+                if diff.week >= 1 then
+                    "Earlier"
+                else if diff.day >= 1 then
+                    "Past Week"
+                else if diff.hour >= 1 then
+                    "Past Day"
+                else
+                    "Past Hour"
 
-        groupNames =
-            [ "Past Hour", "Past Day", "Past Week", "Earlier" ]
+        flattenGroup grouped =
+            case grouped of
+                ( g, b ) :: rest ->
+                    ( g, List.map Tuple.second grouped )
 
-        groupFor diff =
-            if diff.week >= 1 then
-                "Earlier"
-            else if diff.day >= 1 then
-                "Past Week"
-            else if diff.hour >= 1 then
-                "Past Day"
-            else
-                "Past Hour"
-
-        group name =
-            ( name, List.filter (\bug -> groupFor (periodDiff bug) == name) bugs )
+                [] ->
+                    ( "Grouping error", [] )
     in
-        List.map group groupNames
+        bugs
+            |> List.map (\bug -> ( groupFor bug, bug ))
+            |> groupWhile (\a b -> Tuple.first a == Tuple.first b)
+            |> List.map flattenGroup

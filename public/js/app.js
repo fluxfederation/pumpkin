@@ -15481,13 +15481,7 @@ var _user$project$ViewCommon$paginatedChunkList = F3(
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
-			A2(
-				_elm_lang$core$List$map,
-				function (chunk) {
-					return showChunk(
-						A2(_elm_lang$core$Debug$log, 'chunk', chunk));
-				},
-				chunkList));
+			A2(_elm_lang$core$List$map, showChunk, chunkList));
 	});
 var _user$project$ViewCommon$fontAwesome = function (name) {
 	return A2(
@@ -16587,45 +16581,47 @@ var _user$project$BugDetails$view = function (model) {
 
 var _user$project$BugList$bugGroups = F2(
 	function (now, bugs) {
-		var groupFor = function (diff) {
-			return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > -1) ? 'Earlier' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > -1) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > -1) ? 'Past Day' : 'Past Hour'));
-		};
-		var groupNames = {
-			ctor: '::',
-			_0: 'Past Hour',
-			_1: {
-				ctor: '::',
-				_0: 'Past Day',
-				_1: {
-					ctor: '::',
-					_0: 'Past Week',
-					_1: {
-						ctor: '::',
-						_0: 'Earlier',
-						_1: {ctor: '[]'}
-					}
-				}
+		var flattenGroup = function (grouped) {
+			var _p0 = grouped;
+			if (_p0.ctor === '::') {
+				return {
+					ctor: '_Tuple2',
+					_0: _p0._0._0,
+					_1: A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$second, grouped)
+				};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: 'Grouping error',
+					_1: {ctor: '[]'}
+				};
 			}
 		};
-		var periodDiff = function (bug) {
-			return A2(_rluiten$elm_date_extra$Date_Extra_Period$diff, now, bug.lastOccurredAt);
+		var groupFor = function (bug) {
+			var diff = A2(_rluiten$elm_date_extra$Date_Extra_Period$diff, now, bug.lastOccurredAt);
+			return (_elm_lang$core$Native_Utils.cmp(diff.week, 1) > -1) ? 'Earlier' : ((_elm_lang$core$Native_Utils.cmp(diff.day, 1) > -1) ? 'Past Week' : ((_elm_lang$core$Native_Utils.cmp(diff.hour, 1) > -1) ? 'Past Day' : 'Past Hour'));
 		};
-		var group = function (name) {
-			return {
-				ctor: '_Tuple2',
-				_0: name,
-				_1: A2(
-					_elm_lang$core$List$filter,
-					function (bug) {
+		return A2(
+			_elm_lang$core$List$map,
+			flattenGroup,
+			A2(
+				_elm_community$list_extra$List_Extra$groupWhile,
+				F2(
+					function (a, b) {
 						return _elm_lang$core$Native_Utils.eq(
-							groupFor(
-								periodDiff(bug)),
-							name);
+							_elm_lang$core$Tuple$first(a),
+							_elm_lang$core$Tuple$first(b));
+					}),
+				A2(
+					_elm_lang$core$List$map,
+					function (bug) {
+						return {
+							ctor: '_Tuple2',
+							_0: groupFor(bug),
+							_1: bug
+						};
 					},
-					bugs)
-			};
-		};
-		return A2(_elm_lang$core$List$map, group, groupNames);
+					bugs)));
 	});
 var _user$project$BugList$issueHref = function (issue) {
 	return A2(
@@ -16800,11 +16796,11 @@ var _user$project$BugList$sidebarBug = F2(
 			});
 	});
 var _user$project$BugList$sidebarBugGroup = F2(
-	function (model, _p0) {
-		var _p1 = _p0;
-		var _p2 = _p1._1;
+	function (model, _p1) {
+		var _p2 = _p1;
+		var _p3 = _p2._1;
 		return (_elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$List$length(_p2),
+			_elm_lang$core$List$length(_p3),
 			0) > 0) ? {
 			ctor: '::',
 			_0: A2(
@@ -16816,7 +16812,7 @@ var _user$project$BugList$sidebarBugGroup = F2(
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p1._0),
+					_0: _elm_lang$html$Html$text(_p2._0),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -16831,7 +16827,7 @@ var _user$project$BugList$sidebarBugGroup = F2(
 					A2(
 						_elm_lang$core$List$map,
 						_user$project$BugList$sidebarBug(model),
-						_p2)),
+						_p3)),
 				_1: {ctor: '[]'}
 			}
 		} : {ctor: '[]'};
@@ -16854,8 +16850,8 @@ var _user$project$BugList$view = function (model) {
 		{
 			ctor: '::',
 			_0: function () {
-				var _p3 = _elm_lang$core$List$head(model.bugs);
-				if ((_p3.ctor === 'Just') && (_p3._0.ctor === 'Loading')) {
+				var _p4 = _elm_lang$core$List$head(model.bugs);
+				if ((_p4.ctor === 'Just') && (_p4._0.ctor === 'Loading')) {
 					return _user$project$ViewCommon$spinner;
 				} else {
 					return A3(
@@ -16912,33 +16908,33 @@ var _user$project$BugList$init = F2(
 	});
 var _user$project$BugList$update = F2(
 	function (msg, model) {
-		var _p4 = msg;
-		switch (_p4.ctor) {
+		var _p5 = msg;
+		switch (_p5.ctor) {
 			case 'LoadedBugs':
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							bugs: A2(_user$project$ChunkList$update, model.bugs, _p4._0)
+							bugs: A2(_user$project$ChunkList$update, model.bugs, _p5._0)
 						}));
 			case 'LoadMoreBugs':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_user$project$BugList$fetchBugs, model.filter, _p4._0)
+					_1: A2(_user$project$BugList$fetchBugs, model.filter, _p5._0)
 				};
 			case 'TimeTick':
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							now: _elm_lang$core$Date$fromTime(_p4._0)
+							now: _elm_lang$core$Date$fromTime(_p5._0)
 						}));
 			default:
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selected: _p4._0}));
+						{selected: _p5._0}));
 		}
 	});
 
