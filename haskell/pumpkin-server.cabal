@@ -1,0 +1,72 @@
+name:                pumpkin-server
+version:             0.1.0.0
+-- synopsis:
+-- description:
+homepage:            https://github.com/powershop/pumpkin
+license:             MIT
+license-file:        LICENSE
+author:              Steve Purcell
+maintainer:          steve.purcell@powershop.co.nz
+copyright:           2017 Flux Federation Ltd
+category:            Web
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Server
+                     , Actions
+                     , Auth
+                     , API
+                     , DB
+                     , Matcher
+                     , Types
+                     , JSON
+  build-depends:       base >= 4.7 && < 5
+                     , aeson
+                     , bytestring
+                     , ekg
+                     , ekg-core
+                     , http-api-data
+                     , http-types
+                     , mtl
+                     , network-uri
+                     , postgresql-simple
+                     , postgresql-transactional
+                     , servant
+                     , servant-server
+                     , text
+                     , time
+                     , unix
+                     , unordered-containers
+                     , uuid-types
+                     , wai
+                     , wai-middleware-auth
+                     , wai-middleware-metrics
+                     , wai-middleware-static
+                     , warp
+  default-language:    Haskell2010
+  ghc-options:         -Wall
+
+executable pumpkin-server
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T
+  build-depends:       base
+                     , pumpkin-server
+                     , optparse-applicative
+  default-language:    Haskell2010
+
+executable pumpkin-matcher
+  hs-source-dirs:      matcher
+  main-is:             Main.hs
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T
+  build-depends:       base
+                     , pumpkin-server
+                     , optparse-applicative
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/powershop/pumpkin

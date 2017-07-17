@@ -1,0 +1,85 @@
+#+CATEGORY: Pumpskell
+
+* DONE Serve static assets
+  CLOSED: [2017-06-22 Thu 12:57]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-22 Thu 12:57]
+  CLOCK: [2017-06-22 Thu 12:20]--[2017-06-22 Thu 12:57] =>  0:37
+  CLOCK: [2017-06-22 Thu 10:45]--[2017-06-22 Thu 11:31] =>  0:46
+  :END:      
+* DONE Serve fake environments list and empty bugs
+  CLOSED: [2017-06-22 Thu 15:30]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-22 Thu 15:30]
+  CLOCK: [2017-06-22 Thu 14:18]--[2017-06-22 Thu 15:30] =>  1:12
+  :END:      
+* DONE Serve real environments
+  CLOSED: [2017-06-23 Fri 08:12]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-23 Fri 08:12]
+  :END:      
+* DONE Serve real bug search results
+  CLOSED: [2017-06-23 Fri 15:35]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-23 Fri 15:35]
+  :END:      
+* DONE Handle serving / as /index.html
+  CLOSED: [2017-06-24 Sat 18:11]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-24 Sat 18:11]
+  :END:      
+* DONE Serve real bug details
+  CLOSED: [2017-06-24 Sat 17:31]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-24 Sat 17:31]
+  :END:      
+* DONE Support collection of inbound occurrences
+  CLOSED: [2017-06-24 Sat 20:49]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-24 Sat 20:49]
+  :END:      
+* DONE Allow closing bugs
+  CLOSED: [2017-06-24 Sat 20:07]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-24 Sat 20:07]
+  :END:      
+* DONE Allow editing issues
+  CLOSED: [2017-06-26 Mon 10:23]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-26 Mon 10:23]
+  :END:      
+* DONE Proper transaction bracketing
+  CLOSED: [2017-06-29 Thu 18:38]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-29 Thu 18:38]
+  :END:      
+* TODO Nicer error handling, validation
+* DONE Matching of new occurrences
+  CLOSED: [2017-06-30 Fri 17:51]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-30 Fri 17:51]
+  :END:      
+* DONE Auth for [[file:~/Projects/pumpkin/app/controllers/occurrences_controller.rb::'Authorization'][occurrence submission]]
+  CLOSED: [2017-07-02 Sun 16:37]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-07-02 Sun 16:37]
+  :END:      
+* TODO Google Auth
+* TODO Heartbeat
+* DONE [[https://maxgabriel.github.io/ekg-yesod/][EKG]] monitoring
+  CLOSED: [2017-06-26 Mon 12:22]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-26 Mon 12:22]
+  :END:      
+* DONE Nicer command-line arg parsing
+  CLOSED: [2017-06-27 Tue 21:10]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-27 Tue 21:10]
+  :END:      
+* DONE Newtype wrappers for IDs
+  CLOSED: [2017-06-30 Fri 10:43]
+  :LOGBOOK:  
+  - State "DONE"       from "TODO"       [2017-06-30 Fri 10:43]
+  :END:      
+* TODO Deployment story (Docker?)
+* TODO Generate API docs
