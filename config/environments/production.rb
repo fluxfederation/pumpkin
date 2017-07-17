@@ -36,6 +36,13 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
 
+  config.lograge.enabled = true
+  config.lograge.custom_options = lambda do |event|
+    {
+      exception: event.payload[:exception], # ["ExceptionClass", "the message"]
+    }
+  end
+
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
   config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new)
