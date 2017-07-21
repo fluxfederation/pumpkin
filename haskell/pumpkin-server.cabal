@@ -42,6 +42,7 @@ library
                      , unordered-containers
                      , uuid-types
                      , wai
+                     , wai-extra
                      , wai-middleware-auth
                      , wai-middleware-metrics
                      , wai-middleware-static

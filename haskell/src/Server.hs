@@ -21,6 +21,7 @@ import qualified Network.URI as URI
 import Network.Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai.Metrics
+import Network.Wai.Middleware.RequestLogger (logStdout)
 import Network.Wai.Middleware.Static (static)
 import Servant (Proxy(..))
 import Servant.API
@@ -77,4 +78,4 @@ runServer config = do
   waiMetrics <- registerWaiMetrics store
   Warp.run
     (serverPort config)
-    (metrics waiMetrics (withAuth (authToken config) app))
+    (logStdout . metrics waiMetrics . withAuth (authToken config) $ app)
