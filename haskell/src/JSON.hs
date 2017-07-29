@@ -7,14 +7,9 @@ import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Aeson.Types
 import Data.HashMap.Strict as HM
-import qualified Data.UUID.Types as UUID
-import Data.UUID.Types (UUID)
 import Network.URI (URI)
 import qualified Network.URI as URI
 import Types
-
-instance ToJSON UUID where
-  toJSON = toJSON . UUID.toString
 
 instance ToJSON a => ToJSON (IDFor t a) where
   toJSON (IDFor i) = toJSON i
