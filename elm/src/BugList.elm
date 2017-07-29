@@ -53,7 +53,7 @@ type alias Model =
 init : Filter -> Maybe BugID -> ( Model, Cmd Msg )
 init filter selected =
     ( { filter = filter
-      , bugs = []
+      , bugs = ChunkList.empty
       , selected = selected
       , now = (Date.fromTime 0)
       }
@@ -127,13 +127,7 @@ allBugs model =
 view : Model -> Html Msg
 view model =
     div [ class "sidebar-bugs menu" ]
-        [ case List.head model.bugs of
-            Just RemoteData.Loading ->
-                spinner
-
-            _ ->
-                paginatedChunkList (sidebarBugGroups model) model.bugs LoadMoreBugs
-        ]
+        [ paginatedChunkList (sidebarBugGroups model) model.bugs LoadMoreBugs ]
 
 
 sidebarBugGroups : Model -> List Bug -> List (Html Msg)

@@ -14887,70 +14887,62 @@ var _user$project$Types$IssueID = function (a) {
 };
 
 var _user$project$ChunkList$items = function (chunks) {
-	var f = function (c) {
-		var _p0 = c;
-		if (_p0.ctor === 'Success') {
-			return _p0._0.items;
-		} else {
-			return {ctor: '[]'};
-		}
-	};
-	return A2(_elm_lang$core$List$concatMap, f, chunks);
-};
-var _user$project$ChunkList$next = function (chunks) {
-	var _p1 = _elm_community$list_extra$List_Extra$last(
-		A2(_elm_community$list_extra$List_Extra$takeWhile, _bloom$remotedata$RemoteData$isSuccess, chunks));
-	if ((_p1.ctor === 'Just') && (_p1._0.ctor === 'Success')) {
-		return _p1._0._0.nextItem;
+	var _p0 = chunks.loaded;
+	if (_p0.ctor === 'Just') {
+		return _p0._0.items;
 	} else {
-		return _elm_lang$core$Maybe$Nothing;
+		return {ctor: '[]'};
 	}
 };
+var _user$project$ChunkList$next = function (chunks) {
+	return _elm_community$maybe_extra$Maybe_Extra$join(
+		A2(
+			_elm_lang$core$Maybe$map,
+			function (_) {
+				return _.nextItem;
+			},
+			chunks.loaded));
+};
+var _user$project$ChunkList$appendChunk = F2(
+	function (existing, $new) {
+		var _p1 = existing;
+		if (_p1.ctor === 'Just') {
+			var _p2 = _p1._0;
+			return _elm_lang$core$Native_Utils.eq(
+				_p2.nextItem,
+				_elm_lang$core$List$head($new.items)) ? {
+				items: A2(_elm_lang$core$Basics_ops['++'], _p2.items, $new.items),
+				nextItem: $new.nextItem
+			} : _p2;
+		} else {
+			return $new;
+		}
+	});
 var _user$project$ChunkList$update = F2(
 	function (previous, data) {
-		var newChunks = A2(
-			_elm_lang$core$Basics_ops['++'],
-			previous,
-			{
-				ctor: '::',
-				_0: data,
-				_1: {ctor: '[]'}
-			});
-		var successful = _elm_community$maybe_extra$Maybe_Extra$values(
-			A2(_elm_lang$core$List$map, _bloom$remotedata$RemoteData$toMaybe, newChunks));
-		var consolidated = function () {
-			var _p2 = _elm_community$list_extra$List_Extra$last(successful);
-			if (_p2.ctor === 'Just') {
-				return {
-					ctor: '::',
-					_0: _bloom$remotedata$RemoteData$Success(
-						{
-							items: A2(
-								_elm_lang$core$List$concatMap,
-								function (_) {
-									return _.items;
-								},
-								successful),
-							nextItem: _p2._0.nextItem
-						}),
-					_1: {ctor: '[]'}
-				};
-			} else {
-				return {ctor: '[]'};
-			}
-		}();
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			consolidated,
-			_bloom$remotedata$RemoteData$isSuccess(data) ? {ctor: '[]'} : {
-				ctor: '::',
-				_0: data,
-				_1: {ctor: '[]'}
-			});
+		var _p3 = data;
+		if (_p3.ctor === 'Success') {
+			return _elm_lang$core$Native_Utils.update(
+				previous,
+				{
+					next: _bloom$remotedata$RemoteData$NotAsked,
+					loaded: _elm_lang$core$Maybe$Just(
+						A2(_user$project$ChunkList$appendChunk, previous.loaded, _p3._0))
+				});
+		} else {
+			return _elm_lang$core$Native_Utils.update(
+				previous,
+				{next: data});
+		}
 	});
+var _user$project$ChunkList$empty = {loaded: _elm_lang$core$Maybe$Nothing, next: _bloom$remotedata$RemoteData$NotAsked};
 var _user$project$ChunkList$Chunk = F2(
 	function (a, b) {
 		return {items: a, nextItem: b};
+	});
+var _user$project$ChunkList$ChunkList = F2(
+	function (a, b) {
+		return {loaded: a, next: b};
 	});
 
 var _user$project$Rest$fetch = F2(
@@ -14961,7 +14953,7 @@ var _user$project$Rest$fetch = F2(
 			_bloom$remotedata$RemoteData$asCmd(
 				_elm_lang$http$Http$toTask(req)));
 	});
-var _user$project$Rest$defaultPageSize = 100;
+var _user$project$Rest$defaultPageSize = 10;
 var _user$project$Rest$deleteIssueUrl = F2(
 	function (_p1, _p0) {
 		var _p2 = _p1;
@@ -15409,79 +15401,84 @@ var _user$project$ViewCommon$bugErrorClass = function (bug) {
 };
 var _user$project$ViewCommon$paginatedChunkList = F3(
 	function (displayItems, chunkList, loadMoreMessage) {
-		var showChunk = function (remoteChunk) {
-			var _p3 = remoteChunk;
+		var pending = function () {
+			var _p3 = chunkList.next;
 			switch (_p3.ctor) {
 				case 'NotAsked':
-					return A2(
-						_elm_lang$html$Html$div,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Not asked'),
-							_1: {ctor: '[]'}
-						});
-				case 'Loading':
-					return A2(
-						_elm_lang$html$Html$div,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Loading'),
-							_1: {ctor: '[]'}
-						});
-				case 'Failure':
-					return A2(
-						_elm_lang$html$Html$div,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Failed'),
-							_1: {ctor: '[]'}
-						});
-				default:
-					var _p5 = _p3._0;
-					return A2(
-						_elm_lang$html$Html$div,
-						{ctor: '[]'},
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							displayItems(_p5.items),
-							function () {
-								var _p4 = _p5.nextItem;
-								if (_p4.ctor === 'Just') {
-									return {
+					var _p4 = chunkList.loaded;
+					if (_p4.ctor === 'Just') {
+						var _p5 = _p4._0.nextItem;
+						if (_p5.ctor === 'Just') {
+							return {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
 										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$button,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('button'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(
-														loadMoreMessage(
-															_elm_lang$core$Maybe$Just(_p4._0))),
-													_1: {ctor: '[]'}
-												}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Show more'),
-												_1: {ctor: '[]'}
-											}),
+										_0: _elm_lang$html$Html_Attributes$class('button'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(
+												loadMoreMessage(
+													_elm_lang$core$Maybe$Just(_p5._0))),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Show more'),
 										_1: {ctor: '[]'}
-									};
-								} else {
-									return {ctor: '[]'};
-								}
-							}()));
+									}),
+								_1: {ctor: '[]'}
+							};
+						} else {
+							return {ctor: '[]'};
+						}
+					} else {
+						return {ctor: '[]'};
+					}
+				case 'Loading':
+					return {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Loading'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					};
+				case 'Failure':
+					return {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Failed'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					};
+				default:
+					return {
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('This kinda shouldn\'t happen'),
+						_1: {ctor: '[]'}
+					};
 			}
-		};
+		}();
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
-			A2(_elm_lang$core$List$map, showChunk, chunkList));
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				displayItems(
+					_user$project$ChunkList$items(chunkList)),
+				pending));
 	});
 var _user$project$ViewCommon$fontAwesome = function (name) {
 	return A2(
@@ -16423,11 +16420,7 @@ var _user$project$BugDetails$init = function (bug) {
 		ctor: '_Tuple2',
 		_0: {
 			bug: bug,
-			occurrences: {
-				ctor: '::',
-				_0: _bloom$remotedata$RemoteData$NotAsked,
-				_1: {ctor: '[]'}
-			},
+			occurrences: _user$project$ChunkList$empty,
 			expandedOccurrences: {ctor: '[]'},
 			showFullStackTrace: false,
 			now: _elm_lang$core$Date$fromTime(0),
@@ -16849,18 +16842,11 @@ var _user$project$BugList$view = function (model) {
 		},
 		{
 			ctor: '::',
-			_0: function () {
-				var _p4 = _elm_lang$core$List$head(model.bugs);
-				if ((_p4.ctor === 'Just') && (_p4._0.ctor === 'Loading')) {
-					return _user$project$ViewCommon$spinner;
-				} else {
-					return A3(
-						_user$project$ViewCommon$paginatedChunkList,
-						_user$project$BugList$sidebarBugGroups(model),
-						model.bugs,
-						_user$project$BugList$LoadMoreBugs);
-				}
-			}(),
+			_0: A3(
+				_user$project$ViewCommon$paginatedChunkList,
+				_user$project$BugList$sidebarBugGroups(model),
+				model.bugs,
+				_user$project$BugList$LoadMoreBugs),
 			_1: {ctor: '[]'}
 		});
 };
@@ -16891,7 +16877,7 @@ var _user$project$BugList$init = F2(
 			ctor: '_Tuple2',
 			_0: {
 				filter: filter,
-				bugs: {ctor: '[]'},
+				bugs: _user$project$ChunkList$empty,
 				selected: selected,
 				now: _elm_lang$core$Date$fromTime(0)
 			},
@@ -16909,33 +16895,33 @@ var _user$project$BugList$init = F2(
 	});
 var _user$project$BugList$update = F2(
 	function (msg, model) {
-		var _p5 = msg;
-		switch (_p5.ctor) {
+		var _p4 = msg;
+		switch (_p4.ctor) {
 			case 'LoadedBugs':
 				return _user$project$BugList$noCmd(
-					_elm_lang$core$Native_Utils.eq(_p5._0, model.filter) ? _elm_lang$core$Native_Utils.update(
+					_elm_lang$core$Native_Utils.eq(_p4._0, model.filter) ? _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							bugs: A2(_user$project$ChunkList$update, model.bugs, _p5._1)
+							bugs: A2(_user$project$ChunkList$update, model.bugs, _p4._1)
 						}) : model);
 			case 'LoadMoreBugs':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_user$project$BugList$fetchBugs, model.filter, _p5._0)
+					_1: A2(_user$project$BugList$fetchBugs, model.filter, _p4._0)
 				};
 			case 'TimeTick':
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							now: _elm_lang$core$Date$fromTime(_p5._0)
+							now: _elm_lang$core$Date$fromTime(_p4._0)
 						}));
 			default:
 				return _user$project$BugList$noCmd(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selected: _p5._0}));
+						{selected: _p4._0}));
 		}
 	});
 

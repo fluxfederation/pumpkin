@@ -10,7 +10,6 @@ import Types exposing (..)
 import ChunkList exposing (ChunkList)
 import RemoteData
 import Maybe.Extra as MaybeX
-import List.Extra as ListX
 import Regex exposing (..)
 
 
@@ -36,30 +35,32 @@ fontAwesome name =
 paginatedChunkList : (List a -> List (Html msg)) -> ChunkList a -> (Maybe a -> msg) -> Html msg
 paginatedChunkList displayItems chunkList loadMoreMessage =
     let
-        showChunk remoteChunk =
-            case remoteChunk of
+        pending =
+            case chunkList.next of
                 RemoteData.NotAsked ->
-                    div [] [ text "Not asked" ]
-
-                RemoteData.Loading ->
-                    div [] [ text "Loading" ]
-
-                RemoteData.Failure _ ->
-                    div [] [ text "Failed" ]
-
-                RemoteData.Success chunk ->
-                    div []
-                        ((displayItems chunk.items)
-                            ++ case chunk.nextItem of
+                    case chunkList.loaded of
+                        Just chunk ->
+                            case chunk.nextItem of
                                 Just next ->
                                     [ button [ class "button", onClick (loadMoreMessage (Just next)) ] [ text "Show more" ] ]
 
-                                Nothing ->
+                                _ ->
                                     []
-                        )
+
+                        _ ->
+                            []
+
+                RemoteData.Loading ->
+                    [ div [] [ text "Loading" ] ]
+
+                RemoteData.Failure _ ->
+                    [ div [] [ text "Failed" ] ]
+
+                RemoteData.Success chunk ->
+                    [ text "This kinda shouldn't happen" ]
     in
         div []
-            (List.map showChunk chunkList)
+            ((displayItems (ChunkList.items chunkList)) ++ pending)
 
 
 bugErrorClass : Bug -> String

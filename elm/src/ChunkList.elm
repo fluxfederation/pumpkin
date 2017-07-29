@@ -1,7 +1,6 @@
-module ChunkList exposing (Chunk, ChunkList, update, next, items)
+module ChunkList exposing (Chunk, ChunkList, update, next, items, empty)
 
 import RemoteData exposing (..)
-import List.Extra as ListX
 import Maybe.Extra as MaybeX
 
 
@@ -12,57 +11,50 @@ type alias Chunk a =
 
 
 type alias ChunkList a =
-    List (WebData (Chunk a))
+    { loaded : Maybe (Chunk a)
+    , next : WebData (Chunk a)
+    }
+
+
+empty : ChunkList a
+empty =
+    { loaded = Nothing, next = NotAsked }
 
 
 update : ChunkList a -> WebData (Chunk a) -> ChunkList a
 update previous data =
-    let
-        newChunks =
-            previous ++ [ data ]
+    case data of
+        Success chunk ->
+            { previous | next = NotAsked, loaded = Just (appendChunk previous.loaded chunk) }
 
-        successful =
-            MaybeX.values (List.map RemoteData.toMaybe newChunks)
+        _ ->
+            { previous | next = data }
 
-        consolidated =
-            case ListX.last successful of
-                Just last ->
-                    [ Success
-                        { items = List.concatMap .items successful
-                        , nextItem = last.nextItem
-                        }
-                    ]
 
-                _ ->
-                    []
-    in
-        consolidated
-            ++ (if RemoteData.isSuccess data then
-                    []
-                else
-                    [ data ]
-               )
+appendChunk : Maybe (Chunk a) -> Chunk a -> Chunk a
+appendChunk existing new =
+    case existing of
+        Just prev ->
+            -- Only append if this was the chunk we were expecting
+            if prev.nextItem == List.head new.items then
+                { items = prev.items ++ new.items, nextItem = new.nextItem }
+            else
+                prev
+
+        Nothing ->
+            new
 
 
 next : ChunkList a -> Maybe a
 next chunks =
-    case (ListX.last (ListX.takeWhile RemoteData.isSuccess chunks)) of
-        Just (Success chunk) ->
-            chunk.nextItem
-
-        _ ->
-            Nothing
+    MaybeX.join (Maybe.map .nextItem chunks.loaded)
 
 
 items : ChunkList a -> List a
 items chunks =
-    let
-        f c =
-            case c of
-                Success chunk ->
-                    chunk.items
+    case chunks.loaded of
+        Just chunk ->
+            chunk.items
 
-                _ ->
-                    []
-    in
-        List.concatMap f chunks
+        _ ->
+            []

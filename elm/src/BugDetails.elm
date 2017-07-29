@@ -127,7 +127,7 @@ subscriptions model =
 init : Bug -> ( Model, Cmd Msg )
 init bug =
     ( { bug = bug
-      , occurrences = [ RemoteData.NotAsked ]
+      , occurrences = ChunkList.empty
       , expandedOccurrences = []
       , showFullStackTrace = False
       , now = (Date.fromTime 0)
