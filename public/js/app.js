@@ -14953,7 +14953,7 @@ var _user$project$Rest$fetch = F2(
 			_bloom$remotedata$RemoteData$asCmd(
 				_elm_lang$http$Http$toTask(req)));
 	});
-var _user$project$Rest$defaultPageSize = 10;
+var _user$project$Rest$defaultPageSize = 100;
 var _user$project$Rest$deleteIssueUrl = F2(
 	function (_p1, _p0) {
 		var _p2 = _p1;

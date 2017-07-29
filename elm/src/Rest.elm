@@ -211,7 +211,7 @@ deleteIssueUrl (BugID bugId) (IssueID issueId) =
 
 defaultPageSize : Int
 defaultPageSize =
-    10
+    100
 
 
 loadBugDetails : BugID -> Http.Request Bug
