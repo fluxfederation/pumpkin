@@ -18,6 +18,8 @@ type BugID = IDFor BugSummary UUID
 data BugSummary = BugSummary
   { bugID :: BugID
   , bugMessage :: Text
+  , bugLatestEventName :: Text
+  , bugLatestEventAt :: LocalTime
   , bugFirstOccurredAt :: LocalTime
   , bugLastOccurredAt :: LocalTime
   , bugClosedAt :: Maybe LocalTime
