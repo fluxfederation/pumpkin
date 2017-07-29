@@ -11,7 +11,7 @@ import Types
 type Environments = "environments" :> Get '[ JSON] [Environment]
 
 type BugList
-   = "bugs" :> QueryParams "environment_ids" EnvironmentID :> QueryFlag "closed" :> QueryParam "search" Text :> QueryParam "limit" Int :> QueryParam "start" Int :> Get '[ JSON] [BugDetails]
+   = "bugs" :> QueryParams "environment_ids" EnvironmentID :> QueryFlag "closed" :> QueryParam "search" Text :> QueryParam "limit" Int :> QueryParam "start" BugID :> Get '[ JSON] [BugDetails]
 
 type BugShow = "bugs" :> Capture "id" BugID :> Get '[ JSON] BugDetails
 

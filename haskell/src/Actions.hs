@@ -22,7 +22,7 @@ getBugs ::
   -> Bool
   -> Maybe Text
   -> Maybe Int
-  -> Maybe Int
+  -> Maybe BugID
   -> Handler [BugDetails]
 getBugs envIDs closed search limit start = liftDB (DB.loadBugs bs)
   where

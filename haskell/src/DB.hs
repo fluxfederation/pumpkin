@@ -64,7 +64,7 @@ data BugSearch = BugSearch
   , bsClosed :: Bool
   , bsSearch :: Maybe Text
   , bsLimit :: Int
-  , bsStart :: Maybe Int
+  , bsStart :: Maybe BugID
   } deriving (Show)
 
 instance FromRow Issue
