@@ -29,7 +29,7 @@ import Task
 
 
 type Msg
-    = LoadedBugs (WebData (Chunk Bug))
+    = LoadedBugs Filter (WebData (Chunk Bug))
     | SelectBug (Maybe BugID)
     | LoadMoreBugs (Maybe Bug)
     | TimeTick Time.Time
@@ -80,9 +80,14 @@ subscriptions model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadedBugs result ->
+        LoadedBugs filter result ->
             -- TODO: clear selected bug if it's not in the list
-            noCmd { model | bugs = (ChunkList.update model.bugs result) }
+            noCmd
+                (if filter == model.filter then
+                    { model | bugs = (ChunkList.update model.bugs result) }
+                 else
+                    model
+                )
 
         LoadMoreBugs start ->
             ( model, fetchBugs model.filter start )
@@ -96,7 +101,7 @@ update msg model =
 
 fetchBugs : Filter -> Maybe Bug -> Cmd Msg
 fetchBugs filter start =
-    Rest.fetch LoadedBugs
+    Rest.fetch (LoadedBugs filter)
         (Rest.loadBugs
             filter.environmentIDs
             filter.includeClosed

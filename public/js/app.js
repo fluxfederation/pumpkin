@@ -16864,14 +16864,15 @@ var _user$project$BugList$view = function (model) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$BugList$LoadedBugs = function (a) {
-	return {ctor: 'LoadedBugs', _0: a};
-};
+var _user$project$BugList$LoadedBugs = F2(
+	function (a, b) {
+		return {ctor: 'LoadedBugs', _0: a, _1: b};
+	});
 var _user$project$BugList$fetchBugs = F2(
 	function (filter, start) {
 		return A2(
 			_user$project$Rest$fetch,
-			_user$project$BugList$LoadedBugs,
+			_user$project$BugList$LoadedBugs(filter),
 			A4(
 				_user$project$Rest$loadBugs,
 				filter.environmentIDs,
@@ -16912,11 +16913,11 @@ var _user$project$BugList$update = F2(
 		switch (_p5.ctor) {
 			case 'LoadedBugs':
 				return _user$project$BugList$noCmd(
-					_elm_lang$core$Native_Utils.update(
+					_elm_lang$core$Native_Utils.eq(_p5._0, model.filter) ? _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							bugs: A2(_user$project$ChunkList$update, model.bugs, _p5._0)
-						}));
+							bugs: A2(_user$project$ChunkList$update, model.bugs, _p5._1)
+						}) : model);
 			case 'LoadMoreBugs':
 				return {
 					ctor: '_Tuple2',
