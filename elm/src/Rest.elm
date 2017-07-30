@@ -72,8 +72,8 @@ bugsUrl environmentIds includeClosedBugs limit startFrom search =
             )
 
 
-detailsUrl : BugID -> String
-detailsUrl (BugID uuid) =
+bugUrl : BugID -> String
+bugUrl (BugID uuid) =
     "/bugs/" ++ uuid.toString
 
 
@@ -191,18 +191,18 @@ event =
 
 
 closeBugUrl : BugID -> String
-closeBugUrl (BugID uuid) =
-    "/bugs/" ++ uuid.toString ++ "/close"
+closeBugUrl bug =
+    bugUrl bug ++ "/close"
 
 
 createIssueUrl : BugID -> String -> String
-createIssueUrl (BugID bugId) issueUrl =
-    "/bugs/" ++ bugId.toString ++ "/create_issue?url=" ++ issueUrl
+createIssueUrl bug issueUrl =
+    bugUrl bug ++ "/create_issue?url=" ++ issueUrl
 
 
 deleteIssueUrl : BugID -> IssueID -> String
-deleteIssueUrl (BugID bugId) (IssueID issueId) =
-    "/bugs/" ++ bugId.toString ++ "/delete_issue?issue_id=" ++ issueId.toString
+deleteIssueUrl bug (IssueID issueId) =
+    bugUrl bug ++ "/delete_issue?issue_id=" ++ issueId.toString
 
 
 
@@ -216,7 +216,7 @@ defaultPageSize =
 
 loadBugDetails : BugID -> Http.Request Bug
 loadBugDetails bugId =
-    Http.get (detailsUrl bugId) decodeBug
+    Http.get (bugUrl bugId) decodeBug
 
 
 loadOccurrences : BugID -> Maybe OccurrenceID -> Http.Request (Chunk Occurrence)

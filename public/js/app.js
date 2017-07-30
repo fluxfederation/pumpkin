@@ -14954,36 +14954,6 @@ var _user$project$Rest$fetch = F2(
 				_elm_lang$http$Http$toTask(req)));
 	});
 var _user$project$Rest$defaultPageSize = 100;
-var _user$project$Rest$deleteIssueUrl = F2(
-	function (_p1, _p0) {
-		var _p2 = _p1;
-		var _p3 = _p0;
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			'/bugs/',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p2._0.toString,
-				A2(_elm_lang$core$Basics_ops['++'], '/delete_issue?issue_id=', _p3._0.toString)));
-	});
-var _user$project$Rest$createIssueUrl = F2(
-	function (_p4, issueUrl) {
-		var _p5 = _p4;
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			'/bugs/',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p5._0.toString,
-				A2(_elm_lang$core$Basics_ops['++'], '/create_issue?url=', issueUrl)));
-	});
-var _user$project$Rest$closeBugUrl = function (_p6) {
-	var _p7 = _p6;
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		'/bugs/',
-		A2(_elm_lang$core$Basics_ops['++'], _p7._0.toString, '/close'));
-};
 var _user$project$Rest$event = A2(
 	_elm_lang$core$Json_Decode$map,
 	_user$project$Types$Event,
@@ -15008,9 +14978,9 @@ var _user$project$Rest$stacktrace = _elm_lang$core$Json_Decode$maybe(
 var _user$project$Rest$decodeChunk = F2(
 	function (pageSize, decodeItem) {
 		var toPage = function (items) {
-			var _p8 = A2(_elm_community$list_extra$List_Extra$splitAt, pageSize, items);
-			var wanted = _p8._0;
-			var rest = _p8._1;
+			var _p0 = A2(_elm_community$list_extra$List_Extra$splitAt, pageSize, items);
+			var wanted = _p0._0;
+			var rest = _p0._1;
 			return A2(
 				_user$project$Types$Chunk,
 				wanted,
@@ -15039,9 +15009,9 @@ var _user$project$Rest$decodeIssue = A4(
 var _user$project$Rest$decodeEnvironments = _elm_lang$core$Json_Decode$list(_user$project$Rest$decodeEnvironment);
 var _user$project$Rest$date = function () {
 	var decodeDateFromString = function (s) {
-		var _p9 = _elm_lang$core$Date$fromString(s);
-		if (_p9.ctor === 'Ok') {
-			return _elm_lang$core$Json_Decode$succeed(_p9._0);
+		var _p1 = _elm_lang$core$Date$fromString(s);
+		if (_p1.ctor === 'Ok') {
+			return _elm_lang$core$Json_Decode$succeed(_p1._0);
 		} else {
 			return _elm_lang$core$Json_Decode$fail(
 				A2(_elm_lang$core$Basics_ops['++'], 'Invalid date: ', s));
@@ -15065,29 +15035,6 @@ var _user$project$Rest$decodeBug = A8(
 		_elm_lang$core$Json_Decode$field,
 		'issues',
 		_elm_lang$core$Json_Decode$list(_user$project$Rest$decodeIssue)));
-var _user$project$Rest$closeBug = function (bugId) {
-	return A3(
-		_elm_lang$http$Http$post,
-		_user$project$Rest$closeBugUrl(bugId),
-		_elm_lang$http$Http$emptyBody,
-		_user$project$Rest$decodeBug);
-};
-var _user$project$Rest$createIssue = F2(
-	function (bugId, url) {
-		return A3(
-			_elm_lang$http$Http$post,
-			A2(_user$project$Rest$createIssueUrl, bugId, url),
-			_elm_lang$http$Http$emptyBody,
-			_user$project$Rest$decodeBug);
-	});
-var _user$project$Rest$deleteIssue = F2(
-	function (bugId, issueId) {
-		return A3(
-			_elm_lang$http$Http$post,
-			A2(_user$project$Rest$deleteIssueUrl, bugId, issueId),
-			_elm_lang$http$Http$emptyBody,
-			_user$project$Rest$decodeBug);
-	});
 var _user$project$Rest$decodeOccurrence = A7(
 	_elm_lang$core$Json_Decode$map6,
 	_user$project$Types$Occurrence,
@@ -15097,14 +15044,58 @@ var _user$project$Rest$decodeOccurrence = A7(
 	A2(_elm_lang$core$Json_Decode$field, 'occurred_at', _user$project$Rest$date),
 	A2(_elm_lang$core$Json_Decode$field, 'data', _elm_lang$core$Json_Decode$value),
 	_user$project$Rest$stacktrace);
-var _user$project$Rest$detailsUrl = function (_p10) {
-	var _p11 = _p10;
-	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', _p11._0.toString);
+var _user$project$Rest$bugUrl = function (_p2) {
+	var _p3 = _p2;
+	return A2(_elm_lang$core$Basics_ops['++'], '/bugs/', _p3._0.toString);
 };
+var _user$project$Rest$closeBugUrl = function (bug) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_user$project$Rest$bugUrl(bug),
+		'/close');
+};
+var _user$project$Rest$closeBug = function (bugId) {
+	return A3(
+		_elm_lang$http$Http$post,
+		_user$project$Rest$closeBugUrl(bugId),
+		_elm_lang$http$Http$emptyBody,
+		_user$project$Rest$decodeBug);
+};
+var _user$project$Rest$createIssueUrl = F2(
+	function (bug, issueUrl) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			_user$project$Rest$bugUrl(bug),
+			A2(_elm_lang$core$Basics_ops['++'], '/create_issue?url=', issueUrl));
+	});
+var _user$project$Rest$createIssue = F2(
+	function (bugId, url) {
+		return A3(
+			_elm_lang$http$Http$post,
+			A2(_user$project$Rest$createIssueUrl, bugId, url),
+			_elm_lang$http$Http$emptyBody,
+			_user$project$Rest$decodeBug);
+	});
+var _user$project$Rest$deleteIssueUrl = F2(
+	function (bug, _p4) {
+		var _p5 = _p4;
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			_user$project$Rest$bugUrl(bug),
+			A2(_elm_lang$core$Basics_ops['++'], '/delete_issue?issue_id=', _p5._0.toString));
+	});
+var _user$project$Rest$deleteIssue = F2(
+	function (bugId, issueId) {
+		return A3(
+			_elm_lang$http$Http$post,
+			A2(_user$project$Rest$deleteIssueUrl, bugId, issueId),
+			_elm_lang$http$Http$emptyBody,
+			_user$project$Rest$decodeBug);
+	});
 var _user$project$Rest$loadBugDetails = function (bugId) {
 	return A2(
 		_elm_lang$http$Http$get,
-		_user$project$Rest$detailsUrl(bugId),
+		_user$project$Rest$bugUrl(bugId),
 		_user$project$Rest$decodeBug);
 };
 var _user$project$Rest$addParams = F2(
@@ -15120,26 +15111,26 @@ var _user$project$Rest$addParams = F2(
 					'&',
 					A2(
 						_elm_lang$core$List$map,
-						function (_p12) {
-							var _p13 = _p12;
+						function (_p6) {
+							var _p7 = _p6;
 							return A2(
 								_elm_lang$core$Basics_ops['++'],
-								_p13._0,
-								A2(_elm_lang$core$Basics_ops['++'], '=', _p13._1));
+								_p7._0,
+								A2(_elm_lang$core$Basics_ops['++'], '=', _p7._1));
 						},
 						params))));
 	});
-var _user$project$Rest$occurrenceIDToParam = function (_p14) {
-	var _p15 = _p14;
-	return _p15._0.toString;
+var _user$project$Rest$occurrenceIDToParam = function (_p8) {
+	var _p9 = _p8;
+	return _p9._0.toString;
 };
-var _user$project$Rest$envIDToParam = function (_p16) {
-	var _p17 = _p16;
-	return _p17._0;
+var _user$project$Rest$envIDToParam = function (_p10) {
+	var _p11 = _p10;
+	return _p11._0;
 };
-var _user$project$Rest$bugIDToParam = function (_p18) {
-	var _p19 = _p18;
-	return _p19._0.toString;
+var _user$project$Rest$bugIDToParam = function (_p12) {
+	var _p13 = _p12;
+	return _p13._0.toString;
 };
 var _user$project$Rest$environmentsUrl = '/environments';
 var _user$project$Rest$loadEnvironments = A2(_elm_lang$http$Http$get, _user$project$Rest$environmentsUrl, _user$project$Rest$decodeEnvironments);
@@ -15160,14 +15151,14 @@ var _user$project$Rest$pageParams = F3(
 				_1: {ctor: '[]'}
 			},
 			function () {
-				var _p20 = startFrom;
-				if (_p20.ctor === 'Just') {
+				var _p14 = startFrom;
+				if (_p14.ctor === 'Just') {
 					return {
 						ctor: '::',
 						_0: A2(
 							_user$project$Rest$Param,
 							'start',
-							idToString(_p20._0)),
+							idToString(_p14._0)),
 						_1: {ctor: '[]'}
 					};
 				} else {
@@ -15176,14 +15167,14 @@ var _user$project$Rest$pageParams = F3(
 			}());
 	});
 var _user$project$Rest$occurrencesUrl = F3(
-	function (_p21, limit, occurrenceID) {
-		var _p22 = _p21;
+	function (_p15, limit, occurrenceID) {
+		var _p16 = _p15;
 		return A2(
 			_user$project$Rest$addParams,
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				'/bugs/',
-				A2(_elm_lang$core$Basics_ops['++'], _p22._0.toString, '/occurrences')),
+				A2(_elm_lang$core$Basics_ops['++'], _p16._0.toString, '/occurrences')),
 			A3(_user$project$Rest$pageParams, _user$project$Rest$occurrenceIDToParam, limit, occurrenceID));
 	});
 var _user$project$Rest$loadOccurrences = F2(
