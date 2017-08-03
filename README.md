@@ -1,9 +1,27 @@
 # Pumpkin - a Squash alternative
 
-## Our to-do list
+## Introduction
 
-* *Closing bugs* - it should be possible to close bugs from the front end, and also toggle whether closed bugs are being displayed
-* *Create JIRAs* - it should be possible to easily create a JIRA for a bug, causing its URL to be linked to that bug
-* *Load additional paginated occurrences* - truncated occurrences from a single bug have a "show more" button, but you can't load the older occurrences
+[Squash](http://squash.io/) is a popular open source tool for
+exception reporting and bug analysis, and we've used it extensively at
+Powershop/Flux with some success.
 
+_Pumpkin_ is a similar and more minimal system we've built in-house to
+replace Squash in our workflow, with a few specific goals:
+
+- Simpler ingestion pipeline
+- See occurrences of the same bugs across multiple environments
+- Actively maintained
+- Very stable and scalable
+- Highly usable and adaptable
+
+## Getting up and running
+
+## Contributing
+
+## Copyright and license
+
+Pumpkin is copyright 2017 Flux Federation, and its use and
+modification is governed by an MIT-style license. See the file
+"LICENSE" for details.
 
