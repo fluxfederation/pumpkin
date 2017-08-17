@@ -54,7 +54,7 @@ apiAPP = serve (Proxy :: Proxy API) api
 app :: Application
 app req respond =
   if null (pathInfo req) -- Root page
-    then respond (responseFile status200 [] "index.html" Nothing)
+    then respond (responseFile status200 [] "app.html" Nothing)
     else static apiAPP req respond
 
 withAuth :: String -> Middleware
