@@ -27,7 +27,6 @@ library
                      , aeson
                      , bytestring
                      , ekg
-                     , ekg-core
                      , http-api-data
                      , http-types
                      , mtl
@@ -43,7 +42,6 @@ library
                      , uuid-types
                      , wai
                      , wai-extra
-                     , wai-middleware-auth
                      , wai-middleware-metrics
                      , wai-middleware-static
                      , warp
