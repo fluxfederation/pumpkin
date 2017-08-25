@@ -10,7 +10,7 @@ parseOpts :: [(String, String)] -> Parser Config
 parseOpts env =
   Config <$>
   strOption
-    (long "rootdir" <> showDefault <> value "../public" <> help "Web root dir") <*>
+    (long "rootdir" <> showDefault <> value "./public" <> help "Web root dir") <*>
   option
     auto
     (long "port" <> showDefault <> value 8080 <> help "Web server port") <*>
