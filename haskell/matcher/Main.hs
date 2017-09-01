@@ -2,8 +2,8 @@ module Main where
 
 import Matcher
 
-import Options.Applicative
 import Data.Semigroup ((<>))
+import Options.Applicative
 
 data Opts = Opts
   { interval :: Int
@@ -30,4 +30,6 @@ main = run =<< execParser opts
     opts =
       info
         (parseOpts <**> helper)
-        (fullDesc <> progDesc "Match new occurrences")
+        (fullDesc <> progDesc "Match new occurrences" <>
+         footer
+           "PostgreSQL connection is configured using the standard libpq environment variables, e.g. $PGHOST. Please refer to the PostgreSQL documentation for more information.")

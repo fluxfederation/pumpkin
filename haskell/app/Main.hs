@@ -33,4 +33,6 @@ main = do
     execParser
       (info
          (parseOpts env <**> helper)
-         (fullDesc <> progDesc "Serve the pumpkin API"))
+         (fullDesc <> progDesc "Serve the pumpkin API" <>
+          footer
+            "PostgreSQL connection is configured using the standard libpq environment variables, e.g. $PGHOST. Please refer to the PostgreSQL documentation for more information."))
