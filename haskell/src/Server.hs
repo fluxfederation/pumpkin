@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Server
   ( runServer
@@ -12,17 +13,20 @@ import Auth
 import JSON ()
 import Types
 
+import Data.FileEmbed (embedDir)
 import Data.Monoid ((<>))
 import qualified Data.Text as T
 import Network.HTTP.Types.Method
-import Network.HTTP.Types.Status
 import Network.URI (URI)
 import qualified Network.URI as URI
 import Network.Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai.Metrics
 import Network.Wai.Middleware.RequestLogger (logStdout)
-import Network.Wai.Middleware.Static (static)
+import Network.Wai.Middleware.Rewrite (rewritePureWithQueries)
+import qualified Network.Wai.Middleware.Static as Static
+import qualified Network.Wai.Middleware.StaticEmbedded
+       as StaticEmbed
 import Servant (Proxy(..))
 import Servant.API
 import Servant.Server
@@ -51,11 +55,17 @@ api =
 apiAPP :: Application
 apiAPP = serve (Proxy :: Proxy API) api
 
-app :: Application
-app req respond =
-  if null (pathInfo req) -- Root page
-    then respond (responseFile status200 [] "app.html" Nothing)
-    else static apiAPP req respond
+rootURL :: Middleware
+rootURL = rewritePureWithQueries rewriteRootToIndex
+  where
+    rewriteRootToIndex ([], q) _ = (["app.html"], q)
+    rewriteRootToIndex path _ = path
+
+staticFiles :: Maybe FilePath -> IO Middleware
+staticFiles Nothing = return $ StaticEmbed.static $(embedDir "../public")
+staticFiles (Just dir) = do
+  changeWorkingDirectory dir
+  return Static.static
 
 withAuth :: String -> Middleware
 withAuth secret protected req respond =
@@ -65,17 +75,19 @@ withAuth secret protected req respond =
        else pass
 
 data Config = Config
-  { rootDir :: FilePath
+  { authToken :: String
   , serverPort :: Int
   , ekgPort :: Int
-  , authToken :: String
+  , rootDir :: Maybe FilePath
   }
 
 runServer :: Config -> IO ()
 runServer config = do
-  changeWorkingDirectory (rootDir config)
   store <- serverMetricStore <$> forkServer "localhost" (ekgPort config)
   waiMetrics <- registerWaiMetrics store
+  static <- staticFiles (rootDir config)
   Warp.run
     (serverPort config)
-    (logStdout . metrics waiMetrics . withAuth (authToken config) $ app)
+    (logStdout .
+     metrics waiMetrics . withAuth (authToken config) . rootURL . static $
+     apiAPP)

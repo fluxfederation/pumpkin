@@ -10,16 +10,16 @@ parseOpts :: [(String, String)] -> Parser Config
 parseOpts env =
   Config <$>
   strOption
-    (long "rootdir" <> showDefault <> value "./public" <> help "Web root dir") <*>
+    (long "auth-token" <> envDefault "AUTH_TOKEN" <>
+     help "Auth token (default: $AUTH_TOKEN)") <*>
   option
     auto
     (long "port" <> showDefault <> value 8080 <> help "Web server port") <*>
   option
     auto
     (long "ekgport" <> showDefault <> value 8000 <> help "EKG front end port") <*>
-  strOption
-    (long "auth-token" <> envDefault "AUTH_TOKEN" <>
-     help "Auth token (default: $AUTH_TOKEN)")
+  optional
+    (option auto (long "rootdir" <> help "Web root dir (for development use)"))
   where
     envDefault name =
       case lookup name env of
