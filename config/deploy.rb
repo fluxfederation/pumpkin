@@ -7,7 +7,7 @@ set :pty, true
 set :shell, "/bin/bash"
 set :use_sudo, false
 set :scm, :git
-set :repo_url, 'git@git.powershop.co.nz:pumpkin/api.git'
+set :repo_url, 'git@github.com:fluxfederation/pumpkin.git'
 set :branch, ENV['BRANCH'] if ENV['BRANCH']
 set :bundle_without, [:development, :test, :deployment]
 set :passenger_restart_with_touch, true
