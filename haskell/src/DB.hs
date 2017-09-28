@@ -53,11 +53,14 @@ loadEnvironments :: DB [Environment]
 loadEnvironments =
   query_
     " SELECT id FROM \
-      \   (SELECT e.*, last_occurred_at FROM environments e \
-      \      JOIN (SELECT environment_id, MAX(occurred_at) AS last_occurred_at \
-      \            FROM occurrences GROUP BY environment_id) AS l \
-      \        ON l.environment_id = e.id \
-      \     ORDER BY last_occurred_at DESC) AS envs"
+    \   (SELECT e.*, \
+    \      ( \
+    \        SELECT occurrences.occurred_at AS last_occurred_at \
+    \        FROM occurrences WHERE occurrences.environment_id = e.id \
+    \        ORDER BY occurred_at DESC LIMIT 1 \
+    \      ) \
+    \    FROM environments AS e \
+    \    ORDER BY last_occurred_at DESC) AS envs"
 
 data BugSearch = BugSearch
   { bsEnvIDs :: [EnvironmentID]
