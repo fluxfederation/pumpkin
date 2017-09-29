@@ -4,6 +4,7 @@
   "attributes": {
     "id": { "type": "string" },
     "message": { "type": "string" },
+    "tags" : { "type": "array", "items": { "type": "string" } },
     "data": { "type": "object" },
     "environment": {
       "type": "object",
@@ -14,5 +15,5 @@
       "required": ["id", "name"]
     }
   },
-  "required": ["id", "message", "data", "environment_id"]
+  "required": ["id", "message", "tags, data", "environment_id"]
 }

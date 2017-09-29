@@ -5,7 +5,7 @@
     "attributes": {
       "$ref": "file://occurrences/_occurrence.json"
     },
-    "required": ["id", "message", "data", "environment_id"]
+    "required": ["id", "message", "tags", "data", "environment_id"]
   },
   "minItems": 1
 }

@@ -24,7 +24,7 @@ class OccurrencesController < ApplicationController
   private
 
   def occurrence_params
-    params.require(:occurrence).permit(:occurred_at, :message)
+    params.require(:occurrence).permit(:occurred_at, :message, :tags)
   end
 
   def authenticate!
