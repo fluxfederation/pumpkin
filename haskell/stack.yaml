@@ -66,19 +66,20 @@ extra-package-dbs: []
 # compiler-check: newer-minor
 
 # See https://docs.haskellstack.org/en/stable/docker_integration/#configuration
-# docker:
-#   enable: true
+docker:
+  enable: false
+  image: "fluxfederation/pumpkin-build"
 
 image:
   containers:
-  - name: "powershop/pumpkin"
-    base: "pumpkin-base"
+  - name: "fluxfederation/pumpkin"
+    base: "fluxfederation/pumpkin-base"
     entrypoints:
       - pumpkin-server
     executables:
       - pumpkin-server
-  - name: "powershop/pumpkin"
-    base: "pumpkin-base"
+  - name: "fluxfederation/pumpkin"
+    base: "fluxfederation/pumpkin-base"
     entrypoints:
       - pumpkin-matcher
     executables:

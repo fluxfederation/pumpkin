@@ -2,7 +2,7 @@ name:                pumpkin-server
 version:             0.1.0.0
 -- synopsis:
 -- description:
-homepage:            https://github.com/powershop/pumpkin
+homepage:            https://github.com/fluxfederation/pumpkin
 license:             MIT
 license-file:        LICENSE
 author:              Steve Purcell
@@ -70,4 +70,4 @@ executable pumpkin-matcher
 
 source-repository head
   type:     git
-  location: https://github.com/powershop/pumpkin
+  location: https://github.com/fluxfederation/pumpkin
