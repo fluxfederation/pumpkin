@@ -1,8 +1,8 @@
 all: docker
 
 docker:
-	docker build -f Dockerfile-base -t fluxfederation/pumpkin-base .
-	docker build -f Dockerfile-build -t fluxfederation/pumpkin-build .
+	docker build -t fluxfederation/pumpkin-base docker/base
+	docker build -t fluxfederation/pumpkin-build docker/build
 	stack build --docker
 	stack image --docker container
 

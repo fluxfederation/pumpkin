@@ -16,8 +16,8 @@ make docker
 and wait a little while.
 
 An example stack can then be started with docker compose using the
-provided `docker-compose.yml`. The web server will be exposed on
-`localhost`'s port 8080.
+provided `docker/docker-compose.yml`. The web server will be exposed
+on `localhost`'s port 8080.
 
 Note that the database must currently be set up manually, e.g. by
 loading `PROJECTROOT/db/structure.sql` into it: see the compose file
